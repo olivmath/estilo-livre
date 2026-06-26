@@ -7,13 +7,13 @@
 | 12  | Supino reto            |       |     |     |
 | 11  | Supino inclinado       |       |     |     |
 | 13  | Supino declinado       |       |     |     |
-|     | Crucifixo reto         | 4     | 12  | F1  |
+|     | Crucifixo reto         | 4     | 12  | E1  |
 |     | Crucifixo inclinado    |       |     |     |
 |     | Crucifixo declinado    |       |     |     |
-| 22  | Cross over             | 4     | 12  | F2  |
+| 22  | Cross over             | 4     | 12  | E2  |
 | 09  | Peck Deck              | 4     | 12  | A3  |
 | 14  | Supino máq. reto       | 4     | 12  | A2  |
-| 10  | Supino máq. inclinado  | 4     | 12  | A5  |
+| 10  | Supino máq. inclinado  | 4     | 12  | A1  |
 |     | Pull-over              |       |     |     |
 
 ---
@@ -22,9 +22,9 @@
 
 | N°  | Exercício           | Série | Rep | OBS |
 |-----|---------------------|-------|-----|-----|
-|     | Desenvolvimento     |       |     |     |
-| 18  | Desenv. máquina     | 4     | 12  | A4  |
-|     | Desenv. frontal     | 4     | 12  | E3  |
+|     | Desenvolvimento     | 4     | 12  | A4  |
+| 18  | Desenv. máquina     | 4     | 12  | E3  |
+|     | Desenv. frontal     |       |     |     |
 |     | Desenv. arnold      |       |     |     |
 |     | Elevação lateral    | 4     | 12  | A5  |
 |     | Elevação frontal    | 4     | 12  | A6  |
@@ -39,7 +39,7 @@
 | N°  | Exercício       | Série | Rep | OBS |
 |-----|-----------------|-------|-----|-----|
 | 22  | Pulley          | 4     | 12  | A7  |
-|     | Testa polia     | 4     | 12  | F4  |
+|     | Testa polia     | 4     | 12  | E4  |
 |     | Testa halter    |       |     |     |
 |     | Frânces         |       |     |     |
 |     | Banco           |       |     |     |
@@ -55,7 +55,7 @@
 | N°  | Exercício            | Série | Rep | OBS |
 |-----|----------------------|-------|-----|-----|
 | 20  | Puxada p/ trás       |       |     |     |
-|     | Puxada p/ frente     | 4     | 12  | B1  |
+| 20  | Puxada p/ frente     | 4     | 12  | B1  |
 |     | Puxador polia        |       |     |     |
 |     | Puxador              |       |     |     |
 | 19  | Remada articulada    | 4     | 12  | B3  |
@@ -77,12 +77,12 @@
 |     | Rosca alternada     |       |     |     |
 |     | Rosca scoot máq.    |       |     |     |
 |     | Rosca concentrada   |       |     |     |
-| 22  | Rosca polia baixa   | 4     | 12  | F7  |
+| 22  | Rosca polia baixa   | 4     | 12  | E7  |
 |     | Rosca martelo       | 4     | 12  | B5  |
 |     | Rosca 21            |       |     |     |
 | 23  | Rosca Scott         |       |     |     |
 |     | Rosca unilateral    |       |     |     |
-|     | 4R Banco Scott      | 4     | 12  | B6  |
+|     | Banco Scott         | 4     | 12  | B6  |
 
 ---
 
@@ -101,13 +101,13 @@
 | N°  | Exercício               | Série | Rep | OBS |
 |-----|-------------------------|-------|-----|-----|
 |     | Agachamentos            |       |     |     |
-|     | Agachamentos Hack       |       |     |     |
+| 15  | Agachamentos Hack       |       |     |     |
 | 16  | Agachamentos Smith      | 4     | 12  | E8  |
-|     | Leg press 45°           | 4     | 12  | C2  |
+| 17  | Leg press 45°           | 4     | 12  | C2  |
 | 01  | Leg press Horizontal    |       |     |     |
 |     | Avanço                  |       |     |     |
 | 04  | Extensor                | 4     | 12  | C1  |
-| 02  | Flexor Mesa             | 4     | 12  |     |
+| 02  | Flexor Mesa             | 4     | 12  | D2  |
 |     | Stiff                   | 4     | 12  | E9  |
 | 06  | Adutor                  | 4     | 12  | C3  |
 | 07  | Abdutor                 | 4     | 12  | D3  |
@@ -115,7 +115,6 @@
 |     | Flexão Quadril          |       |     |     |
 |     | Leg 180° Smith          |       |     |     |
 
-> **Cadeira Isométrica**: 3x 1min
 
 ---
 
@@ -127,10 +126,10 @@
 |     | 4 Apoio Flexionado     |       |     |     |
 |     | 4 Apoio Estendido      |       |     |     |
 |     | 4 Apoio Cruzado        |       |     |     |
-|     | Elevação Pélvica       |       |     |     |
-| 03  | Glúteo Máq. Artic.     | 4     | 12  | D5  |
-|     | Afundo                 |       |     |     |
-|     | Afundo com Step        | 4     | 12  | D4  |
+|     | Elevação Pélvica       | 4     | 12  | D5  |
+| 03  | Glúteo Máq. Artic.     |       |     |     |
+|     | Afundo                 | 4     | 12  | D4  |
+|     | Afundo com Step        |       |     |     |
 |     | Afundo caneleira       |       |     |     |
 | 22  | Polia Flexionado       |       |     |     |
 |     | Glúteo                 |       |     |     |
