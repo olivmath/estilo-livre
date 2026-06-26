@@ -5,57 +5,110 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>FitTrack — Estilo Livre</title>
 <style>
-:root{--bg:#06091a;--acc:#F5C400;--blue:#1B3487;--t:#fff;--t2:#8899bb;--bg2:#0b1228;--bg3:#162040;--r:12px;}
+:root{--bg:#06091a;--bg2:#0b1228;--bg3:#162040;--acc:#F5C400;--blue:#1B3487;--t:#fff;--t2:#8899bb;--red:#f44336;--r:12px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow-x:hidden}
-body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-.wrap{text-align:center;width:100%;max-width:360px}
-.logo{width:80px;height:80px;border-radius:50%;background:var(--blue);overflow:hidden;margin:0 auto 16px;box-shadow:0 0 32px #1B348744}
+html,body{min-height:100vh;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.wrap{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center}
+.logo{width:90px;height:90px;border-radius:50%;background:var(--blue);overflow:hidden;margin-bottom:20px;box-shadow:0 0 40px #1B348766}
 .logo img{width:100%;height:100%;object-fit:cover}
-.academy{font-size:11px;color:var(--acc);font-weight:700;letter-spacing:3px;margin-bottom:4px}
-.brand-title{font-size:28px;font-weight:800;color:var(--t);margin-bottom:4px}
-.subtitle{font-size:13px;color:var(--t2);margin-bottom:40px}
-.cards{display:flex;flex-direction:column;gap:12px}
-.card{background:var(--bg2);border-radius:var(--r);padding:20px 24px;display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--t);border:1px solid var(--bg3);transition:border-color .15s,transform .1s;cursor:pointer}
-.card:hover,.card:active{border-color:var(--acc);transform:scale(0.99)}
-.card-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.card-info .card-title{font-size:17px;font-weight:700}
-.card-info .card-sub{font-size:13px;color:var(--t2);margin-top:2px}
-.arrow{margin-left:auto;color:var(--t2);font-size:18px}
+.academy{font-size:11px;color:var(--acc);font-weight:700;letter-spacing:3px;margin-bottom:6px}
+.brand{font-size:32px;font-weight:800;margin-bottom:6px}
+.sub{font-size:14px;color:var(--t2);margin-bottom:32px}
+.tabs{display:flex;background:var(--bg2);border-radius:10px;padding:4px;gap:4px;margin-bottom:28px;width:100%}
+.tab{flex:1;padding:10px;border:none;border-radius:8px;background:none;color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.tab.active{background:var(--acc);color:#06091a}
+.form{width:100%}
+.ig{margin-bottom:16px}
+.lbl{display:block;font-size:13px;color:var(--t2);margin-bottom:8px}
+input{width:100%;background:var(--bg2);border:1px solid var(--bg3);border-radius:14px;color:var(--t);padding:16px 18px;font-size:16px;outline:none}
+input:focus{border-color:var(--acc)}
+.btn{width:100%;background:var(--acc);color:#06091a;border:none;border-radius:14px;padding:17px;font-size:17px;font-weight:700;cursor:pointer;margin-top:6px;transition:opacity .15s}
+.btn:active{opacity:.85}
+.toggle{text-align:center;margin-top:22px;font-size:15px;color:var(--t2)}
+.toggle span{color:var(--acc);font-weight:600;cursor:pointer}
+.err{color:var(--red);font-size:13px;text-align:center;margin-top:12px;display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="logo"><img src="../logo.jpeg" alt="Estilo Livre"></div>
+  <div class="logo"><img src="../docs/logo.jpeg" alt="Estilo Livre"></div>
   <div class="academy">ACADEMIA</div>
-  <div class="brand-title">Estilo Livre</div>
-  <div class="subtitle">Selecione o seu perfil de acesso</div>
-  <div class="cards">
-    <a class="card" href="user/index.html">
-      <div class="card-icon" style="background:#1B3487">🏋️</div>
-      <div class="card-info">
-        <div class="card-title">Sou Aluno</div>
-        <div class="card-sub">Registrar e acompanhar meus treinos</div>
-      </div>
-      <div class="arrow">›</div>
-    </a>
-    <a class="card" href="prof/index.html">
-      <div class="card-icon" style="background:#9C27B0">👨‍🏫</div>
-      <div class="card-info">
-        <div class="card-title">Sou Professor</div>
-        <div class="card-sub">Gerenciar alunos e fichas de treino</div>
-      </div>
-      <div class="arrow">›</div>
-    </a>
-    <a class="card" href="admin/index.html">
-      <div class="card-icon" style="background:#F5C400">⚙️</div>
-      <div class="card-info">
-        <div class="card-title" style="color:#06091a">Sou Admin</div>
-        <div class="card-sub" style="color:#06091a99">Painel completo de administração</div>
-      </div>
-      <div class="arrow" style="color:#06091a88">›</div>
-    </a>
+  <div class="brand">Estilo Livre</div>
+  <div class="sub">Seu treino, sua progressão.</div>
+  <div class="tabs">
+    <button class="tab active" onclick="setRole('aluno',this)">Aluno</button>
+    <button class="tab" onclick="setRole('prof',this)">Professor</button>
+    <button class="tab" onclick="setRole('admin',this)">Admin</button>
+  </div>
+  <div class="form">
+    <div id="reg-fields" style="display:none">
+      <div class="ig"><label class="lbl">Nome</label><input id="reg-name" type="text" placeholder="Seu nome"></div>
+    </div>
+    <div class="ig"><label class="lbl">Email</label><input id="auth-email" type="email" placeholder="email@exemplo.com" autocomplete="username"></div>
+    <div class="ig"><label class="lbl">Senha</label><input id="auth-pw" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn" id="auth-btn" onclick="doLogin()">Entrar</button>
+    <div class="err" id="login-err"></div>
+  </div>
+  <div class="toggle" id="toggle-area">
+    <span id="toggle-pre">Não tem conta? </span><span id="toggle-link" onclick="toggleReg()">Criar conta</span>
   </div>
 </div>
+<script>
+const DB={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
+let role='aluno',isReg=false;
+
+(()=>{
+  const cu=DB.get('cu',null);if(cu?.email){location.href='user/index.html';return;}
+  const ca=DB.get('ca',null);if(ca?.email){location.href=ca.role==='professor'?'prof/index.html':'admin/index.html';}
+})();
+
+function setRole(r,btn){
+  role=r;isReg=false;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('reg-fields').style.display='none';
+  document.getElementById('auth-btn').textContent='Entrar';
+  document.getElementById('toggle-area').style.display=r==='aluno'?'block':'none';
+  document.getElementById('login-err').style.display='none';
+}
+function toggleReg(){
+  isReg=!isReg;
+  document.getElementById('reg-fields').style.display=isReg?'block':'none';
+  document.getElementById('auth-btn').textContent=isReg?'Criar conta':'Entrar';
+  document.getElementById('toggle-link').textContent=isReg?'Entrar':'Criar conta';
+  document.getElementById('toggle-pre').textContent=isReg?'Já tem conta? ':'Não tem conta? ';
+}
+function doLogin(){
+  const email=document.getElementById('auth-email').value.trim().toLowerCase();
+  const pw=document.getElementById('auth-pw').value;
+  const err=document.getElementById('login-err');
+  err.style.display='none';
+  if(!email||!pw){err.textContent='Preencha todos os campos.';err.style.display='block';return;}
+  if(role==='aluno'){
+    const users=DB.get('users',{});
+    if(isReg){
+      if(users[email]){err.textContent='Email já cadastrado.';err.style.display='block';return;}
+      const name=document.getElementById('reg-name').value.trim()||'Atleta';
+      users[email]={name,email,pw,active:true};DB.set('users',users);
+      DB.set('cu',users[email]);location.href='user/index.html';
+    }else{
+      const u=users[email];
+      if(!u||u.pw!==pw){err.textContent='Email ou senha incorretos.';err.style.display='block';return;}
+      if(u.active===false){err.textContent='Acesso bloqueado. Fale com o professor.';err.style.display='block';return;}
+      DB.set('cu',u);location.href='user/index.html';
+    }
+  }else{
+    let admins=DB.get('admins',null);
+    if(!admins){admins={'admin@estilo.com':{name:'Administrador',email:'admin@estilo.com',pw:'admin2024',role:'admin'}};DB.set('admins',admins);}
+    const a=admins[email];
+    if(!a||a.pw!==pw){err.textContent='Email ou senha incorretos.';err.style.display='block';return;}
+    const expected=role==='prof'?'professor':'admin';
+    if(a.role&&a.role!==expected){err.textContent='Perfil não autorizado para este acesso.';err.style.display='block';return;}
+    DB.set('ca',a);location.href=role==='prof'?'prof/index.html':'admin/index.html';
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
 </body>
 </html>

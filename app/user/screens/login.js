@@ -1,7 +1,7 @@
 document.body.insertAdjacentHTML('beforeend', `
 <!-- LOGIN -->
 <div id="s-login" class="screen">
-  <div style="width:80px;height:80px;border-radius:50%;background:var(--blue);overflow:hidden;margin-bottom:16px;box-shadow:0 0 32px #1B348744"><img src="../../logo.jpeg" alt="Estilo Livre" style="width:100%;height:100%;object-fit:cover"></div>
+  <div style="width:80px;height:80px;border-radius:50%;background:var(--blue);overflow:hidden;margin-bottom:16px;box-shadow:0 0 32px #1B348744"><img src="../../docs/logo.jpeg" alt="Estilo Livre" style="width:100%;height:100%;object-fit:cover"></div>
   <div style="font-size:11px;color:var(--acc);font-weight:700;letter-spacing:3px;margin-bottom:4px">ACADEMIA</div>
   <div style="font-size:26px;font-weight:800;color:var(--t);margin-bottom:4px">Estilo Livre</div>
   <div style="font-size:13px;color:var(--t2);margin-bottom:36px">Seu treino, sua progressão.</div>
