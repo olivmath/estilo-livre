@@ -14,10 +14,7 @@ body{display:flex;align-items:center;justify-content:center;padding:40px 24px}
 .logo img{width:100%;height:100%;object-fit:cover}
 .academy{font-size:11px;color:var(--acc);font-weight:700;letter-spacing:3px;margin-bottom:6px}
 .brand{font-size:32px;font-weight:800;margin-bottom:6px}
-.sub{font-size:14px;color:var(--t2);margin-bottom:32px}
-.tabs{display:flex;background:var(--bg2);border-radius:10px;padding:4px;gap:4px;margin-bottom:28px;width:100%}
-.tab{flex:1;padding:10px;border:none;border-radius:8px;background:none;color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
-.tab.active{background:var(--acc);color:#06091a}
+.sub{font-size:14px;color:var(--t2);margin-bottom:36px}
 .form{width:100%}
 .ig{margin-bottom:16px}
 .lbl{display:block;font-size:13px;color:var(--t2);margin-bottom:8px}
@@ -25,9 +22,7 @@ input{width:100%;background:var(--bg2);border:1px solid var(--bg3);border-radius
 input:focus{border-color:var(--acc)}
 .btn{width:100%;background:var(--acc);color:#06091a;border:none;border-radius:14px;padding:17px;font-size:17px;font-weight:700;cursor:pointer;margin-top:6px;transition:opacity .15s}
 .btn:active{opacity:.85}
-.toggle{text-align:center;margin-top:22px;font-size:15px;color:var(--t2)}
-.toggle span{color:var(--acc);font-weight:600;cursor:pointer}
-.err{color:var(--red);font-size:13px;text-align:center;margin-top:12px;display:none}
+.err{color:var(--red);font-size:13px;text-align:center;margin-top:14px;display:none}
 </style>
 </head>
 <body>
@@ -36,77 +31,43 @@ input:focus{border-color:var(--acc)}
   <div class="academy">ACADEMIA</div>
   <div class="brand">Estilo Livre</div>
   <div class="sub">Seu treino, sua progressão.</div>
-  <div class="tabs">
-    <button class="tab active" onclick="setRole('aluno',this)">Aluno</button>
-    <button class="tab" onclick="setRole('prof',this)">Professor</button>
-    <button class="tab" onclick="setRole('admin',this)">Admin</button>
-  </div>
   <div class="form">
-    <div id="reg-fields" style="display:none">
-      <div class="ig"><label class="lbl">Nome</label><input id="reg-name" type="text" placeholder="Seu nome"></div>
-    </div>
     <div class="ig"><label class="lbl">Email</label><input id="auth-email" type="email" placeholder="email@exemplo.com" autocomplete="username"></div>
     <div class="ig"><label class="lbl">Senha</label><input id="auth-pw" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-    <button class="btn" id="auth-btn" onclick="doLogin()">Entrar</button>
+    <button class="btn" onclick="doLogin()">Entrar</button>
     <div class="err" id="login-err"></div>
-  </div>
-  <div class="toggle" id="toggle-area">
-    <span id="toggle-pre">Não tem conta? </span><span id="toggle-link" onclick="toggleReg()">Criar conta</span>
   </div>
 </div>
 <script>
 const DB={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
-let role='aluno',isReg=false;
 
 (()=>{
   const cu=DB.get('cu',null);if(cu?.email){location.href='user/index.html';return;}
   const ca=DB.get('ca',null);if(ca?.email){location.href=ca.role==='professor'?'prof/index.html':'admin/index.html';}
 })();
 
-function setRole(r,btn){
-  role=r;isReg=false;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('reg-fields').style.display='none';
-  document.getElementById('auth-btn').textContent='Entrar';
-  document.getElementById('toggle-area').style.display=r==='aluno'?'block':'none';
-  document.getElementById('login-err').style.display='none';
-}
-function toggleReg(){
-  isReg=!isReg;
-  document.getElementById('reg-fields').style.display=isReg?'block':'none';
-  document.getElementById('auth-btn').textContent=isReg?'Criar conta':'Entrar';
-  document.getElementById('toggle-link').textContent=isReg?'Entrar':'Criar conta';
-  document.getElementById('toggle-pre').textContent=isReg?'Já tem conta? ':'Não tem conta? ';
-}
 function doLogin(){
   const email=document.getElementById('auth-email').value.trim().toLowerCase();
   const pw=document.getElementById('auth-pw').value;
   const err=document.getElementById('login-err');
   err.style.display='none';
   if(!email||!pw){err.textContent='Preencha todos os campos.';err.style.display='block';return;}
-  if(role==='aluno'){
-    const users=DB.get('users',{});
-    if(isReg){
-      if(users[email]){err.textContent='Email já cadastrado.';err.style.display='block';return;}
-      const name=document.getElementById('reg-name').value.trim()||'Atleta';
-      users[email]={name,email,pw,active:true};DB.set('users',users);
-      DB.set('cu',users[email]);location.href='user/index.html';
-    }else{
-      const u=users[email];
-      if(!u||u.pw!==pw){err.textContent='Email ou senha incorretos.';err.style.display='block';return;}
-      if(u.active===false){err.textContent='Acesso bloqueado. Fale com o professor.';err.style.display='block';return;}
-      DB.set('cu',u);location.href='user/index.html';
-    }
-  }else{
-    let admins=DB.get('admins',null);
-    if(!admins){admins={'admin@estilo.com':{name:'Administrador',email:'admin@estilo.com',pw:'admin2024',role:'admin'}};DB.set('admins',admins);}
-    const a=admins[email];
-    if(!a||a.pw!==pw){err.textContent='Email ou senha incorretos.';err.style.display='block';return;}
-    const expected=role==='prof'?'professor':'admin';
-    if(a.role&&a.role!==expected){err.textContent='Perfil não autorizado para este acesso.';err.style.display='block';return;}
-    DB.set('ca',a);location.href=role==='prof'?'prof/index.html':'admin/index.html';
+
+  const users=DB.get('users',{});
+  const u=users[email];
+  if(u&&u.pw===pw){
+    if(u.active===false){err.textContent='Acesso bloqueado. Fale com o professor.';err.style.display='block';return;}
+    DB.set('cu',u);location.href='user/index.html';return;
   }
+
+  let admins=DB.get('admins',null);
+  if(!admins){admins={'admin@estilo.com':{name:'Administrador',email:'admin@estilo.com',pw:'admin2024',role:'admin'}};DB.set('admins',admins);}
+  const a=admins[email];
+  if(a&&a.pw===pw){
+    DB.set('ca',a);location.href=a.role==='professor'?'prof/index.html':'admin/index.html';return;
+  }
+
+  err.textContent='Email ou senha incorretos.';err.style.display='block';
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 </script>
