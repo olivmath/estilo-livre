@@ -7,6 +7,9 @@ document.body.insertAdjacentHTML('beforeend', `
   <button class="nb" data-s="workouts" onclick="nav('workouts',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>Treinos
   </button>
+  <button class="nb" data-s="history" onclick="nav('history',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>Histórico
+  </button>
   <button class="nb" data-s="profile" onclick="nav('profile',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Perfil
   </button>

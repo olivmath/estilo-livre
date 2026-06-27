@@ -16,8 +16,6 @@ document.body.insertAdjacentHTML('beforeend', `
     <div style="font-size:12px;color:var(--t2);margin-top:8px;text-align:center" id="d-cycle-lbl">—</div>
   </div>
   <div id="d-trend"></div>
-  <div class="sh"><span class="sh-t">Histórico</span></div>
-  <div id="d-recent"></div>
   <div id="d-sugs"></div>
 </div>
 `);
