@@ -17,7 +17,6 @@ document.body.insertAdjacentHTML('beforeend', `
     <div class="stat"><div class="sv" id="p-total">0</div><div class="sl">Treinos</div></div>
     <div class="stat"><div class="sv" id="p-cycles">0</div><div class="sl">Ciclos</div></div>
   </div>
-  <div class="card"><div class="ct">Histórico</div><div id="p-hist"></div></div>
   <div style="padding:16px"><button class="btn bs" style="color:var(--red)" onclick="if(confirm('Apagar tudo?'))clearAll()">Apagar dados</button></div>
 </div>
 `);

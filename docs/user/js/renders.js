@@ -182,18 +182,6 @@ function renderProfile(){
   const photo=DB.get(`photo_${U.email}`,null);
   const pav=document.getElementById('p-avatar');
   pav.innerHTML=photo?`<img src="${photo}" style="width:100%;height:100%;object-fit:cover">`:`<span>${U.name[0].toUpperCase()}</span>`;
-  const rows=[...sess].sort((a,b)=>b.date-a.date).slice(0,30);
-  document.getElementById('p-hist').innerHTML=rows.length?rows.map(s=>{
-    const w=wks.find(x=>x.id===s.wkId); const color=s.wkColor||w?.color||'var(--acc)';
-    const d=new Date(s.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});
-    return`<div class="sess-row" onclick="openSessById('${s.id}')">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></div>
-        <span>Treino ${s.wkLabel||w?.label||'?'} — ${s.wkName||w?.name||''}</span>
-      </div>
-      <div style="text-align:right;font-size:12px;color:var(--t2)">${d}<br>${Math.floor(s.dur/60)}min</div>
-    </div>`;
-  }).join(''):`<div style="font-size:13px;color:var(--t2)">Sem histórico.</div>`;
 }
 
 // ── PHOTO UPLOAD ─────────────────────────────────────────────
