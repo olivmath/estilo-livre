@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /users/{uid} {
+      // User reads only their own doc
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      // First login: client creates own doc, role MUST be "aluno"
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.role == "aluno"
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.keys().hasOnly(["email","name","photoURL","role","createdAt"]);
+
+      // No client updates — role changes go through Firebase Console / Admin SDK
+      allow update, delete: if false;
+    }
+  }
+}
