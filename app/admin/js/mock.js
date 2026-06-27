@@ -73,6 +73,7 @@ function ensureMockData() {
     {name:'Igor Santos',     email:'igor@estilo.com',  freq:3,  days:90,base:1.3, stop:32},
     {name:'Juliana Pires',   email:'ju@estilo.com',    freq:2.5,days:50,base:0.8, stop:0 },
     {name:'Rafael Andrade',  email:'rafael@estilo.com',freq:3.5,days:85,base:1.5, stop:0 },
+    {name:'Lucas Oliveira',  email:'lucas@estilo.com', freq:4,  days:0,  base:1.0, stop:0 },
   ];
   const WKS=[
     {label:'A',name:'Treino Completo',color:'#1B3487',exs:[
@@ -106,6 +107,38 @@ function ensureMockData() {
     }
     DB.set(`sess_${u.email}`,sessions);
   });
+  // Ficha real do Lucas (A/B/C/D/E da ficha-treino.md)
+  const mkL=(num,mac,name,sets,reps)=>({id:uid(),num,mac,name,sets,reps,wt:0,obs:''});
+  DB.set('wk_lucas@estilo.com',[
+    {id:uid(),label:'A',name:'Peitoral / Ombro / Tríceps',color:'#1B3487',exercises:[
+      mkL('A1','10','Supino Máq. Inclinado',4,12),mkL('A2','14','Supino Máq. Reto',4,12),
+      mkL('A3','09','Peck Deck',4,12),mkL('A4','','Desenvolvimento',4,12),
+      mkL('A5','','Elevação Lateral',4,12),mkL('A6','','Elevação Frontal',4,12),
+      mkL('A7','22','Pulley Tríceps',4,12),mkL('A8','22','Corda Tríceps',4,12),
+      mkL('A9','','Supinado',4,12),
+    ]},
+    {id:uid(),label:'B',name:'Costas / Bíceps',color:'#9C27B0',exercises:[
+      mkL('B1','20','Puxada p/ Frente',4,12),mkL('B2','21','Remada Baixa',4,12),
+      mkL('B3','19','Remada Articulada',4,12),mkL('B4','','Rosca Direta W',4,12),
+      mkL('B5','','Rosca Martelo',4,12),mkL('B6','','Banco Scott',4,12),
+    ]},
+    {id:uid(),label:'C',name:'Coxa / Glúteo I',color:'#4CAF50',exercises:[
+      mkL('C1','04','Extensor',4,12),mkL('C2','17','Leg Press 45°',4,12),
+      mkL('C3','06','Adutor',4,12),
+    ]},
+    {id:uid(),label:'D',name:'Coxa / Glúteo II',color:'#FF9800',exercises:[
+      mkL('D1','','Cadeira Flexora',4,12),mkL('D2','02','Flexor Mesa',4,12),
+      mkL('D3','07','Abdutor',4,12),mkL('D4','','Afundo',4,12),
+      mkL('D5','','Elevação Pélvica',4,12),mkL('D6','','Panturrilha Solo',4,15),
+    ]},
+    {id:uid(),label:'E',name:'Variados',color:'#00BCD4',exercises:[
+      mkL('E1','','Crucifixo Reto',4,12),mkL('E2','22','Cross Over',4,12),
+      mkL('E3','18','Desenv. Máquina',4,12),mkL('E4','','Testa Polia',4,12),
+      mkL('E5','09','Peck Deck Invertido',4,12),mkL('E6','','Crucifixo Inverso',4,12),
+      mkL('E7','22','Rosca Polia Baixa',4,12),mkL('E8','16','Agachamento Smith',4,12),
+      mkL('E9','','Stiff',4,12),
+    ]},
+  ]);
   // Seed exercise library
   if (!DB.get('exercises', null)) {
     const exercises = [];
