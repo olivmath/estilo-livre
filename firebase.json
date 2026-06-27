@@ -11,11 +11,10 @@
     }
   ],
   "hosting": {
-    "public": "app",
+    "public": "v0.2/dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
-      { "source": "/", "destination": "/login/index.html" },
-      { "source": "/login", "destination": "/login/index.html" }
+      { "source": "**", "destination": "/index.html" }
     ],
     "headers": [
       {
