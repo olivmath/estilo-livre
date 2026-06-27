@@ -83,7 +83,7 @@ function ensureMockData() {
     ]},
   ];
   const newUsers={};
-  MOCK.forEach(u=>{newUsers[u.email]={name:u.name,email:u.email,pw:'123',active:true};});
+  MOCK.forEach(u=>{newUsers[u.email]={name:u.name,email:u.email,pw:'123456',active:true};});
   DB.set('users',newUsers);
   MOCK.forEach(u=>{
     const wks=WKS.map(t=>({
