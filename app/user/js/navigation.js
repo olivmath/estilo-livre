@@ -6,5 +6,6 @@ function nav(sid,btn){
   if(btn)btn.classList.add('active');
   if(sid==='home')renderHome();
   if(sid==='workouts')renderWorkouts();
+  if(sid==='history')renderHistory();
   if(sid==='profile')renderProfile();
 }

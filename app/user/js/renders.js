@@ -80,26 +80,6 @@ function renderHome(){
   document.getElementById('d-pbar').style.cssText=`width:${pct}%;background:var(--acc)`;
   document.getElementById('d-cycle-lbl').textContent=pct===100?'🎉 Ciclo completo!':pct?`${Math.round(pct)}% concluído`:'Inicie o ciclo!';
 
-  const recent=[...sess].sort((a,b)=>b.date-a.date).slice(0,5);
-  document.getElementById('d-recent').innerHTML=recent.length?recent.map(s=>{
-    const w=wks.find(x=>x.id===s.wkId); const color=s.wkColor||w?.color||'var(--acc)';
-    const d=new Date(s.date).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
-    const avg=s.exs?.length?(s.exs.reduce((a,r)=>a+r.diff,0)/s.exs.length).toFixed(1):'—';
-    const dc=diffColor(parseFloat(avg));
-    return`<div class="card" style="cursor:pointer;border-left:3px solid ${color}" onclick="openSessById('${s.id}')">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-weight:600">Treino ${s.wkLabel||w?.label||'?'} — ${s.wkName||w?.name||''}</div>
-          <div style="font-size:12px;color:var(--t2);margin-top:2px">${d} · ${Math.floor(s.dur/60)}min</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:20px;font-weight:700;color:${dc}">${avg}</div>
-          <div style="font-size:11px;color:var(--t3)">dif. média</div>
-        </div>
-      </div>
-    </div>`;
-  }).join(''):`<div class="empty">Nenhum treino ainda.<br>Toque em Play para começar!</div>`;
-
   // Trend chart
   const allSess=[...sess].sort((a,b)=>a.date-b.date).slice(-12);
   document.getElementById('d-trend').innerHTML=allSess.length>=2?`
@@ -164,6 +144,31 @@ function renderExercises(){
       </div>
     </div>`;
   }).join(''):`<div class="empty">Nenhum exercício cadastrado pelo professor.</div>`;
+}
+
+// ── RENDER HISTORY ────────────────────────────────────────────
+function renderHistory(){
+  if(!U)return;
+  const wks=getWks(),sess=getSess();
+  const rows=[...sess].sort((a,b)=>b.date-a.date);
+  document.getElementById('h-list').innerHTML=rows.length?rows.map(s=>{
+    const w=wks.find(x=>x.id===s.wkId); const color=s.wkColor||w?.color||'var(--acc)';
+    const d=new Date(s.date).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
+    const avg=s.exs?.length?(s.exs.reduce((a,r)=>a+r.diff,0)/s.exs.length).toFixed(1):'—';
+    const dc=diffColor(parseFloat(avg));
+    return`<div class="card" style="cursor:pointer;border-left:3px solid ${color}" onclick="openSessById('${s.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:600">Treino ${s.wkLabel||w?.label||'?'} — ${s.wkName||w?.name||''}</div>
+          <div style="font-size:12px;color:var(--t2);margin-top:2px">${d} · ${Math.floor(s.dur/60)}min</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:700;color:${dc}">${avg}</div>
+          <div style="font-size:11px;color:var(--t3)">dif. média</div>
+        </div>
+      </div>
+    </div>`;
+  }).join(''):`<div class="empty">Nenhum treino ainda.<br>Toque em Play para começar!</div>`;
 }
 
 // ── RENDER PROFILE ────────────────────────────────────────────
