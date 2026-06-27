@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-route
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginScreen } from "@/screens/LoginScreen";
 import { PendingScreen } from "@/screens/PendingScreen";
-import { StudentPlaceholder } from "@/screens/StudentPlaceholder";
+import { StudentApp } from "@/screens/StudentApp";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { AlunosPage } from "@/pages/AlunosPage";
@@ -61,7 +61,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<RoleGate />} />
         <Route path="/pending" element={<PendingScreen />} />
-        <Route path="/student" element={<StudentPlaceholder />} />
+        <Route path="/student" element={<StudentApp />} />
 
         <Route
           path="/prof/*"
