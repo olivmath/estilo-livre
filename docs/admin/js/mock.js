@@ -75,20 +75,10 @@ function ensureMockData() {
     {name:'Rafael Andrade',  email:'rafael@estilo.com',freq:3.5,days:85,base:1.5, stop:0 },
   ];
   const WKS=[
-    {label:'A',name:'Peitoral / Tríceps',color:'#1B3487',exs:[
-      {mac:'12',name:'Supino Reto',sets:4,reps:12,wt:40},{mac:'10',name:'Supino Máq. Inclinado',sets:4,reps:12,wt:35},
-      {mac:'09',name:'Peck Deck',sets:4,reps:12,wt:30},{mac:'22',name:'Pulley Tríceps',sets:4,reps:12,wt:25},
-      {mac:'',name:'Frânces',sets:4,reps:12,wt:15},
-    ]},
-    {label:'B',name:'Costas / Bíceps',color:'#9C27B0',exs:[
-      {mac:'20',name:'Puxada p/ Frente',sets:4,reps:12,wt:40},{mac:'21',name:'Remada Baixa',sets:4,reps:12,wt:50},
-      {mac:'19',name:'Remada Articulada',sets:4,reps:12,wt:40},{mac:'',name:'Rosca Direta W',sets:4,reps:12,wt:20},
-      {mac:'',name:'Rosca Martelo',sets:4,reps:12,wt:15},
-    ]},
-    {label:'C',name:'Pernas / Glúteos',color:'#4CAF50',exs:[
-      {mac:'17',name:'Leg Press 45°',sets:4,reps:12,wt:100},{mac:'04',name:'Extensor',sets:4,reps:12,wt:50},
-      {mac:'02',name:'Flexor Mesa',sets:4,reps:12,wt:40},{mac:'06',name:'Adutor',sets:4,reps:12,wt:45},
-      {mac:'',name:'Elevação Pélvica',sets:4,reps:12,wt:40},
+    {label:'A',name:'Treino Completo',color:'#1B3487',exs:[
+      {mac:'12',name:'Supino Reto',sets:4,reps:12,wt:40},{mac:'20',name:'Puxada p/ Frente',sets:4,reps:12,wt:40},
+      {mac:'17',name:'Leg Press 45°',sets:4,reps:12,wt:100},{mac:'22',name:'Pulley Tríceps',sets:4,reps:12,wt:25},
+      {mac:'',name:'Rosca Direta W',sets:4,reps:12,wt:20},
     ]},
   ];
   const newUsers={};

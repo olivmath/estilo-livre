@@ -6,32 +6,7 @@ const getSess=()=>DB.get(k('sess'),[]);
 const setSess=v=>DB.set(k('sess'),v);
 
 function syncFromTemplates(){
-  const templates=DB.get('wk_templates',[]);
-  if(!templates.length)return;
-  const userWks=getWks();
-  const synced=templates.map(tmpl=>{
-    const existing=userWks.find(w=>w.id===tmpl.id);
-    return{
-      id:tmpl.id,
-      label:tmpl.label,
-      name:tmpl.name,
-      color:tmpl.color,
-      exercises:tmpl.exercises.map(ex=>{
-        const existingEx=existing?.exercises?.find(e=>e.name===ex.name);
-        return{
-          id:ex.exId||uid(),
-          num:ex.num,
-          mac:ex.mac||'',
-          name:ex.name,
-          sets:ex.sets,
-          reps:ex.reps,
-          wt:existingEx?.wt??0,
-          obs:''
-        };
-      })
-    };
-  });
-  setWks(synced);
+  if(getWks().length>0)return;
 }
 
 // ── CYCLE ─────────────────────────────────────────────────────
