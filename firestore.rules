@@ -3,24 +3,68 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Deny everything by default
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuth() && role() == 'admin';
+    }
+
+    function isProf() {
+      return isAuth() && role() == 'professor';
+    }
+
+    function isAdminOrProf() {
+      return isAdmin() || isProf();
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
 
     match /users/{uid} {
-      // User reads only their own doc
-      allow read: if request.auth != null && request.auth.uid == uid;
+      allow read: if isAdminOrProf() || isOwner(uid);
 
-      // First login: client creates own doc, role MUST be "aluno"
-      allow create: if request.auth != null
-        && request.auth.uid == uid
-        && request.resource.data.role == "aluno"
-        && request.resource.data.email == request.auth.token.email
-        && request.resource.data.keys().hasOnly(["email","name","photoURL","role","createdAt"]);
+      allow create: if isAdmin()
+        || (isProf()
+          && request.resource.data.role == 'aluno'
+          && request.resource.data.active == true)
+        || (isOwner(uid)
+          && request.resource.data.role == 'pendente'
+          && request.resource.data.email == request.auth.token.email
+          && request.resource.data.keys().hasOnly(['email','name','photoURL','role','createdAt']));
 
-      // No client updates — role changes go through Firebase Console / Admin SDK
-      allow update, delete: if false;
+      allow update: if isAdmin()
+        || (isProf() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['active']));
+
+      allow delete: if isAdmin();
+
+      match /workouts/{wkId} {
+        allow read, write: if isAdminOrProf() || isOwner(uid);
+      }
+
+      match /sessions/{sessionId} {
+        allow read, write: if isAdminOrProf() || isOwner(uid);
+      }
+    }
+
+    match /exercises/{id} {
+      allow read: if isAuth();
+      allow create, update, delete: if isAdminOrProf();
+    }
+
+    match /wk_templates/{id} {
+      allow read: if isAuth();
+      allow create, update, delete: if isAdminOrProf();
     }
   }
 }

@@ -1,0 +1,62 @@
+const { onCall } = require("firebase-functions/v2/https");
+const admin = require("firebase-admin");
+const { requireAdminOrProf } = require("./helpers");
+
+const db = admin.firestore();
+
+exports.getDashboardStats = onCall({ region: "us-central1" }, async (request) => {
+  requireAdminOrProf(request);
+  const now = Date.now();
+  const msDay = 86400000;
+
+  const [usersSnap, sessionsSnap] = await Promise.all([
+    db.collection("users").where("role", "in", ["aluno", "pendente"]).get(),
+    db.collectionGroup("sessions").orderBy("date", "desc").limit(200).get(),
+  ]);
+
+  const students = usersSnap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  const sessionDocs = sessionsSnap.docs.map((d) => ({
+    id: d.id, uid: d.ref.parent.parent.id, ...d.data(),
+  }));
+
+  const todaySessions = sessionDocs.filter((s) => now - (s.date?.toMillis?.() ?? 0) < msDay).length;
+  const weekSessions  = sessionDocs.filter((s) => now - (s.date?.toMillis?.() ?? 0) < 7 * msDay).length;
+
+  const lastByUid = {};
+  for (const s of sessionDocs) {
+    const ms = s.date?.toMillis?.() ?? 0;
+    if (!lastByUid[s.uid] || ms > lastByUid[s.uid]) lastByUid[s.uid] = ms;
+  }
+
+  const inactiveCount = students.filter((st) => now - (lastByUid[st.uid] ?? 0) > 14 * msDay).length;
+  const alertCount    = students.filter((st) => {
+    const diff = now - (lastByUid[st.uid] ?? 0);
+    return diff > 7 * msDay && diff <= 14 * msDay;
+  }).length;
+
+  const cache = {};
+  const recentActivity = await Promise.all(sessionDocs.slice(0, 12).map(async (s) => {
+    if (!cache[s.uid]) {
+      const u = await db.collection("users").doc(s.uid).get();
+      cache[s.uid] = u.exists ? u.data().name : "Unknown";
+    }
+    return { ...s, studentName: cache[s.uid] };
+  }));
+
+  const weekChart = Array.from({ length: 7 }, (_, i) => {
+    const dayStart = now - (6 - i) * msDay;
+    const dayEnd   = dayStart + msDay;
+    const count    = sessionDocs.filter((s) => {
+      const ms = s.date?.toMillis?.() ?? 0;
+      return ms >= dayStart && ms < dayEnd;
+    }).length;
+    return { day: new Date(dayStart).toLocaleDateString("pt-BR", { weekday: "short" }), count };
+  });
+
+  const alerts = students
+    .map((st) => ({ uid: st.uid, name: st.name, daysAgo: Math.floor((now - (lastByUid[st.uid] ?? 0)) / msDay) }))
+    .filter((st) => st.daysAgo > 7)
+    .sort((a, b) => b.daysAgo - a.daysAgo);
+
+  return { totalStudents: students.length, todaySessions, weekSessions, inactiveCount, alertCount, recentActivity, weekChart, alerts };
+});

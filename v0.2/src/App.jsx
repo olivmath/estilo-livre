@@ -1,6 +1,15 @@
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginScreen } from "@/screens/LoginScreen";
-import { HelloScreen } from "@/screens/HelloScreen";
+import { PendingScreen } from "@/screens/PendingScreen";
+import { StudentPlaceholder } from "@/screens/StudentPlaceholder";
+import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { DashboardPage } from "@/pages/DashboardPage";
+import { AlunosPage } from "@/pages/AlunosPage";
+import { ExerciciosPage } from "@/pages/ExerciciosPage";
+import { TemplatesPage } from "@/pages/TemplatesPage";
+import { RankingPage } from "@/pages/RankingPage";
+import { ContasPage } from "@/pages/ContasPage";
 
 function Spinner() {
   return (
@@ -23,12 +32,72 @@ function ErrorScreen({ message }) {
   );
 }
 
-export default function App() {
+function RoleGate() {
   const { user, role, loading, error } = useAuth();
 
   if (loading) return <Spinner />;
-  if (error)   return <ErrorScreen message={error} />;
-  if (!user)   return <LoginScreen />;
+  if (error) return <ErrorScreen message={error} />;
+  if (!user) return <LoginScreen />;
+  if (!role) return <Spinner />;
 
-  return <HelloScreen user={user} role={role} />;
+  if (role === "pendente") return <Navigate to="/pending" replace />;
+  if (role === "aluno") return <Navigate to="/student" replace />;
+  if (role === "professor") return <Navigate to="/prof/dashboard" replace />;
+  if (role === "admin") return <Navigate to="/admin/dashboard" replace />;
+
+  return <Spinner />;
+}
+
+function ProtectedRoute({ roles, children }) {
+  const { user, role, loading } = useAuth();
+  if (loading) return <Spinner />;
+  if (!user || !roles.includes(role)) return <Navigate to="/" replace />;
+  return children;
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<RoleGate />} />
+        <Route path="/pending" element={<PendingScreen />} />
+        <Route path="/student" element={<StudentPlaceholder />} />
+
+        <Route
+          path="/prof/*"
+          element={
+            <ProtectedRoute roles={["professor", "admin"]}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="alunos" element={<AlunosPage />} />
+          <Route path="exercicios" element={<ExerciciosPage />} />
+          <Route path="templates" element={<TemplatesPage />} />
+          <Route path="ranking" element={<RankingPage />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+        </Route>
+
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="alunos" element={<AlunosPage />} />
+          <Route path="exercicios" element={<ExerciciosPage />} />
+          <Route path="templates" element={<TemplatesPage />} />
+          <Route path="ranking" element={<RankingPage />} />
+          <Route path="contas" element={<ContasPage />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
