@@ -16,6 +16,19 @@ export function AuthProvider({ children }) {
     firebaseUser || null
   );
 
+  useEffect(() => {
+    if (firebaseUser && profile?.role) {
+      firebaseUser.getIdTokenResult().then((idTokenResult) => {
+        if (idTokenResult.claims.role !== profile.role) {
+          console.log("Custom claims out of sync. Force refreshing token...");
+          firebaseUser.getIdToken(true).then(() => {
+            console.log("Token successfully refreshed with new claims.");
+          });
+        }
+      });
+    }
+  }, [firebaseUser, profile]);
+
   const loading = firebaseUser === undefined || (firebaseUser && profileLoading);
 
   return (

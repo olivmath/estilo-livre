@@ -82,7 +82,6 @@ export function DashboardLayout() {
         width: 220,
         background: "var(--bg2)",
         borderRight: "1px solid var(--blue)",
-        display: "flex",
         flexDirection: "column",
         padding: "20px 12px",
         position: "fixed",
@@ -145,10 +144,8 @@ export function DashboardLayout() {
       {/* Main */}
       <main style={{
         flex: 1,
-        marginLeft: 0,
-        paddingBottom: 64,
       }}
-        className="md:ml-[220px] md:pb-0"
+        className="ml-0 pb-16 md:ml-[220px] md:pb-0"
       >
         <Outlet />
       </main>
@@ -159,7 +156,6 @@ export function DashboardLayout() {
         bottom: 0, left: 0, right: 0,
         background: "var(--bg2)",
         borderTop: "1px solid var(--blue)",
-        display: "flex",
         justifyContent: "space-around",
         padding: "8px 0 12px",
         zIndex: 40,

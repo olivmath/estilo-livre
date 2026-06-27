@@ -7,18 +7,55 @@ const db = admin.firestore();
 
 const SEEDED_ROLES = {
   "olivmath97@gmail.com": "admin",
-  "maiquiniqueBA@gmail.com": "prof",
+  "maiquiniqueBA@gmail.com": "professor",
 };
 
+async function migrateUserSubcollections(oldUid, newUid) {
+  const oldRef = db.collection("users").doc(oldUid);
+  const newRef = db.collection("users").doc(newUid);
+
+  const [workoutsSnap, sessionsSnap] = await Promise.all([
+    oldRef.collection("workouts").get(),
+    oldRef.collection("sessions").get()
+  ]);
+
+  const promises = [];
+
+  workoutsSnap.docs.forEach((doc) => {
+    promises.push(newRef.collection("workouts").doc(doc.id).set(doc.data()));
+    promises.push(doc.ref.delete());
+  });
+
+  sessionsSnap.docs.forEach((doc) => {
+    promises.push(newRef.collection("sessions").doc(doc.id).set(doc.data()));
+    promises.push(doc.ref.delete());
+  });
+
+  await Promise.all(promises);
+}
+
 exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
-  const inviteSnap = await db.collection("invites").doc(user.email).get();
-  let role = SEEDED_ROLES[user.email] ?? "pendente";
+  const email = user.email;
+  const inviteSnap = await db.collection("invites").doc(email).get();
+  let role = SEEDED_ROLES[email] ?? "pendente";
   let extra = {};
 
   if (inviteSnap.exists) {
     role = inviteSnap.data().role;
     extra.inviteAccepted = true;
     await inviteSnap.ref.delete();
+  } else {
+    // Check for pre-created student profile (random ID)
+    const existingSnap = await db.collection("users").where("email", "==", email).get();
+    if (!existingSnap.empty) {
+      const preCreatedDoc = existingSnap.docs.find(d => d.id !== user.uid && d.data().role === "aluno");
+      if (preCreatedDoc) {
+        role = "aluno";
+        extra = { ...preCreatedDoc.data() };
+        await migrateUserSubcollections(preCreatedDoc.id, user.uid);
+        await preCreatedDoc.ref.delete();
+      }
+    }
   }
 
   await db.collection("users").doc(user.uid).set({

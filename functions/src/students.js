@@ -76,16 +76,18 @@ exports.getStudentStats = onCall({ region: "us-central1" }, async (request) => {
 
   const now = Date.now();
   const totalSessions  = sessions.length;
-  const weekSessions   = sessions.filter((s) => now - s.date.toMillis() <= 7 * msDay).length;
-  const monthSessions  = sessions.filter((s) => now - s.date.toMillis() <= 30 * msDay).length;
-  const daysLastWorkout = totalSessions > 0 ? Math.floor((now - sessions[0].date.toMillis()) / msDay) : null;
+  const weekSessions   = sessions.filter((s) => now - (s.date?.toMillis?.() ?? 0) <= 7 * msDay).length;
+  const monthSessions  = sessions.filter((s) => now - (s.date?.toMillis?.() ?? 0) <= 30 * msDay).length;
+  const daysLastWorkout = totalSessions > 0 && sessions[0].date
+    ? Math.floor((now - (sessions[0].date?.toMillis?.() ?? now)) / msDay)
+    : null;
 
   let rpeSum = 0, rpeCount = 0, totalVolume = 0;
   for (const s of sessions)
     for (const ex of s.exercises ?? []) {
       const rpe = Number(ex.rpe);
       if (!isNaN(rpe) && rpe > 0) { rpeSum += rpe; rpeCount++; }
-      totalVolume += (ex.sets ?? 0) * (ex.reps ?? 0) * (ex.wt ?? 0);
+      totalVolume += (Number(ex.sets) || 0) * (Number(ex.reps) || 0) * (Number(ex.wt) || 0);
     }
 
   const avgRpe = rpeCount > 0 ? rpeSum / rpeCount : null;

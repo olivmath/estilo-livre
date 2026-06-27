@@ -87,9 +87,7 @@ export function DashboardPage() {
       </h1>
 
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 24 }}
-        className="sm:grid-cols-4"
-      >
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <KpiCard label="Total Alunos" value={stats.totalStudents} />
         <KpiCard label="Sessões Hoje" value={stats.todaySessions} />
         <KpiCard label="Sessões Semana" value={stats.weekSessions} />
@@ -100,7 +98,7 @@ export function DashboardPage() {
         />
       </div>
 
-      <div style={{ display: "grid", gap: 20 }} className="md:grid-cols-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Gráfico */}
         <div style={{
           background: "var(--bg2)",
