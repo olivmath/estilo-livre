@@ -106,9 +106,12 @@ function openDetail(email) {
     <!-- CONTEÚDO TAB: FICHA DE TREINOS -->
     <div id="det-sec-ficha" style="display: ${isFicha ? 'block' : 'none'}">
       <div class="card" style="margin-bottom:24px">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px">
           <div class="card-title" style="margin-bottom:0">Planilha de Treinos (Ficha do Aluno)</div>
-          <button class="btn-sm prim" onclick="openAssignWkModal('${email}')">+ Atribuir Treino</button>
+          <div style="display:flex; gap:8px; align-items:center">
+            <button class="btn-sm danger" id="btn-delete-selected" onclick="removeSelectedStudentWks('${email}')" style="display:none">Apagar Selecionados</button>
+            <button class="btn-sm prim" onclick="openAssignWkModal('${email}')">+ Atribuir Treino</button>
+          </div>
         </div>
         <div id="student-wks-container">
           ${renderStudentWorkoutsPlan(email)}
@@ -149,10 +152,21 @@ function renderStudentWorkoutsPlan(email) {
   if (!studentWks.length) {
     return `<div class="empty" style="padding:20px 0">Nenhum treino atribuído a este aluno. Clique em "+ Atribuir Treino" para começar!</div>`;
   }
-  return studentWks.map(wk => `
+
+  const selectAllHtml = `
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; padding: 4px 8px;">
+      <label style="display:flex; align-items:center; gap:8px; font-size:14px; color:var(--t2); cursor:pointer">
+        <input type="checkbox" id="chk-select-all-wks" onchange="toggleSelectAllWorkouts(this.checked, '${email}')" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--acc);">
+        Selecionar todos os treinos
+      </label>
+    </div>
+  `;
+
+  const workoutsHtml = studentWks.map(wk => `
     <div style="border:1px solid var(--bg3); border-radius:12px; padding:16px; margin-bottom:16px; background:rgba(255,255,255,0.01)">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--bg3); padding-bottom:12px; margin-bottom:12px">
         <div style="display:flex; align-items:center; gap:10px">
+          <input type="checkbox" class="wk-select-chk" value="${wk.id}" onchange="updateBatchDeleteBtn('${email}')" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--acc); margin: 0;">
           <div class="tmpl-badge" style="background:${wk.color || 'var(--acc)'}; margin:0">${wk.label}</div>
           <div style="font-weight:700; font-size:16px">${wk.name}</div>
         </div>
@@ -189,12 +203,49 @@ function renderStudentWorkoutsPlan(email) {
       </table>
     </div>
   `).join('');
+
+  return selectAllHtml + workoutsHtml;
 }
 
 function removeStudentWk(email, wkId) {
   if (confirm('Deseja remover este treino da ficha do aluno?')) {
     const wks = DB.get(`wk_${email}`, []);
     DB.set(`wk_${email}`, wks.filter(w => w.id !== wkId));
+    openDetail(email);
+  }
+}
+
+function toggleSelectAllWorkouts(checked, email) {
+  const chks = document.querySelectorAll('.wk-select-chk');
+  chks.forEach(c => c.checked = checked);
+  updateBatchDeleteBtn(email);
+}
+
+function updateBatchDeleteBtn(email) {
+  const chks = document.querySelectorAll('.wk-select-chk');
+  const allChecked = Array.from(chks).every(c => c.checked);
+  const anyChecked = Array.from(chks).some(c => c.checked);
+
+  const selectAllChk = document.getElementById('chk-select-all-wks');
+  if (selectAllChk) {
+    selectAllChk.checked = allChecked && chks.length > 0;
+  }
+
+  const btn = document.getElementById('btn-delete-selected');
+  if (btn) {
+    btn.style.display = anyChecked ? 'inline-block' : 'none';
+  }
+}
+
+function removeSelectedStudentWks(email) {
+  const chks = document.querySelectorAll('.wk-select-chk:checked');
+  const wkIds = Array.from(chks).map(c => c.value);
+  if (wkIds.length === 0) return;
+
+  if (confirm(`Deseja remover os ${wkIds.length} treinos selecionados da ficha do aluno?`)) {
+    const wks = DB.get(`wk_${email}`, []);
+    const updatedWks = wks.filter(w => !wkIds.includes(w.id));
+    DB.set(`wk_${email}`, updatedWks);
     openDetail(email);
   }
 }
@@ -261,4 +312,47 @@ function assignTemplateToStudent(templateId) {
 function createCustomWkForStudent() {
   closeAssignWkModal();
   openWkModal(null, assignStudentEmail);
+}
+
+function openAlunoModal() {
+  ['new-aluno-name','new-aluno-email','new-aluno-pw'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  const errEl = document.getElementById('aluno-modal-err');
+  if(errEl) errEl.style.display = 'none';
+  const modal = document.getElementById('aluno-modal');
+  if(modal) modal.classList.add('active');
+}
+
+function closeAlunoModal() {
+  const modal = document.getElementById('aluno-modal');
+  if(modal) modal.classList.remove('active');
+}
+
+function saveAluno() {
+  const name = document.getElementById('new-aluno-name').value.trim();
+  const email = document.getElementById('new-aluno-email').value.trim().toLowerCase();
+  const pw = document.getElementById('new-aluno-pw').value;
+  const errEl = document.getElementById('aluno-modal-err');
+  
+  if(!name || !email || !pw) {
+    if(errEl) { errEl.textContent = 'Preencha todos os campos.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if(pw.length < 6) {
+    if(errEl) { errEl.textContent = 'Senha deve ter ao menos 6 caracteres.'; errEl.style.display = 'block'; }
+    return;
+  }
+  
+  const users = DB.get('users', {});
+  if(users[email]) {
+    if(errEl) { errEl.textContent = 'Este email de aluno já está cadastrado.'; errEl.style.display = 'block'; }
+    return;
+  }
+  
+  users[email] = { name, email, pw, active: true };
+  DB.set('users', users);
+  closeAlunoModal();
+  renderAlunos();
 }

@@ -1,5 +1,9 @@
 // ── NAV ──────────────────────────────────────────────────────
 function navTo(sec, btn) {
+  if (sec === 'admins' && currentAdmin?.role === 'professor') {
+    navTo('dashboard', document.getElementById('nav-dashboard'));
+    return;
+  }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sni').forEach(b=>b.classList.remove('active'));
   document.getElementById('s-'+sec).classList.add('active');

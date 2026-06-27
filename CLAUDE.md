@@ -18,7 +18,60 @@ localStorage.clear(); location.reload();
 
 ## Architecture
 
-**Single-file app**: all HTML, CSS, and JS lives in `index.html` (~1000 lines). No build step, no npm, no dependencies.
+**Multi-file app** reorganized into `app/` with 3 roles. No build step, no npm, no dependencies.
+
+### File map
+
+```
+app/
+├── index.html                  # Role router (redirects to admin/user/prof)
+├── admin/
+│   ├── index.html
+│   ├── css/main.css
+│   ├── js/
+│   │   ├── globals.js          # DB, U, PAL globals
+│   │   ├── auth.js             # Login / session
+│   │   ├── navigation.js       # nav() routing
+│   │   ├── helpers.js          # Utility functions
+│   │   ├── mock.js             # Seed data
+│   │   ├── dashboard.js        # Dashboard logic
+│   │   ├── alunos.js           # Student management
+│   │   ├── admins.js           # Admin management
+│   │   ├── treinos.js          # Workout templates
+│   │   ├── exercicios.js       # Exercise catalog
+│   │   └── ranking.js          # Ranking logic
+│   └── screens/
+│       ├── shell.js            # App shell / layout
+│       ├── login.js            # Login screen
+│       └── modals.js           # All modal/sheet HTML
+├── user/
+│   ├── index.html
+│   ├── css/main.css
+│   ├── js/
+│   │   ├── globals.js          # DB, U, A, PAL globals
+│   │   ├── auth.js             # Login / session
+│   │   ├── navigation.js       # nav() routing
+│   │   ├── data.js             # localStorage helpers
+│   │   ├── workouts.js         # Workout CRUD
+│   │   ├── exercises.js        # Exercise CRUD
+│   │   ├── active.js           # Active session state (A)
+│   │   ├── weight.js           # adjW(), weight progression
+│   │   ├── sheets.js           # openSheet/closeSheet
+│   │   ├── renders.js          # renderHome/Workouts/Profile
+│   │   ├── report.js           # buildAndShowSummary, saveAndFinish
+│   │   └── init.js             # App bootstrap
+│   └── screens/
+│       ├── nav.js              # Bottom nav HTML
+│       ├── login.js            # Login screen
+│       ├── home.js             # Home screen
+│       ├── workouts.js         # Workouts screen
+│       ├── active.js           # Active workout screen
+│       ├── profile.js          # Profile screen
+│       ├── sheets.js           # Bottom sheet HTML
+│       └── overlays.js         # Full-screen overlays
+└── prof/
+    └── index.html              # Trainer role (stub)
+```
 
 ### JS structure (inside `<script>` at line ~360)
 

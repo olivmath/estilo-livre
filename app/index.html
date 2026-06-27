@@ -43,7 +43,7 @@ const DB={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{re
 
 (()=>{
   const cu=DB.get('cu',null);if(cu?.email){location.href='user/index.html';return;}
-  const ca=DB.get('ca',null);if(ca?.email){location.href=ca.role==='professor'?'prof/index.html':'admin/index.html';}
+  const ca=DB.get('ca',null);if(ca?.email){location.href='admin/index.html';}
 })();
 
 function doLogin(){
@@ -64,7 +64,7 @@ function doLogin(){
   if(!admins){admins={'admin@estilo.com':{name:'Administrador',email:'admin@estilo.com',pw:'admin2024',role:'admin'}};DB.set('admins',admins);}
   const a=admins[email];
   if(a&&a.pw===pw){
-    DB.set('ca',a);location.href=a.role==='professor'?'prof/index.html':'admin/index.html';return;
+    DB.set('ca',a);location.href='admin/index.html';return;
   }
 
   err.textContent='Email ou senha incorretos.';err.style.display='block';

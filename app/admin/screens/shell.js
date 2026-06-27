@@ -68,6 +68,7 @@ document.body.insertAdjacentHTML('beforeend', `
           <button class="fbtn" onclick="setFilter('inactive',this)">Inativos</button>
           <button class="fbtn" onclick="setFilter('blocked',this)">Bloqueados</button>
         </div>
+        <button class="btn-sm prim" onclick="openAlunoModal()">+ Novo Aluno</button>
       </div>
       <div class="card" style="padding:0;overflow:hidden">
         <table class="tbl">

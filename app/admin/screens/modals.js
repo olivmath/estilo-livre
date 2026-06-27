@@ -69,18 +69,45 @@ document.body.insertAdjacentHTML('beforeend', `
 <div class="modal-ov" id="admin-modal">
   <div class="modal-box" style="max-width:440px">
     <div class="modal-hdr">
-      <h2>Novo Administrador</h2>
+      <h2 id="admin-modal-title">Novo Administrador/Professor</h2>
       <button class="modal-close" onclick="closeAdminModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="fg"><label>Nome completo</label><input type="text" id="new-admin-name" placeholder="Nome do professor"></div>
+      <div class="fg"><label>Nome completo</label><input type="text" id="new-admin-name" placeholder="Nome do professor/admin"></div>
       <div class="fg"><label>Email</label><input type="email" id="new-admin-email" placeholder="professor@estilo.com"></div>
       <div class="fg"><label>Senha</label><input type="password" id="new-admin-pw" placeholder="Mínimo 6 caracteres"></div>
+      <div class="fg">
+        <label>Cargo / Permissão</label>
+        <select id="new-admin-role">
+          <option value="professor">Professor</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
       <div class="err-msg" id="admin-modal-err" style="display:none"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-sm sec" onclick="closeAdminModal()">Cancelar</button>
-      <button class="btn-sm prim" onclick="saveAdmin()">Criar Admin</button>
+      <button class="btn-sm prim" onclick="saveAdmin()">Criar Conta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALUNO MODAL -->
+<div class="modal-ov" id="aluno-modal">
+  <div class="modal-box" style="max-width:440px">
+    <div class="modal-hdr">
+      <h2>Novo Aluno</h2>
+      <button class="modal-close" onclick="closeAlunoModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label>Nome completo</label><input type="text" id="new-aluno-name" placeholder="Nome do aluno"></div>
+      <div class="fg"><label>Email</label><input type="email" id="new-aluno-email" placeholder="aluno@exemplo.com"></div>
+      <div class="fg"><label>Senha</label><input type="password" id="new-aluno-pw" placeholder="Mínimo 6 caracteres"></div>
+      <div class="err-msg" id="aluno-modal-err" style="display:none"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm sec" onclick="closeAlunoModal()">Cancelar</button>
+      <button class="btn-sm prim" onclick="saveAluno()">Criar Aluno</button>
     </div>
   </div>
 </div>
