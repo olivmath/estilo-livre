@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import logoImg from "@/assets/logo.jpeg";
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden>
@@ -33,7 +34,7 @@ export function LoginScreen() {
 
         {/* Logo */}
         <div style={styles.logoWrap}>
-          <img src="/logo.jpeg" alt="Estilo Livre" style={styles.logoImg} />
+          <img src={logoImg} alt="Estilo Livre" style={styles.logoImg} />
         </div>
 
         {/* Brand */}
