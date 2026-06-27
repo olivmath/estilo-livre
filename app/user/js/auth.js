@@ -33,9 +33,7 @@ function doLogin(u){
 
 function logout(){
   U=null; DB.set('cu',null);
-  document.getElementById('nav').classList.add('hidden');
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('s-login').classList.add('active');
+  location.href='../index.html';
 }
 
 function clearAll(){localStorage.clear();location.reload();}
