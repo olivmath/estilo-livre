@@ -1,120 +1,85 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Running the app
 
 ```bash
-open index.html          # open in default browser
-# or drag index.html into any browser — no server needed
+open index.html   # no server needed
 ```
 
-To reset all data during development:
-
+Reset dev data:
 ```js
-// In browser DevTools console
 localStorage.clear(); location.reload();
 ```
 
 ## Architecture
 
-**Multi-file app** reorganized into `app/` with 3 roles. No build step, no npm, no dependencies.
-
-### File map
+No build step, no npm, no dependencies. Multi-file app in `app/` with 3 roles.
 
 ```
 app/
-├── index.html                  # Role router (redirects to admin/user/prof)
+├── index.html                  # Role router
 ├── admin/
 │   ├── index.html
 │   ├── css/main.css
-│   ├── js/
-│   │   ├── globals.js          # DB, U, PAL globals
-│   │   ├── auth.js             # Login / session
-│   │   ├── navigation.js       # nav() routing
-│   │   ├── helpers.js          # Utility functions
-│   │   ├── mock.js             # Seed data
-│   │   ├── dashboard.js        # Dashboard logic
-│   │   ├── alunos.js           # Student management
-│   │   ├── admins.js           # Admin management
-│   │   ├── treinos.js          # Workout templates
-│   │   ├── exercicios.js       # Exercise catalog
-│   │   └── ranking.js          # Ranking logic
-│   └── screens/
-│       ├── shell.js            # App shell / layout
-│       ├── login.js            # Login screen
-│       └── modals.js           # All modal/sheet HTML
+│   └── js/
+│       ├── globals.js          # DB, U, PAL
+│       ├── auth.js / navigation.js / helpers.js / mock.js
+│       ├── dashboard.js / alunos.js / admins.js
+│       ├── treinos.js / exercicios.js / ranking.js
+│       └── screens/shell.js / login.js / modals.js
 ├── user/
 │   ├── index.html
 │   ├── css/main.css
-│   ├── js/
-│   │   ├── globals.js          # DB, U, A, PAL globals
-│   │   ├── auth.js             # Login / session
-│   │   ├── navigation.js       # nav() routing
-│   │   ├── data.js             # localStorage helpers
-│   │   ├── workouts.js         # Workout CRUD
-│   │   ├── exercises.js        # Exercise CRUD
-│   │   ├── active.js           # Active session state (A)
-│   │   ├── weight.js           # adjW(), weight progression
-│   │   ├── sheets.js           # openSheet/closeSheet
-│   │   ├── renders.js          # renderHome/Workouts/Profile
-│   │   ├── report.js           # buildAndShowSummary, saveAndFinish
-│   │   └── init.js             # App bootstrap
-│   └── screens/
-│       ├── nav.js              # Bottom nav HTML
-│       ├── login.js            # Login screen
-│       ├── home.js             # Home screen
-│       ├── workouts.js         # Workouts screen
-│       ├── active.js           # Active workout screen
-│       ├── profile.js          # Profile screen
-│       ├── sheets.js           # Bottom sheet HTML
-│       └── overlays.js         # Full-screen overlays
-└── prof/
-    └── index.html              # Trainer role (stub)
+│   └── js/
+│       ├── globals.js          # DB, U, A, PAL
+│       ├── auth.js / navigation.js / data.js
+│       ├── workouts.js / exercises.js / active.js
+│       ├── weight.js / sheets.js / renders.js
+│       ├── report.js / init.js
+│       └── screens/nav.js / login.js / home.js / workouts.js
+│                  active.js / profile.js / sheets.js / overlays.js
+└── prof/index.html             # Trainer stub
 ```
 
-### JS structure (inside `<script>` at line ~360)
+## JS Globals
 
 | Symbol | Role |
 |---|---|
-| `DB` | Thin wrapper: `DB.get(key, default)` / `DB.set(key, val)` over `localStorage` JSON |
-| `U` | Current logged-in user object (`null` when logged out) |
-| `A` | Active workout session state (singleton object) |
-| `PAL` | Color palette array for workout color picker |
+| `DB` | `DB.get(key, default)` / `DB.set(key, val)` over localStorage JSON |
+| `U` | Current logged-in user (`null` when logged out) |
+| `A` | Active workout session (singleton) |
+| `PAL` | Color palette array |
 
-### localStorage keys
+## localStorage Keys
 
 | Key | Content |
 |---|---|
 | `users` | `{ [email]: { name, email, pw } }` |
-| `cu` | Current user object (session persistence) |
-| `wk_<email>` | Array of workout objects for that user |
-| `sess_<email>` | Array of completed session objects for that user |
+| `cu` | Current user session |
+| `wk_<email>` | Workout objects array |
+| `sess_<email>` | Completed session objects array |
 | `photo_<email>` | Base64 JPEG profile photo |
 
-### Screen routing
+## Routing
 
-`nav(screenId, btnEl)` — shows the `.screen#screenId` div, hides all others, updates bottom nav active state. Screens: `home`, `workouts`, `detail`, `active`, `profile`.
+- Screens: `nav(screenId, btnEl)` — shows `.screen#screenId`, hides others, updates nav active state
+- Screens: `home`, `workouts`, `detail`, `active`, `profile`
+- Sheets: `openSheet(id)` / `closeSheet(id)` — toggles `.active` on `.so` overlay + `.sheet`
 
-Bottom sheets (modals) use `openSheet(id)` / `closeSheet(id)` — toggles `.active` class on `.so` overlay and `.sheet` panel.
+## Render Pattern
 
-### Render pattern
+Full re-render on state change (no vDOM):
+- `renderHome()` / `renderWorkouts()` / `renderExercises()` / `renderProfile()`
 
-Full re-render on state change — no virtual DOM, no framework:
-- `renderHome()` — dashboard, trend chart, history
-- `renderWorkouts()` — workout list
-- `renderExercises()` — exercise list for `editWkId`
-- `renderProfile()` — profile screen
+## Active Workout Flow
 
-### Active workout flow
+1. `startWorkout(wkId)` → populates `A`, calls `renderActiveEx()`
+2. `nextSet()` → advances `A.set`; all sets done → `showDiff(ex)` (RPE slider)
+3. `confirmDiff()` → saves RPE, advances `A.exIdx`, calls `renderActiveEx()`
+4. `buildAndShowSummary()` → shows report overlay when all exercises done
+5. `saveAndFinish()` → appends to `sess_<email>`, resets `A`
 
-1. `startWorkout(wkId)` — populates `A`, calls `renderActiveEx()`
-2. `nextSet()` — advances `A.set`; when all sets done, calls `showDiff(ex)` (RPE slider)
-3. `confirmDiff()` — saves RPE, advances `A.exIdx`, calls `renderActiveEx()`
-4. `buildAndShowSummary()` — when all exercises done, shows report overlay
-5. `saveAndFinish()` — appends to `sess_<email>`, resets `A`
-
-### Design tokens (CSS vars)
+## Design Tokens
 
 ```
 --bg:#06091a  --bg2:#0b1228  --bg3:#162040   (dark backgrounds)
@@ -123,11 +88,13 @@ Full re-render on state change — no virtual DOM, no framework:
 --green:#00c853  --red:#f44336               (status colors)
 ```
 
-## Key constraints
+## Key Constraints
 
-- **Mobile-first**: max-width 430px, no desktop layout
-- **No backend**: all data is local to the browser; multi-device sync is out of scope
-- **Passwords stored in plaintext** in localStorage — intentional for this gym-kiosk use case, not a bug to fix
-- Rest timers: 30s between sets, 45s between exercises (hardcoded in `startRest`)
-- Weight increment: 2.5kg (hardcoded in `adjW`)
-- RPE scale: 0–10; suggestions to increase weight trigger at average ≤ 4
+- Mobile-first: max-width 430px, no desktop layout
+- No backend: all data local; multi-device sync out of scope
+- Passwords in plaintext — intentional for gym-kiosk use case
+- Rest timers: 30s (sets) / 45s (exercises) — hardcoded in `startRest`
+- Weight increment: 2.5kg — hardcoded in `adjW`
+- RPE scale 0–10; weight increase suggested at average ≤ 4
+
+<!-- token-policy: v1.0 -->
