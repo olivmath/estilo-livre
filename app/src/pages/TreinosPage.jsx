@@ -3,6 +3,10 @@ import { getTreinos, createTreino, updateTreino, deleteTreino, assignTreino } fr
 import { getExercises } from "@/services/exercises";
 import { getStudents } from "@/services/users";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Spinner, Field } from "@/components/shared";
 import { Plus, Edit2, Trash2, X, UserPlus } from "lucide-react";
 
 const PALETTE = [
@@ -11,60 +15,7 @@ const PALETTE = [
   "#795548", "#43a047",
 ];
 
-function Spinner() {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
-      <div className="w-8 h-8 rounded-full border-[3px] animate-spin"
-        style={{ borderColor: "var(--bg3)", borderTopColor: "var(--acc)" }} />
-    </div>
-  );
-}
-
-function Modal({ open, onClose, title, children }) {
-  if (!open) return null;
-  return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 100,
-      display: "flex", alignItems: "flex-end",
-      background: "rgba(0,0,0,0.6)",
-    }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          width: "100%", maxWidth: 540, margin: "0 auto",
-          background: "var(--bg2)", borderTopLeftRadius: 20, borderTopRightRadius: 20,
-          border: "1px solid var(--blue)", borderBottom: "none",
-          padding: "24px 20px 32px", maxHeight: "92vh", overflowY: "auto",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)" }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)" }}>
-            <X size={18} />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-const inputStyle = {
-  width: "100%", padding: "10px 12px", background: "var(--bg3)",
-  border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)",
-  fontSize: 14, outline: "none",
-};
-
-function Field({ label, children }) {
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <label style={{ display: "block", fontSize: 12, color: "var(--sub)", marginBottom: 6 }}>{label}</label>
-      {children}
-    </div>
-  );
-}
+const inputStyle = { background: "var(--bg3)", border: "1px solid var(--blue)", color: "var(--text)" };
 
 const EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [] };
 
@@ -125,103 +76,107 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={form.id ? "Editar Treino" : "Novo Treino"}>
-      <form onSubmit={submit}>
-        {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 16, color: "var(--text)", maxHeight: "90vh", overflowY: "auto" }}>
+        <DialogHeader>
+          <DialogTitle style={{ color: "var(--text)" }}>{form.id ? "Editar Treino" : "Novo Treino"}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={submit}>
+          {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
-        <div style={{ display: "grid", gridTemplateColumns: "64px 1fr", gap: 12 }}>
-          <Field label="Label">
-            <input style={inputStyle} value={form.label} onChange={(e) => set("label", e.target.value.toUpperCase().slice(0, 2))} placeholder="A" maxLength={2} />
-          </Field>
-          <Field label="Nome">
-            <input style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex: Treino A — Peito e Tríceps" required />
-          </Field>
-        </div>
-
-        <Field label="Cor">
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {PALETTE.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => set("color", c)}
-                style={{
-                  width: 28, height: 28, borderRadius: "50%", background: c,
-                  border: form.color === c ? "3px solid var(--text)" : "3px solid transparent",
-                  cursor: "pointer",
-                }}
-              />
-            ))}
-          </div>
-        </Field>
-
-        {/* Exercises */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <label style={{ fontSize: 12, color: "var(--sub)" }}>Exercícios ({form.exercises.length})</label>
-            <button type="button" onClick={() => setAddingEx(true)}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--acc)", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
-              <Plus size={13} /> Adicionar
-            </button>
+          <div style={{ display: "grid", gridTemplateColumns: "64px 1fr", gap: 12 }}>
+            <Field label="Label" htmlFor="tk-label">
+              <Input id="tk-label" style={inputStyle} value={form.label} onChange={(e) => set("label", e.target.value.toUpperCase().slice(0, 2))} placeholder="A" maxLength={2} />
+            </Field>
+            <Field label="Nome" htmlFor="tk-nome">
+              <Input id="tk-nome" style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex: Treino A — Peito e Tríceps" required />
+            </Field>
           </div>
 
-          {addingEx && (
-            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-              <select
-                value={exPick}
-                onChange={(e) => setExPick(e.target.value)}
-                style={{ ...inputStyle, flex: 1 }}
-              >
-                <option value="">Selecione…</option>
-                {allExercises.map((e) => (
-                  <option key={e.id} value={e.id}>{e.name} ({e.group})</option>
-                ))}
-              </select>
-              <Button type="button" size="sm" onClick={addExercise} disabled={!exPick}>OK</Button>
-              <Button type="button" size="sm" variant="ghost" onClick={() => setAddingEx(false)}><X size={14} /></Button>
+          <Field label="Cor">
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {PALETTE.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => set("color", c)}
+                  style={{
+                    width: 28, height: 28, borderRadius: "50%", background: c,
+                    border: form.color === c ? "3px solid var(--text)" : "3px solid transparent",
+                    cursor: "pointer",
+                  }}
+                />
+              ))}
             </div>
-          )}
+          </Field>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {form.exercises.map((ex, i) => (
-              <div key={i} style={{
-                background: "var(--bg3)", borderRadius: 8, padding: "10px 12px",
-                borderLeft: `3px solid ${form.color}`,
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{ex.name}</span>
-                  <button type="button" onClick={() => removeEx(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)" }}>
-                    <X size={13} />
-                  </button>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                  {[
-                    { k: "sets", label: "Séries" },
-                    { k: "reps", label: "Reps" },
-                    { k: "wt", label: "Peso (kg)" },
-                  ].map(({ k, label }) => (
-                    <div key={k}>
-                      <p style={{ fontSize: 10, color: "var(--sub)", marginBottom: 2 }}>{label}</p>
-                      <input
-                        type="number"
-                        min={0}
-                        value={ex[k]}
-                        onChange={(e) => updateEx(i, k, Number(e.target.value))}
-                        style={{ ...inputStyle, padding: "6px 8px", fontSize: 13 }}
-                      />
-                    </div>
-                  ))}
-                </div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <label style={{ fontSize: 12, color: "var(--sub)" }}>Exercícios ({form.exercises.length})</label>
+              <button type="button" onClick={() => setAddingEx(true)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--acc)", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
+                <Plus size={13} /> Adicionar
+              </button>
+            </div>
+
+            {addingEx && (
+              <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                <Select value={exPick} onValueChange={setExPick}>
+                  <SelectTrigger style={{ ...inputStyle, flex: 1, height: 40 }}>
+                    <SelectValue placeholder="Selecione…" />
+                  </SelectTrigger>
+                  <SelectContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)" }}>
+                    {allExercises.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>{e.name} ({e.group})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button type="button" size="sm" onClick={addExercise} disabled={!exPick}>OK</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setAddingEx(false)}><X size={14} /></Button>
               </div>
-            ))}
-          </div>
-        </div>
+            )}
 
-        <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
-          {loading ? "Salvando…" : "Salvar Treino"}
-        </Button>
-      </form>
-    </Modal>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {form.exercises.map((ex, i) => (
+                <div key={i} style={{
+                  background: "var(--bg3)", borderRadius: 8, padding: "10px 12px",
+                  borderLeft: `3px solid ${form.color}`,
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{ex.name}</span>
+                    <button type="button" onClick={() => removeEx(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)" }}>
+                      <X size={13} />
+                    </button>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                    {[
+                      { k: "sets", label: "Séries" },
+                      { k: "reps", label: "Reps" },
+                      { k: "wt", label: "Peso (kg)" },
+                    ].map(({ k, label }) => (
+                      <div key={k}>
+                        <p style={{ fontSize: 10, color: "var(--sub)", marginBottom: 2 }}>{label}</p>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={ex[k]}
+                          onChange={(e) => updateEx(i, k, Number(e.target.value))}
+                          style={{ ...inputStyle, padding: "6px 8px", fontSize: 13, height: 32 }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
+            {loading ? "Salvando…" : "Salvar Treino"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -244,29 +199,30 @@ function AssignModal({ open, onClose, treinoId, students }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Atribuir a Aluno">
-      {done ? (
-        <p style={{ color: "var(--green)", fontSize: 13 }}>Treino atribuído com sucesso!</p>
-      ) : (
-        <>
-          <select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            style={{
-              width: "100%", padding: "10px 12px", background: "var(--bg3)",
-              border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)",
-              fontSize: 14, outline: "none", marginBottom: 16,
-            }}
-          >
-            <option value="">Selecione um aluno…</option>
-            {students.map((s) => <option key={s.uid} value={s.uid}>{s.name}</option>)}
-          </select>
-          <Button onClick={handle} disabled={loading || !selected} style={{ width: "100%", height: 40 }}>
-            {loading ? "Atribuindo…" : "Atribuir"}
-          </Button>
-        </>
-      )}
-    </Modal>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 16, color: "var(--text)" }}>
+        <DialogHeader>
+          <DialogTitle style={{ color: "var(--text)" }}>Atribuir a Aluno</DialogTitle>
+        </DialogHeader>
+        {done ? (
+          <p style={{ color: "var(--green)", fontSize: 13 }}>Treino atribuído com sucesso!</p>
+        ) : (
+          <>
+            <Select value={selected} onValueChange={setSelected}>
+              <SelectTrigger style={{ background: "var(--bg3)", border: "1px solid var(--blue)", color: "var(--text)", marginBottom: 16 }}>
+                <SelectValue placeholder="Selecione um aluno…" />
+              </SelectTrigger>
+              <SelectContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)" }}>
+                {students.map((s) => <SelectItem key={s.uid} value={s.uid}>{s.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button onClick={handle} disabled={loading || !selected} style={{ width: "100%", height: 40 }}>
+              {loading ? "Atribuindo…" : "Atribuir"}
+            </Button>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -298,21 +254,14 @@ export function TreinosPage() {
     load();
   }
 
-  function handleEdit(t) {
-    setEditing({ ...t });
-    setModalOpen(true);
-  }
-
-  function handleNew() {
-    setEditing(null);
-    setModalOpen(true);
-  }
+  function handleEdit(t) { setEditing({ ...t }); setModalOpen(true); }
+  function handleNew() { setEditing(null); setModalOpen(true); }
 
   if (loading) return <Spinner />;
   if (error) return <div style={{ padding: 24, color: "var(--red)", fontSize: 13 }}>{error}</div>;
 
   return (
-    <div style={{ padding: "24px 20px", maxWidth: 900 }}>
+    <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Treinos</h1>
         <Button size="sm" onClick={handleNew}>
@@ -366,20 +315,8 @@ export function TreinosPage() {
         </div>
       )}
 
-      <TreinoModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        initial={editing}
-        allExercises={exercises}
-        onSaved={load}
-      />
-
-      <AssignModal
-        open={assignOpen}
-        onClose={() => setAssignOpen(false)}
-        treinoId={assignTarget}
-        students={students}
-      />
+      <TreinoModal open={modalOpen} onClose={() => setModalOpen(false)} initial={editing} allExercises={exercises} onSaved={load} />
+      <AssignModal open={assignOpen} onClose={() => setAssignOpen(false)} treinoId={assignTarget} students={students} />
     </div>
   );
 }

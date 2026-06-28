@@ -1,67 +1,18 @@
 import { useEffect, useState, useCallback } from "react";
 import { getExercises, createExercise, updateExercise, deleteExercise } from "@/services/exercises";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit2, Trash2, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Spinner, Field } from "@/components/shared";
+import { Plus, Edit2, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 
 const GROUPS = [
   "Peito", "Costas", "Ombros", "Bíceps", "Tríceps",
   "Abdômen", "Glúteos", "Quadríceps", "Posterior", "Panturrilha", "Outro",
 ];
 
-function Spinner() {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
-      <div className="w-8 h-8 rounded-full border-[3px] animate-spin"
-        style={{ borderColor: "var(--bg3)", borderTopColor: "var(--acc)" }} />
-    </div>
-  );
-}
-
-function Modal({ open, onClose, title, children }) {
-  if (!open) return null;
-  return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 100,
-      display: "flex", alignItems: "flex-end",
-      background: "rgba(0,0,0,0.6)",
-    }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          width: "100%", maxWidth: 520, margin: "0 auto",
-          background: "var(--bg2)", borderTopLeftRadius: 20, borderTopRightRadius: 20,
-          border: "1px solid var(--blue)", borderBottom: "none",
-          padding: "24px 20px 32px", maxHeight: "90vh", overflowY: "auto",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)" }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)" }}>
-            <X size={18} />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, children }) {
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <label style={{ display: "block", fontSize: 12, color: "var(--sub)", marginBottom: 6 }}>{label}</label>
-      {children}
-    </div>
-  );
-}
-
-const inputStyle = {
-  width: "100%", padding: "10px 12px", background: "var(--bg3)",
-  border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)",
-  fontSize: 14, outline: "none",
-};
+const inputStyle = { background: "var(--bg3)", border: "1px solid var(--blue)", color: "var(--text)" };
 
 const EMPTY_FORM = { name: "", machine: "", group: GROUPS[0], sets: 3, reps: 12 };
 
@@ -95,33 +46,43 @@ function ExerciseModal({ open, onClose, initial, onSaved }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={form.id ? "Editar Exercício" : "Novo Exercício"}>
-      <form onSubmit={submit}>
-        {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
-        <Field label="Nome">
-          <input style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex: Supino Reto" required />
-        </Field>
-        <Field label="Máquina / Equipamento (opcional)">
-          <input style={inputStyle} value={form.machine} onChange={(e) => set("machine", e.target.value)} placeholder="Ex: Banco livre, Halter" />
-        </Field>
-        <Field label="Grupo Muscular">
-          <select style={inputStyle} value={form.group} onChange={(e) => set("group", e.target.value)}>
-            {GROUPS.map((g) => <option key={g}>{g}</option>)}
-          </select>
-        </Field>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="Séries">
-            <input style={inputStyle} type="number" min={1} max={20} value={form.sets} onChange={(e) => set("sets", e.target.value)} />
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 16, color: "var(--text)" }}>
+        <DialogHeader>
+          <DialogTitle style={{ color: "var(--text)" }}>{form.id ? "Editar Exercício" : "Novo Exercício"}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={submit}>
+          {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+          <Field label="Nome" htmlFor="ex-nome">
+            <Input id="ex-nome" style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex: Supino Reto" required />
           </Field>
-          <Field label="Reps">
-            <input style={inputStyle} type="number" min={1} max={100} value={form.reps} onChange={(e) => set("reps", e.target.value)} />
+          <Field label="Máquina / Equipamento (opcional)" htmlFor="ex-maquina">
+            <Input id="ex-maquina" style={inputStyle} value={form.machine} onChange={(e) => set("machine", e.target.value)} placeholder="Ex: Banco livre, Halter" />
           </Field>
-        </div>
-        <Button type="submit" disabled={loading} style={{ width: "100%", height: 40, marginTop: 4 }}>
-          {loading ? "Salvando…" : "Salvar"}
-        </Button>
-      </form>
-    </Modal>
+          <Field label="Grupo Muscular" htmlFor="ex-grupo">
+            <Select value={form.group} onValueChange={(v) => set("group", v)}>
+              <SelectTrigger id="ex-grupo" style={{ ...inputStyle, height: 40 }}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)" }}>
+                {GROUPS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <Field label="Séries" htmlFor="ex-sets">
+              <Input id="ex-sets" style={inputStyle} type="number" min={1} max={20} value={form.sets} onChange={(e) => set("sets", e.target.value)} />
+            </Field>
+            <Field label="Reps" htmlFor="ex-reps">
+              <Input id="ex-reps" style={inputStyle} type="number" min={1} max={100} value={form.reps} onChange={(e) => set("reps", e.target.value)} />
+            </Field>
+          </div>
+          <Button type="submit" disabled={loading} style={{ width: "100%", height: 40, marginTop: 4 }}>
+            {loading ? "Salvando…" : "Salvar"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -197,15 +158,8 @@ export function ExerciciosPage() {
     load();
   }
 
-  function handleEdit(ex) {
-    setEditing(ex);
-    setModalOpen(true);
-  }
-
-  function handleNew() {
-    setEditing(null);
-    setModalOpen(true);
-  }
+  function handleEdit(ex) { setEditing(ex); setModalOpen(true); }
+  function handleNew() { setEditing(null); setModalOpen(true); }
 
   const grouped = exercises.reduce((acc, ex) => {
     const g = ex.group ?? "Outro";
@@ -220,7 +174,7 @@ export function ExerciciosPage() {
   if (error) return <div style={{ padding: 24, color: "var(--red)", fontSize: 13 }}>{error}</div>;
 
   return (
-    <div style={{ padding: "24px 20px", maxWidth: 900 }}>
+    <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Exercícios</h1>
         <Button size="sm" onClick={handleNew}>
@@ -232,22 +186,11 @@ export function ExerciciosPage() {
         <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum exercício cadastrado</p>
       ) : (
         sortedGroups.map((g) => (
-          <GroupSection
-            key={g}
-            group={g}
-            exercises={grouped[g]}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <GroupSection key={g} group={g} exercises={grouped[g]} onEdit={handleEdit} onDelete={handleDelete} />
         ))
       )}
 
-      <ExerciseModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        initial={editing}
-        onSaved={load}
-      />
+      <ExerciseModal open={modalOpen} onClose={() => setModalOpen(false)} initial={editing} onSaved={load} />
     </div>
   );
 }

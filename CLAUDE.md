@@ -97,7 +97,59 @@ invites/{email}     — role (consumed on onUserCreate, then deleted)
 
 - Adicionar componentes via `pnpm dlx shadcn@latest add <component>` dentro de `app/`
 - Componentes ficam em `app/src/components/ui/` — nunca duplicar, sempre reutilizar
+- Componentes compartilhados (Spinner, Avatar, Field) ficam em `app/src/components/shared.jsx`
 - Para variantes novas, extender com `class-variance-authority` (CVA) no próprio arquivo do componente
+
+### Padrões PROIBIDOS — nunca escrever isso:
+
+```jsx
+// ❌ input raw
+<input style={...} />
+<input className="..." />
+
+// ❌ select raw
+<select style={...}><option>...</option></select>
+
+// ❌ Modal/Dialog custom (div + position fixed)
+function Modal({ open, onClose, children }) { ... }
+<div style={{ position: "fixed", inset: 0 }}>...</div>
+
+// ❌ Avatar custom (div com inicial)
+<div style={{ borderRadius: "50%", background: "var(--blue)" }}>{name[0]}</div>
+
+// ❌ Spinner custom
+<div className="animate-spin rounded-full border-..." />
+
+// ❌ Label/Field custom
+function Field({ label, children }) { return <div><label>...</label>{children}</div> }
+```
+
+### Padrões CORRETOS — usar sempre:
+
+```jsx
+// ✅ Input
+import { Input } from "@/components/ui/input"
+<Input value={v} onChange={...} placeholder="..." />
+
+// ✅ Select
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+<Select value={v} onValueChange={set}><SelectTrigger>...</SelectTrigger>...</Select>
+
+// ✅ Dialog (modal)
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+<Dialog open={open} onOpenChange={onClose}><DialogContent>...</DialogContent></Dialog>
+
+// ✅ Avatar
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+<Avatar><AvatarImage src={photoURL} /><AvatarFallback>{name[0]}</AvatarFallback></Avatar>
+
+// ✅ Spinner + Field
+import { Spinner, Field } from "@/components/shared"
+
+// ✅ Label
+import { Label } from "@/components/ui/label"
+<Label htmlFor="x">Nome</Label><Input id="x" />
+```
 
 **Design tokens — usar sempre, nunca hardcodar cores:**
 

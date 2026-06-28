@@ -898,7 +898,7 @@ export function AlunosPage() {
   const someSelected = nSelected > 0 && nSelected < filtered.length;
 
   return (
-    <div style={{ padding: "24px 20px", maxWidth: 900 }}>
+    <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Alunos</h1>
         <Button size="sm" onClick={() => setNovoOpen(true)}>

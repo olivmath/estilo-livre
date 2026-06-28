@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getRanking } from "@/services/ranking";
+import { Spinner, UserAvatar } from "@/components/shared";
 
 const TABS = [
   { key: "freq",        label: "Frequência" },
@@ -9,32 +10,6 @@ const TABS = [
 
 const PODIUM_COLORS = ["#F5C400", "#9e9e9e", "#cd7f32"];
 const PODIUM_SIZE   = [56, 48, 44];
-
-function Spinner() {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
-      <div className="w-8 h-8 rounded-full border-[3px] animate-spin"
-        style={{ borderColor: "var(--bg3)", borderTopColor: "var(--acc)" }} />
-    </div>
-  );
-}
-
-function Avatar({ name, photoURL, size = 40, color }) {
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: "50%",
-      background: photoURL ? "transparent" : (color ?? "var(--blue)"),
-      overflow: "hidden", flexShrink: 0,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.38, fontWeight: 800, color: "#000",
-      border: color ? `2px solid ${color}` : "none",
-    }}>
-      {photoURL
-        ? <img src={photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        : (name?.[0]?.toUpperCase() ?? "?")}
-    </div>
-  );
-}
 
 function PodiumCard({ item, rank }) {
   const color = PODIUM_COLORS[rank - 1];
@@ -50,7 +25,7 @@ function PodiumCard({ item, rank }) {
       flex: 1,
     }}>
       <span style={{ fontSize: 20 }}>{rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉"}</span>
-      <Avatar name={item.name} photoURL={item.photoURL} size={size} color={color} />
+      <UserAvatar name={item.name} photoURL={item.photoURL} size={size} />
       <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text)", textAlign: "center", lineHeight: 1.3 }}>
         {item.name?.split(" ")[0]}
       </p>
@@ -60,7 +35,6 @@ function PodiumCard({ item, rank }) {
           : item.value}
         <span style={{ fontSize: 10, marginLeft: 3, color: "var(--sub)" }}>{item.unit}</span>
       </p>
-      {/* Progress bar relative to max */}
       <div style={{ width: "100%", height: 4, background: "var(--bg3)", borderRadius: 2 }}>
         <div style={{ height: "100%", borderRadius: 2, background: color, width: `${100 - (rank - 1) * 20}%` }} />
       </div>
@@ -88,12 +62,11 @@ export function RankingPage() {
   const max   = data[0]?.value ?? 1;
 
   return (
-    <div style={{ padding: "24px 20px", maxWidth: 700 }}>
+    <div style={{ padding: "20px 16px", maxWidth: 700, margin: "0 auto" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", marginBottom: 20 }}>
         Ranking
       </h1>
 
-      {/* Tabs */}
       <div style={{ display: "flex", gap: 4, marginBottom: 24, background: "var(--bg3)", borderRadius: 10, padding: 4 }}>
         {TABS.map((t) => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{
@@ -113,7 +86,6 @@ export function RankingPage() {
         <p style={{ color: "var(--sub)", fontSize: 13 }}>Sem dados suficientes para este ranking</p>
       ) : (
         <>
-          {/* Pódio */}
           {top3.length > 0 && (
             <div style={{ display: "flex", gap: 10, marginBottom: 20, alignItems: "flex-end" }}>
               {top3.length >= 2 && <PodiumCard item={top3[1]} rank={2} />}
@@ -122,7 +94,6 @@ export function RankingPage() {
             </div>
           )}
 
-          {/* Rest */}
           {rest.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {rest.map((item, i) => {
@@ -137,11 +108,9 @@ export function RankingPage() {
                     <span style={{ fontSize: 13, fontWeight: 700, color: "var(--sub)", width: 24, textAlign: "center" }}>
                       {pos}
                     </span>
-                    <Avatar name={item.name} photoURL={item.photoURL} size={36} />
+                    <UserAvatar name={item.name} photoURL={item.photoURL} size={36} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>
-                        {item.name}
-                      </p>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{item.name}</p>
                       <div style={{ height: 3, background: "var(--bg3)", borderRadius: 2, marginTop: 4 }}>
                         <div style={{ height: "100%", borderRadius: 2, background: "var(--blue2)", width: `${pct}%` }} />
                       </div>

@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDashboardStats } from "@/services/dashboard";
-
-function Spinner() {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
-      <div className="w-8 h-8 rounded-full border-[3px] animate-spin"
-        style={{ borderColor: "var(--bg3)", borderTopColor: "var(--acc)" }} />
-    </div>
-  );
-}
+import { Spinner } from "@/components/shared";
 
 function KpiCard({ label, value, sub, accent }) {
   return (
@@ -81,7 +73,7 @@ export function DashboardPage() {
   );
 
   return (
-    <div style={{ padding: "24px 20px", maxWidth: 900 }}>
+    <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", marginBottom: 20 }}>
         Dashboard
       </h1>

@@ -77,6 +77,28 @@ export function DashboardLayout() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg)" }}>
+      {/* Top header — mobile only */}
+      <header
+        className="flex md:hidden"
+        style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0,
+          height: 52,
+          background: "var(--bg2)",
+          borderBottom: "1px solid var(--blue)",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 16px",
+          zIndex: 40,
+        }}
+      >
+        <div>
+          <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.2em", color: "var(--sub)", lineHeight: 1 }}>ACADEMIA</p>
+          <p style={{ fontSize: 14, fontWeight: 800, color: "var(--acc)", letterSpacing: "0.05em", lineHeight: 1.2 }}>ESTILO LIVRE</p>
+        </div>
+        {avatar}
+      </header>
+
       {/* Sidebar — desktop */}
       <aside style={{
         width: 220,
@@ -145,10 +167,8 @@ export function DashboardLayout() {
       </aside>
 
       {/* Main */}
-      <main style={{
-        flex: 1,
-      }}
-        className="ml-0 pb-16 md:ml-[220px] md:pb-0"
+      <main style={{ flex: 1 }}
+        className="ml-0 pt-[52px] pb-20 md:ml-[220px] md:pt-0 md:pb-0"
       >
         <Outlet />
       </main>
@@ -160,7 +180,8 @@ export function DashboardLayout() {
         background: "var(--bg2)",
         borderTop: "1px solid var(--blue)",
         justifyContent: "space-around",
-        padding: "8px 0 12px",
+        padding: "8px 0",
+        paddingBottom: "calc(8px + env(safe-area-inset-bottom, 0px))",
         zIndex: 40,
       }}
         className="flex md:hidden"
