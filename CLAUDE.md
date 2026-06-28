@@ -1,26 +1,21 @@
 # CLAUDE.md
 
-## Running the app
+## Running
 
 ```bash
-open index.html   # no server needed
+open index.html
 ```
-
-Reset dev data:
-```js
-localStorage.clear(); location.reload();
-```
+Reset: `localStorage.clear(); location.reload()` (no browser console)
 
 ## Architecture
 
-No build step, no npm, no dependencies. Multi-file app in `app/` with 3 roles.
+No build, no npm. Multi-file in `app/` with 3 roles.
 
 ```
 app/
 ├── index.html                  # Role router
 ├── admin/
-│   ├── index.html
-│   ├── css/main.css
+│   ├── index.html / css/main.css
 │   └── js/
 │       ├── globals.js          # DB, U, PAL
 │       ├── auth.js / navigation.js / helpers.js / mock.js
@@ -28,20 +23,18 @@ app/
 │       ├── treinos.js / exercicios.js / ranking.js
 │       └── screens/shell.js / login.js / modals.js
 ├── user/
-│   ├── index.html
-│   ├── css/main.css
+│   ├── index.html / css/main.css
 │   └── js/
 │       ├── globals.js          # DB, U, A, PAL
 │       ├── auth.js / navigation.js / data.js
 │       ├── workouts.js / exercises.js / active.js
-│       ├── weight.js / sheets.js / renders.js
-│       ├── report.js / init.js
+│       ├── weight.js / sheets.js / renders.js / report.js / init.js
 │       └── screens/nav.js / login.js / home.js / workouts.js
 │                  active.js / profile.js / sheets.js / overlays.js
 └── prof/index.html             # Trainer stub
 ```
 
-## JS Globals
+## Globals
 
 | Symbol | Role |
 |---|---|
@@ -62,14 +55,13 @@ app/
 
 ## Routing
 
-- Screens: `nav(screenId, btnEl)` — shows `.screen#screenId`, hides others, updates nav active state
+- `nav(screenId, btnEl)` — shows `.screen#screenId`, hides others, updates nav
 - Screens: `home`, `workouts`, `detail`, `active`, `profile`
-- Sheets: `openSheet(id)` / `closeSheet(id)` — toggles `.active` on `.so` overlay + `.sheet`
+- `openSheet(id)` / `closeSheet(id)` — toggles `.active` on `.so` + `.sheet`
 
 ## Render Pattern
 
-Full re-render on state change (no vDOM):
-- `renderHome()` / `renderWorkouts()` / `renderExercises()` / `renderProfile()`
+Full re-render on state change (no vDOM): `renderHome()` / `renderWorkouts()` / `renderExercises()` / `renderProfile()`
 
 ## Active Workout Flow
 
@@ -82,17 +74,17 @@ Full re-render on state change (no vDOM):
 ## Design Tokens
 
 ```
---bg:#06091a  --bg2:#0b1228  --bg3:#162040   (dark backgrounds)
---acc:#F5C400                                 (yellow accent)
---blue:#1B3487  --blue2:#2352c8              (blue range)
---green:#00c853  --red:#f44336               (status colors)
+--bg:#06091a  --bg2:#0b1228  --bg3:#162040
+--acc:#F5C400
+--blue:#1B3487  --blue2:#2352c8
+--green:#00c853  --red:#f44336
 ```
 
-## Key Constraints
+## Constraints
 
 - Mobile-first: max-width 430px, no desktop layout
 - No backend: all data local; multi-device sync out of scope
-- Passwords in plaintext — intentional for gym-kiosk use case
+- Passwords plaintext — intentional (gym-kiosk use case)
 - Rest timers: 30s (sets) / 45s (exercises) — hardcoded in `startRest`
 - Weight increment: 2.5kg — hardcoded in `adjW`
 - RPE scale 0–10; weight increase suggested at average ≤ 4
