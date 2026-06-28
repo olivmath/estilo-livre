@@ -36,8 +36,8 @@ function RoleGate() {
   const { user, role, loading, error } = useAuth();
 
   if (loading) return <Spinner />;
-  if (error) return <ErrorScreen message={error} />;
   if (!user) return <LoginScreen />;
+  if (error) return <Spinner />;
   if (!role) return <Spinner />;
 
   if (role === "pendente") return <Navigate to="/pending" replace />;

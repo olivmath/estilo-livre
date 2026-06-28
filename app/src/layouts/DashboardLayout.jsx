@@ -138,6 +138,9 @@ export function DashboardLayout() {
             <LogOut size={15} />
             Sair
           </button>
+          <p style={{ fontSize: 10, color: "var(--sub)", opacity: 0.4, padding: "0 12px" }}>
+            v{__APP_VERSION__}
+          </p>
         </div>
       </aside>
 

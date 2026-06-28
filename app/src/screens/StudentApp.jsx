@@ -1108,6 +1108,10 @@ export function StudentApp() {
                 <button onClick={() => signOut(auth)} style={styles.btnSignout} className="mt-8">
                   Sair do Aplicativo
                 </button>
+
+                <p style={{ marginTop: 16, fontSize: 11, color: "var(--sub)", opacity: 0.45 }}>
+                  v{__APP_VERSION__}
+                </p>
               </div>
             </div>
           )}

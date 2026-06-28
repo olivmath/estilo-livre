@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
@@ -7,14 +7,25 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [firebaseUser, setFirebaseUser] = useState(undefined);
+  const [notAuthorized, setNotAuthorized] = useState(false);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => setFirebaseUser(u ?? null));
+    return onAuthStateChanged(auth, (u) => {
+      setFirebaseUser(u ?? null);
+      if (!u) setNotAuthorized(false);
+    });
   }, []);
 
   const { profile, loading: profileLoading, error } = useUserProfile(
     firebaseUser || null
   );
+
+  useEffect(() => {
+    if (error) {
+      setNotAuthorized(true);
+      signOut(auth);
+    }
+  }, [error]);
 
   useEffect(() => {
     if (firebaseUser && profile?.role) {
@@ -39,6 +50,8 @@ export function AuthProvider({ children }) {
         profile,
         loading,
         error,
+        notAuthorized,
+        clearNotAuthorized: () => setNotAuthorized(false),
       }}
     >
       {children}
