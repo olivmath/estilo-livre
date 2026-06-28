@@ -3,90 +3,121 @@
 ## Running
 
 ```bash
-open index.html
+cd app && pnpm dev        # Frontend (Vite + React, port 5173)
+cd functions && npm run serve  # Cloud Functions emulator
 ```
-Reset: `localStorage.clear(); location.reload()` (no browser console)
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Frontend | React 19 + Vite 8, React Router 7, Tailwind 4, shadcn/ui |
+| Backend | Firebase Cloud Functions v2 (Node 20, us-central1) |
+| Auth | Firebase Auth + custom claims (`role`) |
+| DB | Firestore |
+| UI Icons | lucide-react |
 
 ## Architecture
 
-No build, no npm. Multi-file in `app/` with 3 roles.
+```
+app/src/
+├── main.jsx / App.jsx          # Entry + role-based router
+├── contexts/AuthContext.jsx    # Firebase Auth state, profile, role
+├── hooks/useUserProfile.js     # Firestore user doc fetch
+├── lib/firebase.js             # Auth, Firestore, Functions init; call() helper
+├── layouts/DashboardLayout.jsx # Prof/admin shell
+├── pages/                      # Admin/prof pages (Dashboard, Alunos, Exercicios, Treinos, Ranking, Contas)
+├── screens/                    # Role entry points (Login, Pending, StudentApp, ActiveWorkout, Hello)
+├── services/                   # Thin wrappers over call() per domain
+│   └── accounts / dashboard / exercises / ranking / sessions / users / workouts
+└── components/ui/              # shadcn components (button, badge, checkbox, …)
+
+functions/
+├── index.js                    # Aggregates all exports
+├── src/
+│   ├── helpers.js              # requireAuth / requireAdmin / requireAdminOrProf
+│   ├── auth.js                 # onUserCreate trigger, getMyRole, setUserRole
+│   ├── students.js             # CRUD for user docs
+│   ├── workouts.js             # Templates + student workout assignment
+│   ├── exercises.js            # Exercise catalog CRUD
+│   ├── sessions.js             # Session reads (student + recent activity)
+│   ├── dashboard.js            # Aggregate stats
+│   ├── ranking.js              # Ranking query
+│   └── accounts.js             # Account management
+└── scripts/
+    ├── seed.js                 # Seed Firestore with demo data
+    ├── assign-workouts.js      # Bulk workout assignment
+    └── sync-claims.js          # Sync custom claims for all users
+```
+
+## Roles & Routing
+
+| Role | Route | Access |
+|---|---|---|
+| `pendente` | `/pending` | Waiting approval screen |
+| `aluno` | `/student` | StudentApp (workouts, history, profile) |
+| `professor` | `/prof/*` | DashboardLayout (no Contas) |
+| `admin` | `/admin/*` | DashboardLayout (full, incl. Contas) |
+
+- `RoleGate` at `/` redirects based on role from Firestore + custom claims
+- `ProtectedRoute` wraps role-specific subtrees
+
+## Firebase Helpers
+
+```js
+// lib/firebase.js
+export const call = (name) => (data) => httpsCallable(fns, name)(data).then(r => r.data)
+
+// Usage in services:
+import { call } from "@/lib/firebase"
+export const getStudents = call("getStudents")
+```
+
+## Firestore Schema
 
 ```
-app/
-├── index.html                  # Role router
-├── admin/
-│   ├── index.html / css/main.css
-│   └── js/
-│       ├── globals.js          # DB, U, PAL
-│       ├── auth.js / navigation.js / helpers.js / mock.js
-│       ├── dashboard.js / alunos.js / admins.js
-│       ├── treinos.js / exercicios.js / ranking.js
-│       └── screens/shell.js / login.js / modals.js
-├── user/
-│   ├── index.html / css/main.css
-│   └── js/
-│       ├── globals.js          # DB, U, A, PAL
-│       ├── auth.js / navigation.js / data.js
-│       ├── workouts.js / exercises.js / active.js
-│       ├── weight.js / sheets.js / renders.js / report.js / init.js
-│       └── screens/nav.js / login.js / home.js / workouts.js
-│                  active.js / profile.js / sheets.js / overlays.js
-└── prof/index.html             # Trainer stub
+users/{uid}
+  email, name, photoURL, role, active, createdAt, lastWorkout
+  workouts/{wkId}   — label, name, color, exercises[], assignedAt, assignedBy, fromTemplateId
+  sessions/{sessId} — date, duration, exercises[], rpe[]
+
+wk_templates/{id}   — label, name, color, exercises[], createdBy, createdAt
+invites/{email}     — role (consumed on onUserCreate, then deleted)
 ```
 
-## Globals
+## Auth Flow
 
-| Symbol | Role |
-|---|---|
-| `DB` | `DB.get(key, default)` / `DB.set(key, val)` over localStorage JSON |
-| `U` | Current logged-in user (`null` when logged out) |
-| `A` | Active workout session (singleton) |
-| `PAL` | Color palette array |
+1. `onUserCreate` trigger → checks `invites/{email}` or pre-created user doc → sets role → `setCustomUserClaims`
+2. Client: `AuthContext` watches `onAuthStateChanged` → `useUserProfile` fetches Firestore doc → syncs claims if stale
+3. Functions guard with `requireAuth` / `requireAdminOrProf` / `requireAdmin` (checks `request.auth.token.role`)
 
-## localStorage Keys
+## Design System — OBRIGATÓRIO
 
-| Key | Content |
-|---|---|
-| `users` | `{ [email]: { name, email, pw } }` |
-| `cu` | Current user session |
-| `wk_<email>` | Workout objects array |
-| `sess_<email>` | Completed session objects array |
-| `photo_<email>` | Base64 JPEG profile photo |
+**Sempre usar shadcn/ui** para qualquer elemento de UI novo. Nunca criar botões, inputs, modais, badges, checkboxes ou dropdowns do zero.
 
-## Routing
+- Adicionar componentes via `pnpm dlx shadcn@latest add <component>` dentro de `app/`
+- Componentes ficam em `app/src/components/ui/` — nunca duplicar, sempre reutilizar
+- Para variantes novas, extender com `class-variance-authority` (CVA) no próprio arquivo do componente
 
-- `nav(screenId, btnEl)` — shows `.screen#screenId`, hides others, updates nav
-- Screens: `home`, `workouts`, `detail`, `active`, `profile`
-- `openSheet(id)` / `closeSheet(id)` — toggles `.active` on `.so` + `.sheet`
+**Design tokens — usar sempre, nunca hardcodar cores:**
 
-## Render Pattern
-
-Full re-render on state change (no vDOM): `renderHome()` / `renderWorkouts()` / `renderExercises()` / `renderProfile()`
-
-## Active Workout Flow
-
-1. `startWorkout(wkId)` → populates `A`, calls `renderActiveEx()`
-2. `nextSet()` → advances `A.set`; all sets done → `showDiff(ex)` (RPE slider)
-3. `confirmDiff()` → saves RPE, advances `A.exIdx`, calls `renderActiveEx()`
-4. `buildAndShowSummary()` → shows report overlay when all exercises done
-5. `saveAndFinish()` → appends to `sess_<email>`, resets `A`
-
-## Design Tokens
-
-```
+```css
 --bg:#06091a  --bg2:#0b1228  --bg3:#162040
 --acc:#F5C400
 --blue:#1B3487  --blue2:#2352c8
 --green:#00c853  --red:#f44336
+--sub: (texto secundário)
 ```
+
+- Classes Tailwind devem referenciar os tokens via `style={{ color: "var(--acc)" }}` ou via CSS custom properties — nunca `text-yellow-400` ou similares
+- Ícones: sempre `lucide-react`, tamanho padrão `size={16}` ou `size={20}`
 
 ## Constraints
 
-- Mobile-first: max-width 430px, no desktop layout
-- No backend: all data local; multi-device sync out of scope
-- Passwords plaintext — intentional (gym-kiosk use case)
-- Rest timers: 30s (sets) / 45s (exercises) — hardcoded in `startRest`
-- Weight increment: 2.5kg — hardcoded in `adjW`
+- Mobile-first: max-width 430px (StudentApp); admin/prof uses full-width dashboard
+- Rest timers: 30s (sets) / 45s (exercises) — hardcoded
+- Weight increment: 2.5kg — hardcoded
 - RPE scale 0–10; weight increase suggested at average ≤ 4
+- Passwords: Firebase Auth (Google/Email) — no plaintext
 
 <!-- token-policy: v1.0 -->
