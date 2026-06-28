@@ -5,7 +5,11 @@ import {
   deleteStudent, toggleBlock, getStudentStats,
 } from "@/services/users";
 import { getStudentSessions } from "@/services/sessions";
-import { getStudentWorkouts, getTreinos, assignTreino, createCustomWorkout, deleteStudentWorkout } from "@/services/workouts";
+import {
+  getStudentWorkouts, getTreinos, assignTreino,
+  createCustomWorkout, updateStudentWorkout, deleteStudentWorkout,
+} from "@/services/workouts";
+import { getExercises } from "@/services/exercises";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -16,7 +20,12 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { X, Plus, Search, Trash2, ChevronRight, ChevronDown, Lock, KeyRound } from "lucide-react";
+import { X, Plus, Search, Trash2, ChevronRight, ChevronDown, Lock, KeyRound, Edit2 } from "lucide-react";
+
+const PALETTE = [
+  "#2352c8", "#1B3487", "#F5C400", "#00c853", "#f44336",
+  "#9c27b0", "#ff6d00", "#00bcd4", "#e91e63", "#607d8b",
+];
 
 const STATUS_COLORS = {
   active:   { bg: "rgba(0,200,83,0.12)",  text: "var(--green)",  label: "Ativo" },
@@ -69,7 +78,7 @@ function Modal({ open, onClose, title, children }) {
   if (!open) return null;
   return (
     <div style={{
-      position: "fixed", inset: 0, zIndex: 100,
+      position: "fixed", inset: 0, zIndex: 200,
       display: "flex", alignItems: "flex-end",
       background: "rgba(0,0,0,0.6)",
     }}
@@ -80,7 +89,7 @@ function Modal({ open, onClose, title, children }) {
           width: "100%", maxWidth: 520, margin: "0 auto",
           background: "var(--bg2)", borderTopLeftRadius: 20, borderTopRightRadius: 20,
           border: "1px solid var(--blue)", borderBottom: "none",
-          padding: "24px 20px 32px", maxHeight: "90vh", overflowY: "auto",
+          padding: "24px 20px 32px", maxHeight: "92vh", overflowY: "auto",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -105,17 +114,14 @@ function Field({ label, children }) {
   );
 }
 
+const inputStyle = {
+  width: "100%", padding: "10px 12px", background: "var(--bg3)",
+  border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)",
+  fontSize: 14, outline: "none",
+};
+
 function Input({ ...props }) {
-  return (
-    <input
-      style={{
-        width: "100%", padding: "10px 12px", background: "var(--bg3)",
-        border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)",
-        fontSize: 14, outline: "none",
-      }}
-      {...props}
-    />
-  );
+  return <input style={inputStyle} {...props} />;
 }
 
 function NovoAlunoModal({ open, onClose, onCreated }) {
@@ -187,21 +193,259 @@ function RpeChart({ sessions }) {
   );
 }
 
-function StudentDetail({ uid, onClose, role }) {
+function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
+  const EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [] };
+  const [form, setForm] = useState(EMPTY);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [addingEx, setAddingEx] = useState(false);
+  const [exSearch, setExSearch] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      setForm(initial ? { ...initial, exercises: [...(initial.exercises ?? [])] } : EMPTY);
+      setError(null);
+      setAddingEx(false);
+      setExSearch("");
+    }
+  }, [open, initial]);
+
+  function set(k, v) { setForm((p) => ({ ...p, [k]: v })); }
+
+  function addExercise(ex) {
+    setForm((p) => ({
+      ...p,
+      exercises: [...p.exercises, { id: ex.id, name: ex.name, group: ex.group, sets: ex.sets ?? 3, reps: ex.reps ?? 12, wt: 0 }],
+    }));
+    setExSearch("");
+    setAddingEx(false);
+  }
+
+  function updateEx(i, k, v) {
+    setForm((p) => {
+      const exs = [...p.exercises];
+      exs[i] = { ...exs[i], [k]: Number(v) };
+      return { ...p, exercises: exs };
+    });
+  }
+
+  function removeEx(i) {
+    setForm((p) => ({ ...p, exercises: p.exercises.filter((_, j) => j !== i) }));
+  }
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!form.name.trim()) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        label: form.label,
+        name: form.name.trim(),
+        color: form.color,
+        exercises: form.exercises,
+      };
+      if (initial?.id) {
+        await updateStudentWorkout(uid, initial.id, payload);
+      } else {
+        await createCustomWorkout(uid, payload);
+      }
+      onSaved();
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const alreadyIds = new Set(form.exercises.map((e) => e.id));
+  const filteredExs = allExercises.filter((e) => {
+    if (alreadyIds.has(e.id)) return false;
+    if (!exSearch) return true;
+    const q = exSearch.toLowerCase();
+    return e.name.toLowerCase().includes(q) || e.group?.toLowerCase().includes(q);
+  });
+
+  return (
+    <Modal open={open} onClose={onClose} title={initial?.id ? "Editar Treino" : "Novo Treino Customizado"}>
+      <form onSubmit={submit}>
+        {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+
+        <div style={{ display: "grid", gridTemplateColumns: "64px 1fr", gap: 12 }}>
+          <Field label="Label">
+            <Input
+              value={form.label}
+              onChange={(e) => set("label", e.target.value.toUpperCase().slice(0, 2))}
+              placeholder="A"
+              maxLength={2}
+            />
+          </Field>
+          <Field label="Nome">
+            <Input
+              value={form.name}
+              onChange={(e) => set("name", e.target.value)}
+              placeholder="Ex: Treino A — Peito e Tríceps"
+              required
+            />
+          </Field>
+        </div>
+
+        <Field label="Cor">
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {PALETTE.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => set("color", c)}
+                style={{
+                  width: 28, height: 28, borderRadius: "50%", background: c,
+                  border: form.color === c ? "3px solid white" : "3px solid transparent",
+                  cursor: "pointer",
+                }}
+              />
+            ))}
+          </div>
+        </Field>
+
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <label style={{ fontSize: 12, color: "var(--sub)" }}>
+              Exercícios ({form.exercises.length})
+            </label>
+            {!addingEx && (
+              <button
+                type="button"
+                onClick={() => setAddingEx(true)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--acc)", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}
+              >
+                <Plus size={13} /> Adicionar
+              </button>
+            )}
+          </div>
+
+          {addingEx && (
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
+                <div style={{ position: "relative", flex: 1 }}>
+                  <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--sub)" }} />
+                  <input
+                    autoFocus
+                    value={exSearch}
+                    onChange={(e) => setExSearch(e.target.value)}
+                    placeholder="Buscar exercício…"
+                    style={{
+                      width: "100%", padding: "8px 10px 8px 30px",
+                      background: "var(--bg2)", border: "1px solid var(--blue)",
+                      borderRadius: 8, color: "var(--text)", fontSize: 13, outline: "none",
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => { setAddingEx(false); setExSearch(""); }}
+                >
+                  <X size={14} />
+                </Button>
+              </div>
+              <div style={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 3 }}>
+                {filteredExs.slice(0, 30).map((ex) => (
+                  <button
+                    key={ex.id}
+                    type="button"
+                    onClick={() => addExercise(ex)}
+                    style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "8px 10px", background: "var(--bg3)", borderRadius: 6,
+                      border: "none", cursor: "pointer", color: "var(--text)", textAlign: "left",
+                    }}
+                  >
+                    <span style={{ fontSize: 13 }}>{ex.name}</span>
+                    <span style={{ fontSize: 11, color: "var(--sub)" }}>{ex.group}</span>
+                  </button>
+                ))}
+                {filteredExs.length === 0 && (
+                  <p style={{ fontSize: 13, color: "var(--sub)", padding: "8px 0" }}>Nenhum exercício encontrado</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {form.exercises.map((ex, i) => (
+              <div key={i} style={{
+                background: "var(--bg3)", borderRadius: 8, padding: "10px 12px",
+                borderLeft: `3px solid ${form.color}`,
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{ex.name}</span>
+                    {ex.group && (
+                      <span style={{ fontSize: 11, color: "var(--sub)", marginLeft: 6 }}>{ex.group}</span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeEx(i)}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)" }}
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  {[
+                    { k: "sets", label: "Séries" },
+                    { k: "reps", label: "Reps" },
+                    { k: "wt", label: "Peso (kg)" },
+                  ].map(({ k, label }) => (
+                    <div key={k}>
+                      <p style={{ fontSize: 10, color: "var(--sub)", marginBottom: 2 }}>{label}</p>
+                      <input
+                        type="number"
+                        min={0}
+                        value={ex[k] ?? 0}
+                        onChange={(e) => updateEx(i, k, e.target.value)}
+                        style={{
+                          width: "100%", padding: "6px 8px", background: "var(--bg2)",
+                          border: "1px solid var(--blue)", borderRadius: 6, color: "var(--text)",
+                          fontSize: 13, outline: "none",
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
+          {loading ? "Salvando…" : initial?.id ? "Salvar Alterações" : "Criar Treino"}
+        </Button>
+      </form>
+    </Modal>
+  );
+}
+
+function StudentDetail({ uid, role }) {
   const [tab, setTab] = useState("progresso");
   const [stats, setStats] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [workouts, setWorkouts] = useState([]);
   const [treinos, setTreinos] = useState([]);
+  const [exercises, setExercises] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [assignOpen, setAssignOpen] = useState(false);
-  const [selectedTreino, setSelectedTreino] = useState("");
-  const [assigning, setAssigning] = useState(false);
+  const [assigning, setAssigning] = useState(null);
 
-  const [newWkOpen, setNewWkOpen] = useState(false);
-  const [newWkName, setNewWkName] = useState("");
-  const [creatingWk, setCreatingWk] = useState(false);
+  const [wkModal, setWkModal] = useState(false);
+  const [wkEditing, setWkEditing] = useState(null);
+
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [expandedWk, setExpandedWk] = useState(new Set());
 
   useEffect(() => {
     if (!uid) return;
@@ -211,45 +455,45 @@ function StudentDetail({ uid, onClose, role }) {
       getStudentSessions(uid, 10),
       getStudentWorkouts(uid),
       getTreinos(),
-    ]).then(([s, sess, wks, tmpl]) => {
+      getExercises(),
+    ]).then(([s, sess, wks, tmpl, exs]) => {
       setStats(s);
       setSessions(sess);
       setWorkouts(wks);
       setTreinos(tmpl);
+      setExercises(exs);
     }).finally(() => setLoading(false));
   }, [uid]);
 
-  async function handleAssign() {
-    if (!selectedTreino) return;
-    setAssigning(true);
+  async function refreshWorkouts() {
+    const wks = await getStudentWorkouts(uid);
+    setWorkouts(wks);
+  }
+
+  async function handleAssign(templateId) {
+    setAssigning(templateId);
     try {
-      await assignTreino(uid, selectedTreino);
-      const wks = await getStudentWorkouts(uid);
-      setWorkouts(wks);
+      await assignTreino(uid, templateId);
+      await refreshWorkouts();
       setAssignOpen(false);
-      setSelectedTreino("");
     } finally {
-      setAssigning(false);
+      setAssigning(null);
     }
   }
 
-  async function handleNewWk() {
-    if (!newWkName.trim()) return;
-    setCreatingWk(true);
-    try {
-      await createCustomWorkout(uid, { name: newWkName.trim(), label: "A", color: "#2352c8", exercises: [] });
-      const wks = await getStudentWorkouts(uid);
-      setWorkouts(wks);
-      setNewWkOpen(false);
-      setNewWkName("");
-    } finally {
-      setCreatingWk(false);
-    }
+  async function handleDeleteWk() {
+    if (!deleteTarget) return;
+    await deleteStudentWorkout(uid, deleteTarget);
+    setWorkouts((p) => p.filter((w) => w.id !== deleteTarget));
+    setDeleteTarget(null);
   }
 
-  async function handleDeleteWk(wkId) {
-    await deleteStudentWorkout(uid, wkId);
-    setWorkouts((p) => p.filter((w) => w.id !== wkId));
+  function toggleExpand(wkId) {
+    setExpandedWk((prev) => {
+      const next = new Set(prev);
+      next.has(wkId) ? next.delete(wkId) : next.add(wkId);
+      return next;
+    });
   }
 
   if (loading) return <Spinner />;
@@ -273,7 +517,6 @@ function StudentDetail({ uid, onClose, role }) {
 
       {tab === "progresso" && (
         <div>
-          {/* Stats cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
             {[
               { label: "Total Sessões", value: stats?.totalSessions ?? 0 },
@@ -292,13 +535,11 @@ function StudentDetail({ uid, onClose, role }) {
             ))}
           </div>
 
-          {/* RPE chart */}
           <div style={{ marginBottom: 16 }}>
             <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 8 }}>RPE (últimas sessões)</p>
             <RpeChart sessions={sessions} />
           </div>
 
-          {/* Sessions table */}
           <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 8 }}>Últimas sessões</p>
           {sessions.length === 0 ? (
             <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhuma sessão registrada</p>
@@ -327,96 +568,209 @@ function StudentDetail({ uid, onClose, role }) {
       {tab === "treinos" && (
         <div>
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-            <Button size="sm" onClick={() => setAssignOpen(true)} style={{ flex: 1 }}>
+            <Button
+              size="sm"
+              onClick={() => setAssignOpen((p) => !p)}
+              style={{ flex: 1 }}
+            >
               Atribuir Treino
             </Button>
-            <Button size="sm" variant="outline" onClick={() => setNewWkOpen(true)} style={{ flex: 1 }}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => { setWkEditing(null); setWkModal(true); }}
+              style={{ flex: 1 }}
+            >
               Novo Customizado
             </Button>
           </div>
 
+          {/* Template picker */}
           {assignOpen && (
             <div style={{
-              background: "var(--bg3)", borderRadius: 8, padding: 12, marginBottom: 12,
-              display: "flex", gap: 8, alignItems: "center",
+              background: "var(--bg3)", borderRadius: 10, padding: 12, marginBottom: 12,
             }}>
-              <select
-                value={selectedTreino}
-                onChange={(e) => setSelectedTreino(e.target.value)}
-                style={{
-                  flex: 1, padding: "8px 10px", background: "var(--bg2)",
-                  border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)", fontSize: 13,
-                }}
-              >
-                <option value="">Selecione…</option>
-                {treinos.map((t) => (
-                  <option key={t.id} value={t.id}>{t.label} — {t.name}</option>
-                ))}
-              </select>
-              <Button size="sm" onClick={handleAssign} disabled={assigning || !selectedTreino}>
-                {assigning ? "…" : "OK"}
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setAssignOpen(false)}>
-                <X size={14} />
-              </Button>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <p style={{ fontSize: 12, color: "var(--sub)", fontWeight: 600 }}>Selecione um template</p>
+                <button
+                  onClick={() => setAssignOpen(false)}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)" }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              {treinos.length === 0 ? (
+                <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum template criado</p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {treinos.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => handleAssign(t.id)}
+                      disabled={assigning !== null}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "10px 12px", background: "var(--bg2)",
+                        borderRadius: 8, border: "1px solid var(--blue)",
+                        borderLeft: `3px solid ${t.color ?? "var(--blue)"}`,
+                        cursor: assigning ? "default" : "pointer",
+                        color: "var(--text)", textAlign: "left",
+                        opacity: assigning === t.id ? 0.6 : 1,
+                      }}
+                    >
+                      <span style={{
+                        fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 20,
+                        background: `${t.color ?? "var(--blue)"}22`, color: t.color ?? "var(--sub)",
+                        flexShrink: 0,
+                      }}>
+                        {t.label}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{t.name}</p>
+                        <p style={{ fontSize: 11, color: "var(--sub)" }}>
+                          {t.exercises?.length ?? 0} exercício{(t.exercises?.length ?? 0) !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      {assigning === t.id && (
+                        <div className="w-4 h-4 rounded-full border-2 animate-spin"
+                          style={{ borderColor: "var(--bg3)", borderTopColor: "var(--acc)", flexShrink: 0 }} />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {newWkOpen && (
-            <div style={{
-              background: "var(--bg3)", borderRadius: 8, padding: 12, marginBottom: 12,
-              display: "flex", gap: 8, alignItems: "center",
-            }}>
-              <input
-                value={newWkName}
-                onChange={(e) => setNewWkName(e.target.value)}
-                placeholder="Nome do treino"
-                style={{
-                  flex: 1, padding: "8px 10px", background: "var(--bg2)",
-                  border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)", fontSize: 13,
-                }}
-              />
-              <Button size="sm" onClick={handleNewWk} disabled={creatingWk || !newWkName.trim()}>
-                {creatingWk ? "…" : "OK"}
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setNewWkOpen(false)}>
-                <X size={14} />
-              </Button>
-            </div>
-          )}
-
+          {/* Workout list */}
           {workouts.length === 0 ? (
             <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhuma ficha atribuída</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {workouts.map((w) => (
-                <div key={w.id} style={{
-                  background: "var(--bg3)", borderRadius: 10, padding: "12px 14px",
-                  borderLeft: `3px solid ${w.color ?? "var(--blue)"}`,
-                }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
-                    <div>
-                      <span style={{ fontSize: 10, color: "var(--sub)", fontWeight: 600 }}>{w.label}</span>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{w.name}</p>
+              {workouts.map((w) => {
+                const expanded = expandedWk.has(w.id);
+                const exCount = w.exercises?.length ?? 0;
+                return (
+                  <div key={w.id} style={{
+                    background: "var(--bg3)", borderRadius: 10,
+                    borderLeft: `3px solid ${w.color ?? "var(--blue)"}`,
+                    overflow: "hidden",
+                  }}>
+                    <div style={{
+                      display: "flex", alignItems: "center",
+                      padding: "12px 14px", gap: 8,
+                    }}>
+                      {/* Expand toggle */}
+                      <button
+                        onClick={() => toggleExpand(w.id)}
+                        style={{
+                          flex: 1, display: "flex", alignItems: "center", gap: 8,
+                          background: "none", border: "none", cursor: "pointer", textAlign: "left", minWidth: 0,
+                        }}
+                      >
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                            <span style={{
+                              fontSize: 10, fontWeight: 800, padding: "1px 6px", borderRadius: 20,
+                              background: `${w.color ?? "var(--blue)"}22`, color: w.color ?? "var(--sub)",
+                            }}>
+                              {w.label}
+                            </span>
+                            {!w.fromTemplateId && (
+                              <span style={{ fontSize: 10, color: "var(--sub)" }}>customizado</span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {w.name}
+                          </p>
+                          <p style={{ fontSize: 11, color: "var(--sub)" }}>
+                            {exCount} exercício{exCount !== 1 ? "s" : ""}
+                          </p>
+                        </div>
+                        <ChevronDown
+                          size={14}
+                          style={{
+                            color: "var(--sub)", flexShrink: 0, marginLeft: "auto",
+                            transform: expanded ? "rotate(180deg)" : "none",
+                            transition: "transform .2s",
+                          }}
+                        />
+                      </button>
+
+                      {/* Actions */}
+                      <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
+                        <button
+                          onClick={() => { setWkEditing(w); setWkModal(true); }}
+                          title="Editar"
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)", padding: 6 }}
+                        >
+                          <Edit2 size={13} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(w.id)}
+                          title="Remover"
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)", padding: 6 }}
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => handleDeleteWk(w.id)}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)", padding: 4 }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
+
+                    {expanded && (
+                      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "8px 14px 12px" }}>
+                        {exCount === 0 ? (
+                          <p style={{ fontSize: 12, color: "var(--sub)" }}>Nenhum exercício — clique em editar para adicionar</p>
+                        ) : (
+                          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            {w.exercises.map((ex, i) => (
+                              <div key={i} style={{
+                                display: "flex", justifyContent: "space-between", alignItems: "center",
+                                padding: "6px 0",
+                                borderBottom: i < exCount - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                              }}>
+                                <span style={{ fontSize: 13, color: "var(--text)" }}>{ex.name}</span>
+                                <span style={{ fontSize: 11, color: "var(--sub)", flexShrink: 0, marginLeft: 8 }}>
+                                  {ex.sets}×{ex.reps}{ex.wt > 0 ? ` · ${ex.wt}kg` : ""}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  {w.exercises?.length > 0 && (
-                    <p style={{ fontSize: 11, color: "var(--sub)" }}>
-                      {w.exercises.length} exercício{w.exercises.length !== 1 ? "s" : ""}
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
       )}
+
+      <WorkoutModal
+        open={wkModal}
+        onClose={() => setWkModal(false)}
+        uid={uid}
+        initial={wkEditing}
+        allExercises={exercises}
+        onSaved={refreshWorkouts}
+      />
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover ficha?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. O histórico de sessões é preservado.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteWk} style={{ background: "var(--red)" }}>
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -431,7 +785,7 @@ export function AlunosPage() {
   const [statsMap, setStatsMap] = useState({});
 
   const [selected, setSelected] = useState(new Set());
-  const [bulkConfirm, setBulkConfirm] = useState(null); // { action: "block"|"unblock"|"delete", uids: [] }
+  const [bulkConfirm, setBulkConfirm] = useState(null);
   const [bulkLoading, setBulkLoading] = useState(false);
 
   const [novoOpen, setNovoOpen] = useState(false);
@@ -528,7 +882,6 @@ export function AlunosPage() {
         </Button>
       </div>
 
-      {/* Search */}
       <div style={{ position: "relative", marginBottom: 12 }}>
         <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--sub)" }} />
         <input
@@ -543,7 +896,6 @@ export function AlunosPage() {
         />
       </div>
 
-      {/* Filters + Ações */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
         {STATUS_FILTERS.map((f) => (
           <button key={f} onClick={() => setStatusFilter(f)} style={{
@@ -621,12 +973,10 @@ export function AlunosPage() {
         </div>
       </div>
 
-      {/* Table */}
       {filtered.length === 0 ? (
         <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum aluno encontrado</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {/* Select-all row */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "4px 14px" }}>
             <button
               onClick={toggleAll}
@@ -665,7 +1015,6 @@ export function AlunosPage() {
                 display: "flex", alignItems: "center", gap: 12,
                 transition: "background .15s, border-color .15s",
               }}>
-                {/* Checkbox */}
                 <button
                   onClick={() => toggleSelect(s.uid)}
                   aria-label={isSelected ? `Desmarcar ${s.name}` : `Selecionar ${s.name}`}
@@ -694,7 +1043,6 @@ export function AlunosPage() {
                   </p>
                 </div>
 
-                {/* Stats */}
                 <div style={{ display: "flex", gap: 16, alignItems: "center" }} className="hidden sm:flex">
                   <div style={{ textAlign: "center" }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{st?.weekSessions ?? "—"}</p>
@@ -727,7 +1075,6 @@ export function AlunosPage() {
 
       <NovoAlunoModal open={novoOpen} onClose={() => setNovoOpen(false)} onCreated={load} />
 
-      {/* Bulk confirmation */}
       <AlertDialog open={!!bulkConfirm} onOpenChange={(open) => !open && setBulkConfirm(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -772,7 +1119,7 @@ export function AlunosPage() {
                 <X size={18} />
               </button>
             </div>
-            <StudentDetail uid={detailUid} onClose={() => setDetailUid(null)} role={role} />
+            <StudentDetail uid={detailUid} role={role} />
           </div>
         </div>
       )}
