@@ -11,7 +11,7 @@
     }
   ],
   "hosting": {
-    "public": "v0.3/dist",
+    "public": "app/dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       { "source": "**", "destination": "/index.html" }
