@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { collection, getDocs, setDoc, deleteDoc, doc, serverTimestamp, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
+import { setUserRole } from "@/services/accounts";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, X } from "lucide-react";
 
@@ -144,11 +145,12 @@ function NovoContaModal({ open, onClose, onCreated }) {
 }
 
 export function ContasPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, role: myRole } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [novoOpen, setNovoOpen] = useState(false);
+  const [changingRole, setChangingRole] = useState(null); // uid being changed
 
   const load = useCallback(() => {
     setLoading(true);
@@ -164,6 +166,16 @@ export function ContasPage() {
     if (!confirm("Remover esta conta?")) return;
     await deleteStaffUser(uid);
     load();
+  }
+
+  async function handleRoleChange(uid, newRole) {
+    setChangingRole(uid);
+    try {
+      await setUserRole(uid, newRole);
+      load();
+    } finally {
+      setChangingRole(null);
+    }
   }
 
   if (loading) return <Spinner />;
@@ -228,12 +240,29 @@ export function ContasPage() {
                   <p style={{ fontSize: 11, color: "var(--sub)" }}>{u.email}</p>
                 </div>
 
-                <span style={{
-                  fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20,
-                  background: roleC.bg, color: roleC.text, flexShrink: 0,
-                }}>
-                  {ROLE_LABELS[u.role] ?? u.role}
-                </span>
+                {myRole === "admin" && !isMe ? (
+                  <select
+                    value={u.role}
+                    disabled={changingRole === u.uid}
+                    onChange={(e) => handleRoleChange(u.uid, e.target.value)}
+                    style={{
+                      fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20,
+                      background: roleC.bg, color: roleC.text, border: "none",
+                      cursor: "pointer", outline: "none", flexShrink: 0,
+                      opacity: changingRole === u.uid ? 0.5 : 1,
+                    }}
+                  >
+                    <option value="professor">Professor</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                ) : (
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20,
+                    background: roleC.bg, color: roleC.text, flexShrink: 0,
+                  }}>
+                    {ROLE_LABELS[u.role] ?? u.role}
+                  </span>
+                )}
 
                 {!isMe && (
                   <button
