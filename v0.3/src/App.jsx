@@ -61,7 +61,14 @@ export default function App() {
       <Routes>
         <Route path="/" element={<RoleGate />} />
         <Route path="/pending" element={<PendingScreen />} />
-        <Route path="/student" element={<StudentApp />} />
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute roles={["aluno"]}>
+              <StudentApp />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/prof/*"

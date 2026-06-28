@@ -14,6 +14,7 @@ import {
   Plus,
   Clock,
 } from "lucide-react";
+import { ActiveWorkoutScreen } from "@/screens/ActiveWorkoutScreen";
 
 export function StudentApp() {
   const { user, profile } = useAuth();
@@ -25,6 +26,9 @@ export function StudentApp() {
   // Active workout states
   const [activeWk, setActiveWk] = useState(null); // { id, label, name, color, exercises: [...], exIdx: 0, set: 0, start: 0, results: [], currentWeight: 0, exStart: 0 }
   const [restTime, setRestTime] = useState(null); // seconds
+  const [restTotal, setRestTotal] = useState(null); // total seconds for ring animation
+  const [restType, setRestType] = useState(null); // 'rest' | 'transition'
+  const [showExit, setShowExit] = useState(false);
   const [showRpe, setShowRpe] = useState(false);
   const [rpeValue, setRpeValue] = useState(5);
   const [showSummary, setShowSummary] = useState(false);
@@ -38,9 +42,15 @@ export function StudentApp() {
   // Viewed past session
   const [viewingSession, setViewingSession] = useState(null);
 
+  // RPE tutorial
+  const [showRpeTutorial, setShowRpeTutorial] = useState(false);
+  const [rpeTutSlide, setRpeTutSlide] = useState(0);
+  const RPE_TUT_TOTAL = 3;
+
   const timerRef = useRef(null);
   const restTimerRef = useRef(null);
   const [elapsedTime, setElapsedTime] = useState("00:00");
+  const prevPctRef = useRef(null);
 
   // Load data from Firestore
   const loadData = useCallback(async () => {
@@ -165,8 +175,8 @@ export function StudentApp() {
     const area = `${svgPts[0].x.toFixed(1)},${H} ` + polyline + ` ${svgPts[svgPts.length - 1].x.toFixed(1)},${H}`;
 
     const trend = pts[pts.length - 1] - pts[0];
-    const trendColor = trend < -0.5 ? "var(--green)" : trend > 0.5 ? "var(--red)" : "var(--acc)";
-    const trendLabel = trend < -0.5 ? "↓ Melhorando" : trend > 0.5 ? "↑ Ficando difícil" : "Estável";
+    const trendColor = trend > 0.5 ? "var(--green)" : "var(--acc)";
+    const trendLabel = trend > 0.5 ? "↑ Evoluindo" : "↓ Acomodando";
 
     return { polyline, area, svgPts, trendColor, trendLabel, W, H, sessionsList: sortedSess };
   };
@@ -198,6 +208,14 @@ export function StudentApp() {
   };
 
   // Workout controls
+  const lastWeightFor = (exName, fallback = 1) => {
+    for (const s of sessions) {
+      const r = s.exs?.find((e) => e.name === exName);
+      if (r?.wt) return r.wt;
+    }
+    return fallback || 1;
+  };
+
   const startWorkout = (wkId) => {
     const wk = workouts.find((w) => w.id === wkId);
     if (!wk?.exercises?.length) return alert("Este treino não possui exercícios cadastrados.");
@@ -211,7 +229,7 @@ export function StudentApp() {
       set: 0,
       start: Date.now(),
       results: [],
-      currentWeight: wk.exercises[0]?.wt || 0,
+      currentWeight: lastWeightFor(wk.exercises[0]?.name, wk.exercises[0]?.wt || 0),
       exStart: Date.now(),
     });
     setRestTime(null);
@@ -230,6 +248,8 @@ export function StudentApp() {
       setShowRpe(true);
     } else {
       setActiveWk((prev) => ({ ...prev, set: newSet }));
+      setRestTotal(30);
+      setRestType("rest");
       setRestTime(30); // 30s rest between sets
     }
   };
@@ -276,9 +296,11 @@ export function StudentApp() {
         results: updatedResults,
         exIdx: nextIdx,
         set: 0,
-        currentWeight: prev.exercises[nextIdx].wt || 0,
+        currentWeight: lastWeightFor(prev.exercises[nextIdx].name, prev.exercises[nextIdx].wt || 0),
         exStart: Date.now(),
       }));
+      setRestTotal(45);
+      setRestType("transition");
       setRestTime(45); // 45s rest between exercises
     }
   };
@@ -306,6 +328,7 @@ export function StudentApp() {
       setActiveWk(null);
       setShowSummary(false);
       setSummaryData(null);
+      launchConfetti();
       await loadData();
       setTab("home");
     } catch (e) {
@@ -315,10 +338,16 @@ export function StudentApp() {
   };
 
   const discardWorkout = () => {
-    if (!confirm("Deseja descartar o treino atual? Suas alterações não serão salvas.")) return;
     setActiveWk(null);
     setShowSummary(false);
     setSummaryData(null);
+    setShowExit(false);
+  };
+
+  const skipRest = () => {
+    setRestTime(null);
+    setRestType(null);
+    setRestTotal(null);
   };
 
   // Adjust weight in active workout
@@ -425,240 +454,80 @@ export function StudentApp() {
 
   const cycleInfoObj = getCycleInfo();
 
+  const launchConfetti = useCallback(() => {
+    const canvas = document.createElement("canvas");
+    canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999";
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+    const COLORS = ["#F5C400", "#2352c8", "#00c853", "#fff", "#f44336", "#1B3487"];
+    const particles = Array.from({ length: 140 }, () => ({
+      x: Math.random() * canvas.width,
+      y: canvas.height * (Math.random() * 0.4),
+      vx: (Math.random() - 0.5) * 7,
+      vy: -(Math.random() * 6 + 3),
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      w: Math.random() * 10 + 5,
+      h: Math.random() * 5 + 3,
+      rot: Math.random() * 360,
+      rotV: (Math.random() - 0.5) * 10,
+    }));
+    let raf;
+    const tick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.18;
+        p.rot += p.rotV;
+        if (p.y < canvas.height + 20) alive = true;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+      if (alive) raf = requestAnimationFrame(tick);
+      else canvas.remove();
+    };
+    raf = requestAnimationFrame(tick);
+    setTimeout(() => { cancelAnimationFrame(raf); canvas.remove(); }, 5000);
+  }, []);
+
+  useEffect(() => {
+    if (prevPctRef.current !== null && prevPctRef.current < 100 && cycleInfoObj.pct === 100) {
+      launchConfetti();
+    }
+    prevPctRef.current = cycleInfoObj.pct;
+  }, [cycleInfoObj.pct, launchConfetti]);
+
   // If a workout session is active
   if (activeWk) {
-    const ex = activeWk.exercises[activeWk.exIdx];
-    const nextEx = activeWk.exercises[activeWk.exIdx + 1];
-
     return (
-      <div style={styles.activePage}>
-        {/* Rest Overlay */}
-        {restTime !== null && (
-          <div style={styles.overlay}>
-            <div style={styles.overlayContent}>
-              <p style={{ color: "var(--sub)", fontSize: 13, textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Descanso</p>
-              <h2 style={{ fontSize: 72, fontWeight: 900, color: "var(--acc)", lineHeight: 1 }}>{restTime}s</h2>
-              <p style={{ color: "var(--text)", fontSize: 14, marginTop: 12, opacity: 0.8 }}>Relaxe e prepare-se.</p>
-              <button onClick={() => setRestTime(null)} style={styles.btnSecondary} className="mt-8">
-                Pular descanso
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Rpe Overlay */}
-        {showRpe && (
-          <div style={styles.overlay}>
-            <div style={styles.overlayContentCard}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>Avalie a Dificuldade</h3>
-              <p style={{ fontSize: 13, color: "var(--sub)", marginBottom: 20 }}>
-                Como foi a execução de <b>{ex.name}</b>?
-              </p>
-
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 24 }}>
-                <span style={{ fontSize: 48, fontWeight: 900, color: diffColor(rpeValue), lineHeight: 1 }}>
-                  {rpeValue}
-                </span>
-                <span style={{ fontSize: 13, color: "var(--sub)", marginTop: 4 }}>
-                  {rpeValue <= 4 ? "Fácil / Leve" : rpeValue <= 7 ? "Moderado / Ideal" : "Muito Difícil / Limite"}
-                </span>
-              </div>
-
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={rpeValue}
-                onChange={(e) => setRpeValue(parseInt(e.target.value))}
-                style={{
-                  width: "100%",
-                  accentColor: diffColor(rpeValue),
-                  marginBottom: 32,
-                  cursor: "pointer",
-                }}
-              />
-
-              <button
-                onClick={confirmRpe}
-                style={{
-                  width: "100%",
-                  padding: 16,
-                  borderRadius: 12,
-                  background: diffColor(rpeValue),
-                  color: "#000",
-                  fontWeight: 700,
-                  fontSize: 16,
-                  cursor: "pointer",
-                }}
-              >
-                Confirmar Dificuldade
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Summary Overlay */}
-        {showSummary && summaryData && (
-          <div style={{ ...styles.overlay, overflowY: "auto" }}>
-            <div style={styles.summaryCard}>
-              <div style={{ ...styles.summaryHdr, borderBottom: `3px solid ${summaryData.wkColor}` }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: summaryData.wkColor, letterSpacing: 2 }}>TREINO CONCLUÍDO</span>
-                <h2 style={{ fontSize: 26, fontWeight: 850, marginTop: 4 }}>Treino {summaryData.wkLabel}</h2>
-                <p style={{ color: "var(--sub)", fontSize: 14 }}>{summaryData.wkName}</p>
-              </div>
-
-              <div style={styles.summaryStats}>
-                <div style={styles.summaryStatItem}>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: "var(--acc)" }}>{elapsedTime}</span>
-                  <span style={{ fontSize: 11, color: "var(--sub)" }}>Duração</span>
-                </div>
-                <div style={styles.summaryStatItem}>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: "var(--acc)" }}>
-                    {fmtVol(summaryData.exs.reduce((a, r) => a + r.wt * r.sets * r.reps, 0))}
-                  </span>
-                  <span style={{ fontSize: 11, color: "var(--sub)" }}>Volume total</span>
-                </div>
-                <div style={styles.summaryStatItem}>
-                  <span style={{
-                    fontSize: 22, fontWeight: 800,
-                    color: diffColor(parseFloat(summaryData.exs.length ? (summaryData.exs.reduce((a, r) => a + r.diff, 0) / summaryData.exs.length) : 5))
-                  }}>
-                    {(summaryData.exs.length ? (summaryData.exs.reduce((a, r) => a + r.diff, 0) / summaryData.exs.length).toFixed(1) : "—")}/10
-                  </span>
-                  <span style={{ fontSize: 11, color: "var(--sub)" }}>Dificuldade média</span>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
-                {summaryData.exs.map((res, i) => (
-                  <div key={i} style={styles.summaryExCard}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                      {res.num && <span style={{ ...styles.badgeNum, background: summaryData.wkColor }}>{res.num}</span>}
-                      <span style={{ fontWeight: 600, fontSize: 14 }}>{res.name}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 12, color: "var(--sub)" }}>
-                        {res.sets} séries × {res.reps} reps · <b>{res.wt}kg</b>
-                      </span>
-                      <span style={{ color: diffColor(res.diff), fontWeight: 700, fontSize: 13 }}>
-                        RPE {res.diff}/10
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ display: "flex", gap: 12 }}>
-                <button onClick={discardWorkout} style={{ ...styles.btnSecondary, flex: 1 }}>Descartar</button>
-                <button onClick={saveWorkoutSession} style={{ ...styles.btnPrimary, flex: 2 }}>Salvar Treino</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Header */}
-        <div style={styles.activeHdr}>
-          <div>
-            <span style={{ fontSize: 11, color: "var(--sub)", textTransform: "uppercase", letterSpacing: 1.5 }}>
-              Treino {activeWk.label}
-            </span>
-            <h2 style={{ fontSize: 16, fontWeight: 700 }}>{activeWk.name}</h2>
-          </div>
-          <button onClick={discardWorkout} style={styles.btnClose}>
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Timer */}
-        <div style={styles.timerBox}>
-          <h1 style={{ fontSize: 40, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{elapsedTime}</h1>
-          <span style={{ fontSize: 11, color: "var(--sub)", textTransform: "uppercase", letterSpacing: 1, marginTop: 4 }}>tempo ativo</span>
-        </div>
-
-        {/* Central Card */}
-        <div style={styles.activeCard}>
-          {/* Badges */}
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
-            {ex.num && <span style={{ ...styles.badgeNum, background: activeWk.color }}>{ex.num}</span>}
-            {ex.mac && <span style={styles.badgeMachine}>Máq. {ex.mac}</span>}
-            {ex.obs && <span style={styles.badgeObs}>{ex.obs}</span>}
-          </div>
-
-          <h3 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", marginBottom: 20 }}>{ex.name}</h3>
-
-          {/* Weight Adjuster */}
-          <div style={styles.weightSelector}>
-            <div style={styles.weightBox}>
-              <h2 style={{ fontSize: 44, fontWeight: 900, color: "var(--acc)", lineHeight: 1 }}>{activeWk.currentWeight}</h2>
-              <span style={{ fontSize: 12, color: "var(--sub)", marginTop: 2 }}>kg · carga atual</span>
-              <div style={styles.weightAdjustBtns}>
-                <button onClick={() => adjustActiveWeight(-2.5)} style={styles.adjBtn}>−</button>
-                <button onClick={() => adjustActiveWeight(2.5)} style={styles.adjBtn}>+</button>
-              </div>
-            </div>
-            <div style={styles.repsBox}>
-              <h2 style={{ fontSize: 44, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{ex.reps}</h2>
-              <span style={{ fontSize: 12, color: "var(--sub)", marginTop: 2 }}>repetições meta</span>
-            </div>
-          </div>
-
-          {/* Set Status */}
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <span style={{ fontSize: 13, color: "var(--sub)" }}>
-              Série <b>{activeWk.set + 1}</b> de {ex.sets}
-            </span>
-          </div>
-
-          {/* Progress dots */}
-          <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 8 }}>
-            {Array.from({ length: ex.sets }).map((_, i) => {
-              const bg = i < activeWk.set ? "var(--green)" : i === activeWk.set ? "var(--acc)" : "var(--bg3)";
-              return (
-                <div
-                  key={i}
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: "50%",
-                    background: bg,
-                    transition: "background 0.3s",
-                    boxShadow: i === activeWk.set ? "0 0 8px var(--acc)" : "none",
-                  }}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Primary Action Button */}
-        <div style={{ padding: "20px 16px" }}>
-          <button
-            onClick={handleNextSet}
-            style={{
-              ...styles.btnPrimary,
-              width: "100%",
-              padding: 16,
-              fontSize: 16,
-              boxShadow: "0 4px 16px rgba(245,196,0,0.3)",
-            }}
-          >
-            Concluir Série
-          </button>
-        </div>
-
-        {/* Next exercise preview */}
-        <div style={{ padding: "0 16px", textAlign: "center" }}>
-          {nextEx ? (
-            <p style={{ fontSize: 12, color: "var(--sub)" }}>
-              Próximo: <b>{nextEx.num ? nextEx.num + " · " : ""}{nextEx.name}</b> · {nextEx.wt}kg
-            </p>
-          ) : (
-            <p style={{ fontSize: 12, color: "var(--green)", fontWeight: 600 }}>
-              ✓ Último exercício do treino!
-            </p>
-          )}
-        </div>
-      </div>
+      <ActiveWorkoutScreen
+        activeWk={activeWk}
+        elapsedTime={elapsedTime}
+        restTime={restTime}
+        restTotal={restTotal}
+        restType={restType}
+        showRpe={showRpe}
+        rpeValue={rpeValue}
+        setRpeValue={setRpeValue}
+        showSummary={showSummary}
+        summaryData={summaryData}
+        showExit={showExit}
+        onNextSet={handleNextSet}
+        onConfirmRpe={confirmRpe}
+        onAdjustWeight={adjustActiveWeight}
+        onSaveSession={saveWorkoutSession}
+        onSkipRest={skipRest}
+        onShowExit={() => setShowExit(true)}
+        onHideExit={() => setShowExit(false)}
+        onConfirmExit={discardWorkout}
+      />
     );
   }
 
@@ -813,10 +682,10 @@ export function StudentApp() {
               {/* Profile Header Banner */}
               <div style={styles.homeHdr}>
                 <div>
-                  <span style={{ fontSize: 10, color: "var(--acc)", fontWeight: 700, letterSpacing: 2 }}>FITTRACK · ACADEMIA ESTILO LIVRE</span>
                   <h2 style={{ fontSize: 20, fontWeight: 800, marginTop: 4 }}>
                     Bom treino, {profile?.name?.split(" ")[0] ?? "Atleta"} 👋
                   </h2>
+                  <span style={{ fontSize: 10, color: "var(--acc)", fontWeight: 700, letterSpacing: 2 }}>ACADEMIA ESTILO LIVRE</span>
                 </div>
                 {profile?.photoURL ? (
                   <img
@@ -863,7 +732,7 @@ export function StudentApp() {
               {/* Cycle Tracker Card */}
               {workouts.length > 0 && (
                 <div style={styles.dashboardCard}>
-                  <h4 style={styles.cardTitle}>Ciclo de Treino Atual</h4>
+                  <h4 style={styles.cardTitle}>Seu loop</h4>
                   <div style={styles.cycleDotsWrap}>
                     {workouts.map((w, i) => {
                       const isDone = cycleInfoObj.done.has(w.id);
@@ -889,8 +758,8 @@ export function StudentApp() {
                   </div>
                   <p style={{ fontSize: 12, color: "var(--sub)", textAlign: "center", marginTop: 8 }}>
                     {cycleInfoObj.pct === 100
-                      ? "🎉 Todo o ciclo concluído! Parabéns."
-                      : `${Math.round(cycleInfoObj.pct)}% concluído · Faltam ${workouts.length - cycleInfoObj.done.size} treinos`}
+                      ? "🎉 Fique no loop!"
+                      : cycleInfoObj.pct ? `${Math.round(cycleInfoObj.pct)}% concluído — não saia do loop!` : "Entre no loop!"}
                   </p>
                 </div>
               )}
@@ -901,7 +770,10 @@ export function StudentApp() {
                 if (!chart) return null;
                 return (
                   <div style={styles.dashboardCard}>
-                    <h4 style={styles.cardTitle}>Tendência de Dificuldade (RPE)</h4>
+                    <h4 style={{ ...styles.cardTitle, display: "flex", alignItems: "center", gap: 6 }}>
+                      Intensidade do treino
+                      <button onClick={() => { setShowRpeTutorial(true); setRpeTutSlide(0); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--bg3,#162040)", border: "none", color: "var(--sub,#8899bb)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>i</button>
+                    </h4>
                     <div style={{ position: "relative" }}>
                       <svg width="100%" height={chart.H} viewBox={`0 0 ${chart.W} ${chart.H}`} style={{ display: "block" }}>
                         <defs>
@@ -929,7 +801,7 @@ export function StudentApp() {
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--sub)", marginTop: 8 }}>
                       <span>{fmtDate(chart.sessionsList[0].date)}</span>
-                      <span>menor RPE = treino rendendo mais</span>
+                      <span>RPE alto = você está se superando</span>
                       <span>{fmtDate(chart.sessionsList[chart.sessionsList.length - 1].date)}</span>
                     </div>
                   </div>
@@ -970,7 +842,7 @@ export function StudentApp() {
               <h2 style={styles.pageTitle}>Meus Treinos</h2>
               {workouts.length > 0 && (
                 <div style={{ ...styles.dashboardCard, padding: 12 }}>
-                  <h4 style={{ ...styles.cardTitle, fontSize: 13, marginBottom: 8 }}>Ciclo atual</h4>
+                  <h4 style={{ ...styles.cardTitle, fontSize: 13, marginBottom: 8 }}>Loop</h4>
                   <div style={{ ...styles.cycleDotsWrap, justifyContent: "flex-start", gap: 6 }}>
                     {workouts.map((w, idx) => (
                       <div
@@ -1085,7 +957,7 @@ export function StudentApp() {
 
                   <h3 style={{ fontSize: 18, fontWeight: 800 }}>{profile?.name}</h3>
                   <span style={{ fontSize: 13, color: "var(--sub)" }}>{profile?.email}</span>
-                  <span style={styles.badgeProfileRole}>Aluno FitTrack</span>
+                  <span style={styles.badgeProfileRole}>Aluno Especial</span>
                 </div>
 
                 <div style={styles.profileStatsBox}>
@@ -1095,7 +967,7 @@ export function StudentApp() {
                   </div>
                   <div style={{ flex: 1, textAlign: "center" }}>
                     <h3 style={{ fontSize: 24, fontWeight: 900, color: "var(--acc)" }}>{cycleInfoObj.cycles}</h3>
-                    <span style={{ fontSize: 11, color: "var(--sub)" }}>Ciclos terminados</span>
+                    <span style={{ fontSize: 11, color: "var(--sub)" }}>Loops</span>
                   </div>
                 </div>
 
@@ -1151,6 +1023,96 @@ export function StudentApp() {
           <span>Perfil</span>
         </button>
       </nav>
+
+      {/* RPE Tutorial Modal */}
+      {showRpeTutorial && (
+        <>
+          <div onClick={() => setShowRpeTutorial(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 300 }} />
+          <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "#0b1228", borderRadius: "20px 20px 0 0", padding: "20px 20px 44px", zIndex: 301, maxHeight: "88vh", overflowY: "auto" }}>
+            <div style={{ width: 40, height: 4, background: "#162040", borderRadius: 2, margin: "0 auto 18px" }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+              <span style={{ fontSize: 17, fontWeight: 700 }}>Entendendo o gráfico</span>
+              <button onClick={() => setShowRpeTutorial(false)} style={{ width: 36, height: 36, borderRadius: 8, background: "#162040", border: "none", color: "#8899bb", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            </div>
+
+            <div style={{ overflow: "hidden" }}>
+              {rpeTutSlide === 0 && (
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>O que é RPE?</div>
+                  <div style={{ fontSize: 13, color: "#8899bb", lineHeight: 1.6, marginBottom: 14 }}>RPE significa <b style={{ color: "#fff" }}>Esforço Percebido</b> — uma nota de 0 a 10 que você dá ao exercício logo depois de terminar.</div>
+                  <div style={{ background: "#162040", borderRadius: 10, padding: "14px 12px 10px", marginBottom: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "10px 0 4px" }}>
+                      <span style={{ fontSize: 11, color: "#3a4a70", width: 28 }}>0</span>
+                      <div style={{ flex: 1, height: 10, borderRadius: 5, background: "linear-gradient(to right,#00c853,#F5C400,#f44336)" }} />
+                      <span style={{ fontSize: 11, color: "#3a4a70", width: 28, textAlign: "right" }}>10</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#3a4a70", marginTop: 4, padding: "0 36px" }}>
+                      <span>sem esforço</span><span>máximo</span>
+                    </div>
+                    <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 7 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}><span style={{ fontSize: 16 }}>😴</span><span><b style={{ color: "#00c853" }}>1–3</b> — fácil, poderia continuar por horas</span></div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}><span style={{ fontSize: 16 }}>💪</span><span><b style={{ color: "#F5C400" }}>4–6</b> — moderado, desafiador mas controlado</span></div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}><span style={{ fontSize: 16 }}>🔥</span><span><b style={{ color: "#f44336" }}>7–10</b> — intenso, perto do limite</span></div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 13, color: "#8899bb", lineHeight: 1.6 }}>O gráfico mostra a <b style={{ color: "#fff" }}>média do RPE</b> ao longo dos seus treinos, do mais antigo para o mais recente.</div>
+                </div>
+              )}
+
+              {rpeTutSlide === 1 && (
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6, color: "#00c853" }}>↑ Evoluindo</div>
+                  <div style={{ fontSize: 13, color: "#8899bb", lineHeight: 1.6, marginBottom: 14 }}>Quando o RPE sobe ao longo do tempo, você está <b style={{ color: "#fff" }}>se superando</b> — cargas maiores, mais séries, menos descanso. Isso é evolução.</div>
+                  <div style={{ background: "#162040", borderRadius: 10, padding: "14px 12px 10px", marginBottom: 14 }}>
+                    <svg width="100%" height="60" viewBox="0 0 260 60" preserveAspectRatio="none" style={{ display: "block", marginBottom: 6 }}>
+                      <defs><linearGradient id="tg-up2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00c853" stopOpacity="0.3"/><stop offset="100%" stopColor="#00c853" stopOpacity="0"/></linearGradient></defs>
+                      <polygon points="4,60 4,40 69,35 134,30 199,20 256,14 256,60" fill="url(#tg-up2)"/>
+                      <polyline points="4,40 69,35 134,30 199,20 256,14" fill="none" stroke="#00c853" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      {[[4,40],[69,35],[134,30],[199,20],[256,14]].map(([cx,cy],i)=><circle key={i} cx={cx} cy={cy} r="3.5" fill="#00c853"/>)}
+                    </svg>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#3a4a70" }}><span>treino 1</span><span>treino mais recente</span></div>
+                  </div>
+                  <div style={{ background: "rgba(0,200,83,.08)", border: "1px solid rgba(0,200,83,.2)", borderRadius: 10, padding: 12, fontSize: 13, color: "#8899bb", lineHeight: 1.5 }}>
+                    RPE crescendo = você está se desafiando cada vez mais.<br/><b style={{ color: "#00c853" }}>Continue assim! 🚀</b>
+                  </div>
+                </div>
+              )}
+
+              {rpeTutSlide === 2 && (
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6, color: "#F5C400" }}>↓ Acomodando</div>
+                  <div style={{ fontSize: 13, color: "#8899bb", lineHeight: 1.6, marginBottom: 14 }}>Quando o RPE cai, o treino está ficando <b style={{ color: "#fff" }}>fácil demais</b> — seu corpo se adaptou e está pedindo mais estímulo.</div>
+                  <div style={{ background: "#162040", borderRadius: 10, padding: "14px 12px 10px", marginBottom: 14 }}>
+                    <svg width="100%" height="60" viewBox="0 0 260 60" preserveAspectRatio="none" style={{ display: "block", marginBottom: 6 }}>
+                      <defs><linearGradient id="tg-dn2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F5C400" stopOpacity="0.3"/><stop offset="100%" stopColor="#F5C400" stopOpacity="0"/></linearGradient></defs>
+                      <polygon points="4,60 4,14 69,20 134,30 199,35 256,40 256,60" fill="url(#tg-dn2)"/>
+                      <polyline points="4,14 69,20 134,30 199,35 256,40" fill="none" stroke="#F5C400" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      {[[4,14],[69,20],[134,30],[199,35],[256,40]].map(([cx,cy],i)=><circle key={i} cx={cx} cy={cy} r="3.5" fill="#F5C400"/>)}
+                    </svg>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#3a4a70" }}><span>treino 1</span><span>treino mais recente</span></div>
+                  </div>
+                  <div style={{ background: "rgba(245,196,0,.08)", border: "1px solid rgba(245,196,0,.2)", borderRadius: 10, padding: 12, fontSize: 13, color: "#8899bb", lineHeight: 1.5 }}>
+                    RPE caindo = hora de aumentar peso ou intensidade.<br/><b style={{ color: "#F5C400" }}>Fique de olho nas sugestões de progressão abaixo! 💡</b>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 22 }}>
+              <button onClick={() => setRpeTutSlide(s => s - 1)} style={{ visibility: rpeTutSlide === 0 ? "hidden" : "visible", background: "#162040", border: "none", color: "#fff", fontSize: 14, fontWeight: 600, padding: "10px 20px", borderRadius: 10, cursor: "pointer" }}>← Anterior</button>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                {Array.from({ length: RPE_TUT_TOTAL }, (_, i) => (
+                  <div key={i} style={{ width: i === rpeTutSlide ? 18 : 6, height: 6, borderRadius: 3, background: i === rpeTutSlide ? "#F5C400" : "#162040", transition: "all .25s" }} />
+                ))}
+              </div>
+              {rpeTutSlide < RPE_TUT_TOTAL - 1
+                ? <button onClick={() => setRpeTutSlide(s => s + 1)} style={{ background: "#F5C400", border: "none", color: "#06091a", fontSize: 14, fontWeight: 600, padding: "10px 20px", borderRadius: 10, cursor: "pointer" }}>Próximo →</button>
+                : <button onClick={() => setShowRpeTutorial(false)} style={{ background: "#F5C400", border: "none", color: "#06091a", fontSize: 14, fontWeight: 600, padding: "10px 20px", borderRadius: 10, cursor: "pointer" }}>Fechar ✓</button>
+              }
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

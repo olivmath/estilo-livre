@@ -48,7 +48,8 @@
   --sidebar-ring:        #F5C400;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin  { to { transform: rotate(360deg); } }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
 
 @theme inline {
   --font-heading:   var(--font-sans);

@@ -281,7 +281,7 @@ function StudentDetail({ uid, onClose, role }) {
               { label: "Mês", value: stats?.monthSessions ?? 0 },
               { label: "Dias s/ treinar", value: stats?.daysLastWorkout ?? "—" },
               { label: "RPE médio", value: stats?.avgRpe != null ? stats.avgRpe.toFixed(1) : "—" },
-              { label: "Ciclos", value: stats?.cycles ?? 0 },
+              { label: "Loops", value: stats?.cycles ?? 0 },
             ].map((c) => (
               <div key={c.label} style={{
                 background: "var(--bg3)", borderRadius: 8, padding: "10px 12px", textAlign: "center",
@@ -597,7 +597,7 @@ export function AlunosPage() {
                 onClick={() => setBulkConfirm({ action: "block", uids: [...selected] })}
                 style={{ color: "var(--text)", borderRadius: 7, padding: "8px 12px", cursor: "pointer" }}
               >
-                <Lock size={13} style={{ color: "var(--red)" }} /> Bloquear
+                <Lock size={13} style={{ color: "var(--acc)" }} /> Bloquear
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setBulkConfirm({ action: "unblock", uids: [...selected] })}
@@ -706,7 +706,7 @@ export function AlunosPage() {
                   </div>
                   <div style={{ textAlign: "center" }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{st?.cycles ?? "—"}</p>
-                    <p style={{ fontSize: 10, color: "var(--sub)" }}>ciclos</p>
+                    <p style={{ fontSize: 10, color: "var(--sub)" }}>loops</p>
                   </div>
                 </div>
 

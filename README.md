@@ -1,4 +1,4 @@
-# FitTrack — Academia Estilo Livre
+# Academia Estilo Livre
 
 App de acompanhamento de treino mobile-first, construído em HTML/CSS/JS puro com persistência em `localStorage`.
 
