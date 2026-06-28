@@ -81,6 +81,10 @@ export function LoginScreen() {
         <p style={styles.footnote}>
           Apenas membros da academia têm acesso.
         </p>
+
+        <p style={{ marginTop: 16, fontSize: 11, color: "var(--sub)", opacity: 0.4 }}>
+          v{__APP_VERSION__}
+        </p>
       </div>
     </div>
   );
