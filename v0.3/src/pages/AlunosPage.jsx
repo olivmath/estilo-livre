@@ -1,14 +1,22 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  getStudents, getStudent, createStudent, updateStudent,
+  getStudents, createStudent,
   deleteStudent, toggleBlock, getStudentStats,
 } from "@/services/users";
 import { getStudentSessions } from "@/services/sessions";
 import { getStudentWorkouts, getTreinos, assignTreino, createCustomWorkout, deleteStudentWorkout } from "@/services/workouts";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { X, Plus, Search, Edit2, Trash2, Lock, Unlock, ChevronRight } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { X, Plus, Search, Trash2, ChevronRight, ChevronDown, Lock, KeyRound } from "lucide-react";
 
 const STATUS_COLORS = {
   active:   { bg: "rgba(0,200,83,0.12)",  text: "var(--green)",  label: "Ativo" },
@@ -421,7 +429,10 @@ export function AlunosPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [statsMap, setStatsMap] = useState({});
-  const [statsLoading, setStatsLoading] = useState(false);
+
+  const [selected, setSelected] = useState(new Set());
+  const [bulkConfirm, setBulkConfirm] = useState(null); // { action: "block"|"unblock"|"delete", uids: [] }
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const [novoOpen, setNovoOpen] = useState(false);
   const [detailUid, setDetailUid] = useState(null);
@@ -429,36 +440,28 @@ export function AlunosPage() {
 
   const load = useCallback(() => {
     setLoading(true);
+    setSelected(new Set());
     getStudents()
-      .then((list) => {
-        setStudents(list);
-        loadStats(list);
-      })
+      .then((list) => { setStudents(list); loadStats(list); })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
 
   async function loadStats(list) {
-    setStatsLoading(true);
     const entries = await Promise.all(
       list.map(async (s) => {
-        try {
-          const st = await getStudentStats(s.uid);
-          return [s.uid, st];
-        } catch {
-          return [s.uid, null];
-        }
+        try { return [s.uid, await getStudentStats(s.uid)]; }
+        catch { return [s.uid, null]; }
       })
     );
     setStatsMap(Object.fromEntries(entries));
-    setStatsLoading(false);
   }
 
   useEffect(() => { load(); }, [load]);
 
   const filtered = students.filter((s) => {
     const st = statsMap[s.uid];
-    const status = st?.status ?? "inactive";
+    const status = st?.status ?? (s.active === false ? "blocked" : "inactive");
     if (statusFilter !== "todos" && status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -467,19 +470,54 @@ export function AlunosPage() {
     return true;
   });
 
-  async function handleToggleBlock(uid) {
-    await toggleBlock(uid);
-    load();
+  function toggleSelect(uid) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(uid) ? next.delete(uid) : next.add(uid);
+      return next;
+    });
   }
 
-  async function handleDelete(uid) {
-    if (!confirm("Deletar aluno? Esta ação não pode ser desfeita.")) return;
-    await deleteStudent(uid);
-    load();
+  function toggleAll() {
+    if (selected.size === filtered.length) setSelected(new Set());
+    else setSelected(new Set(filtered.map((s) => s.uid)));
   }
+
+  async function executeBulk() {
+    if (!bulkConfirm) return;
+    setBulkLoading(true);
+    try {
+      const { action, uids } = bulkConfirm;
+      if (action === "delete") {
+        await Promise.all(uids.map((uid) => deleteStudent(uid)));
+      } else {
+        const blockedUids = new Set(students.filter((s) => s.active === false).map((s) => s.uid));
+        await Promise.all(uids.map((uid) => {
+          const isBlocked = blockedUids.has(uid);
+          if (action === "block" && !isBlocked) return toggleBlock(uid);
+          if (action === "unblock" && isBlocked) return toggleBlock(uid);
+          return Promise.resolve();
+        }));
+      }
+    } finally {
+      setBulkLoading(false);
+      setBulkConfirm(null);
+      load();
+    }
+  }
+
+  const bulkLabels = {
+    block:   { title: "Bloquear alunos selecionados?",   desc: (n) => `${n} aluno${n > 1 ? "s" : ""} perderá${n > 1 ? "ão" : ""} acesso ao app.`,    action: "Bloquear",    danger: true  },
+    unblock: { title: "Liberar alunos selecionados?",      desc: (n) => `${n} aluno${n > 1 ? "s" : ""} voltará${n > 1 ? "ão" : ""} a ter acesso.`,       action: "Liberar",     danger: false },
+    delete:  { title: "Deletar alunos?",     desc: (n) => `Esta ação não pode ser desfeita. ${n} aluno${n > 1 ? "s" : ""} será${n > 1 ? "ão" : ""} removido${n > 1 ? "s" : ""}.`, action: "Deletar", danger: true },
+  };
 
   if (loading) return <Spinner />;
   if (error) return <div style={{ padding: 24, color: "var(--red)", fontSize: 13 }}>{error}</div>;
+
+  const nSelected = selected.size;
+  const allSelected = nSelected > 0 && nSelected === filtered.length;
+  const someSelected = nSelected > 0 && nSelected < filtered.length;
 
   return (
     <div style={{ padding: "24px 20px", maxWidth: 900 }}>
@@ -505,8 +543,8 @@ export function AlunosPage() {
         />
       </div>
 
-      {/* Status filter */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
+      {/* Filters + Ações */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
         {STATUS_FILTERS.map((f) => (
           <button key={f} onClick={() => setStatusFilter(f)} style={{
             padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer",
@@ -517,6 +555,70 @@ export function AlunosPage() {
             {STATUS_LABELS[f]}
           </button>
         ))}
+
+        <div style={{ marginLeft: "auto", flexShrink: 0 }}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                disabled={nSelected === 0}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  padding: "6px 12px", borderRadius: 20, border: "1px solid",
+                  borderColor: nSelected > 0 ? "var(--blue2)" : "var(--blue)",
+                  background: nSelected > 0 ? "var(--blue2)" : "var(--bg3)",
+                  color: nSelected > 0 ? "var(--text)" : "var(--sub)",
+                  fontSize: 12, fontWeight: 600, cursor: nSelected > 0 ? "pointer" : "default",
+                  opacity: nSelected === 0 ? 0.45 : 1,
+                  transition: "background .15s, border-color .15s",
+                }}
+              >
+                Ações
+                {nSelected > 0 && (
+                  <span style={{
+                    background: "rgba(255,255,255,0.15)", borderRadius: 10,
+                    padding: "1px 6px", fontSize: 11, fontWeight: 700,
+                  }}>{nSelected}</span>
+                )}
+                <ChevronDown size={13} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              style={{
+                background: "var(--bg2)",
+                border: "1px solid var(--blue)",
+                borderRadius: 10,
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                padding: "4px",
+                minWidth: 200,
+              }}
+            >
+              <DropdownMenuItem
+                onClick={() => setBulkConfirm({ action: "block", uids: [...selected] })}
+                style={{ color: "var(--text)", borderRadius: 7, padding: "8px 12px", cursor: "pointer" }}
+              >
+                <Lock size={13} style={{ color: "var(--red)" }} /> Bloquear
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setBulkConfirm({ action: "unblock", uids: [...selected] })}
+                style={{ color: "var(--text)", borderRadius: 7, padding: "8px 12px", cursor: "pointer" }}
+              >
+                <KeyRound size={13} style={{ color: "var(--green)" }} /> Liberar
+              </DropdownMenuItem>
+              {role === "admin" && (
+                <>
+                  <DropdownMenuSeparator style={{ background: "var(--blue)", margin: "4px 0" }} />
+                  <DropdownMenuItem
+                    onClick={() => setBulkConfirm({ action: "delete", uids: [...selected] })}
+                    style={{ color: "var(--red)", borderRadius: 7, padding: "8px 12px", cursor: "pointer" }}
+                  >
+                    <Trash2 size={13} /> Deletar
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Table */}
@@ -524,15 +626,64 @@ export function AlunosPage() {
         <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum aluno encontrado</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {/* Select-all row */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "4px 14px" }}>
+            <button
+              onClick={toggleAll}
+              aria-label={allSelected ? "Desmarcar todos" : "Selecionar todos"}
+              style={{
+                width: 18, height: 18, borderRadius: 5, border: "2px solid",
+                borderColor: allSelected || someSelected ? "var(--blue2)" : "var(--sub)",
+                background: allSelected ? "var(--blue2)" : someSelected ? "var(--blue)" : "transparent",
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              {(allSelected || someSelected) && (
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  {allSelected
+                    ? <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    : <line x1="2" y1="5" x2="8" y2="5" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
+                  }
+                </svg>
+              )}
+            </button>
+            <span style={{ fontSize: 11, color: "var(--sub)" }}>
+              {nSelected > 0 ? `${nSelected} selecionado${nSelected > 1 ? "s" : ""}` : "Selecionar todos"}
+            </span>
+          </div>
+
           {filtered.map((s) => {
             const st = statsMap[s.uid];
             const status = st?.status ?? (s.active === false ? "blocked" : "inactive");
+            const isSelected = selected.has(s.uid);
             return (
               <div key={s.uid} style={{
-                background: "var(--bg2)", border: "1px solid var(--blue)",
+                background: isSelected ? "rgba(35,82,200,0.15)" : "var(--bg2)",
+                border: `1px solid ${isSelected ? "var(--blue2)" : "var(--blue)"}`,
                 borderRadius: 10, padding: "12px 14px",
                 display: "flex", alignItems: "center", gap: 12,
+                transition: "background .15s, border-color .15s",
               }}>
+                {/* Checkbox */}
+                <button
+                  onClick={() => toggleSelect(s.uid)}
+                  aria-label={isSelected ? `Desmarcar ${s.name}` : `Selecionar ${s.name}`}
+                  style={{
+                    width: 18, height: 18, borderRadius: 5, border: "2px solid",
+                    borderColor: isSelected ? "var(--blue2)" : "var(--sub)",
+                    background: isSelected ? "var(--blue2)" : "transparent",
+                    cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0, transition: "background .15s, border-color .15s",
+                  }}
+                >
+                  {isSelected && (
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                      <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </button>
+
                 <Avatar name={s.name} photoURL={s.photoURL} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -550,9 +701,7 @@ export function AlunosPage() {
                     <p style={{ fontSize: 10, color: "var(--sub)" }}>sess/sem</p>
                   </div>
                   <div style={{ textAlign: "center" }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>
-                      {st?.avgRpe != null ? st.avgRpe.toFixed(1) : "—"}
-                    </p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{st?.avgRpe != null ? st.avgRpe.toFixed(1) : "—"}</p>
                     <p style={{ fontSize: 10, color: "var(--sub)" }}>RPE</p>
                   </div>
                   <div style={{ textAlign: "center" }}>
@@ -563,31 +712,13 @@ export function AlunosPage() {
 
                 <StatusBadge status={status} />
 
-                {/* Actions */}
-                <div style={{ display: "flex", gap: 4 }}>
-                  <button
-                    onClick={() => handleToggleBlock(s.uid)}
-                    title={s.active === false ? "Desbloquear" : "Bloquear"}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)", padding: 6 }}
-                  >
-                    {s.active === false ? <Unlock size={15} /> : <Lock size={15} />}
-                  </button>
-                  {role === "admin" && (
-                    <button
-                      onClick={() => handleDelete(s.uid)}
-                      title="Deletar"
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)", padding: 6 }}
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => { setDetailUid(s.uid); setDetailName(s.name); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)", padding: 6 }}
-                  >
-                    <ChevronRight size={15} />
-                  </button>
-                </div>
+                <button
+                  onClick={() => { setDetailUid(s.uid); setDetailName(s.name); }}
+                  aria-label={`Ver detalhes de ${s.name}`}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)", padding: 6 }}
+                >
+                  <ChevronRight size={15} />
+                </button>
               </div>
             );
           })}
@@ -595,6 +726,28 @@ export function AlunosPage() {
       )}
 
       <NovoAlunoModal open={novoOpen} onClose={() => setNovoOpen(false)} onCreated={load} />
+
+      {/* Bulk confirmation */}
+      <AlertDialog open={!!bulkConfirm} onOpenChange={(open) => !open && setBulkConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{bulkConfirm && bulkLabels[bulkConfirm.action].title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {bulkConfirm && bulkLabels[bulkConfirm.action].desc(bulkConfirm.uids.length)}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkLoading}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={executeBulk}
+              disabled={bulkLoading}
+              style={bulkConfirm && bulkLabels[bulkConfirm.action].danger ? { background: "var(--red)" } : {}}
+            >
+              {bulkLoading ? "Aguarde…" : bulkConfirm && bulkLabels[bulkConfirm.action].action}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Student detail slide-over */}
       {detailUid && (
