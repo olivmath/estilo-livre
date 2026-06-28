@@ -808,7 +808,7 @@ export function StudentApp() {
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
                       <h4 style={{ ...styles.cardTitle, marginBottom: 0, display: "flex", alignItems: "center", gap: 6 }}>
                         Intensidade do treino
-                        <button onClick={() => { setShowRpeTutorial(true); setRpeTutSlide(0); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--bg3,#162040)", border: "none", color: "var(--sub,#8899bb)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>i</button>
+                        <button onClick={() => { setShowRpeTutorial(true); setRpeTutSlide(0); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--acc)", border: "none", color: "var(--bg)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>i</button>
                       </h4>
                       {/* Trend badge */}
                       <span style={{ fontSize: 11, fontWeight: 700, color: chart.trendColor, background: `color-mix(in srgb, ${chart.trendColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${chart.trendColor} 30%, transparent)`, borderRadius: 99, padding: "3px 10px" }}>
