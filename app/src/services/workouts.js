@@ -9,3 +9,4 @@ export const assignTreino          = (uid, treinoId)       => call("assignTempla
 export const createCustomWorkout   = (uid, data)           => call("createCustomWorkout")({ uid, data });
 export const updateStudentWorkout  = (uid, wkId, data)     => call("updateStudentWorkout")({ uid, wkId, data });
 export const deleteStudentWorkout  = (uid, wkId)           => call("deleteStudentWorkout")({ uid, wkId });
+export const reorderStudentWorkouts = (uid, orderedIds)    => call("reorderStudentWorkouts")({ uid, orderedIds });

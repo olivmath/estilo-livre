@@ -91,7 +91,20 @@ exports.getStudentStats = onCall({ region: "us-central1" }, async (request) => {
     }
 
   const avgRpe = rpeCount > 0 ? rpeSum / rpeCount : null;
-  const cycles = new Set(sessions.map((s) => s.wkId).filter(Boolean)).size;
+
+  const wkSnap = await db.collection("users").doc(uid).collection("workouts").get();
+  const workoutIds = new Set(wkSnap.docs.map((d) => d.id));
+  let cycles = 0;
+  if (workoutIds.size > 0) {
+    const seen = new Set();
+    for (const s of [...sessions].reverse()) {
+      if (s.wkId && workoutIds.has(s.wkId)) {
+        seen.add(s.wkId);
+        if (seen.size === workoutIds.size) { cycles++; seen.clear(); }
+      }
+    }
+  }
+
   const status = daysLastWorkout === null || daysLastWorkout > 14 ? "inactive"
     : daysLastWorkout > 7 ? "warning" : "active";
 

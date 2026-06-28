@@ -7,7 +7,7 @@ import {
 import { getStudentSessions } from "@/services/sessions";
 import {
   getStudentWorkouts, getTreinos, assignTreino,
-  createCustomWorkout, updateStudentWorkout, deleteStudentWorkout,
+  createCustomWorkout, updateStudentWorkout, deleteStudentWorkout, reorderStudentWorkouts,
 } from "@/services/workouts";
 import { getExercises } from "@/services/exercises";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { X, Plus, Search, Trash2, ChevronRight, ChevronDown, Lock, KeyRound, Edit2 } from "lucide-react";
+import { X, Plus, Search, Trash2, ChevronRight, ChevronDown, Lock, KeyRound, Edit2, ChevronUp } from "lucide-react";
 
 const PALETTE = [
   "#2352c8", "#1B3487", "#F5C400", "#00c853", "#f44336",
@@ -488,6 +488,17 @@ function StudentDetail({ uid, role }) {
     setDeleteTarget(null);
   }
 
+  async function handleMoveWk(wkId, direction) {
+    const idx = workouts.findIndex((w) => w.id === wkId);
+    if (direction === "up" && idx === 0) return;
+    if (direction === "down" && idx === workouts.length - 1) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    const next = [...workouts];
+    [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+    setWorkouts(next);
+    await reorderStudentWorkouts(uid, next.map((w) => w.id));
+  }
+
   function toggleExpand(wkId) {
     setExpandedWk((prev) => {
       const next = new Set(prev);
@@ -687,18 +698,31 @@ function StudentDetail({ uid, role }) {
                             {exCount} exercício{exCount !== 1 ? "s" : ""}
                           </p>
                         </div>
-                        <ChevronDown
-                          size={14}
-                          style={{
-                            color: "var(--sub)", flexShrink: 0, marginLeft: "auto",
-                            transform: expanded ? "rotate(180deg)" : "none",
-                            transition: "transform .2s",
-                          }}
-                        />
+                        <span style={{
+                          fontSize: 10, color: "var(--sub)", flexShrink: 0, marginLeft: "auto",
+                          transform: expanded ? "rotate(180deg)" : "none",
+                          display: "inline-block", transition: "transform .2s",
+                        }}>▾</span>
                       </button>
 
                       {/* Actions */}
                       <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
+                        <button
+                          onClick={() => handleMoveWk(w.id, "up")}
+                          disabled={workouts.indexOf(w) === 0}
+                          title="Mover para cima"
+                          style={{ background: "none", border: "none", cursor: workouts.indexOf(w) === 0 ? "default" : "pointer", color: "var(--sub)", padding: 6, opacity: workouts.indexOf(w) === 0 ? 0.3 : 1 }}
+                        >
+                          <ChevronUp size={13} />
+                        </button>
+                        <button
+                          onClick={() => handleMoveWk(w.id, "down")}
+                          disabled={workouts.indexOf(w) === workouts.length - 1}
+                          title="Mover para baixo"
+                          style={{ background: "none", border: "none", cursor: workouts.indexOf(w) === workouts.length - 1 ? "default" : "pointer", color: "var(--sub)", padding: 6, opacity: workouts.indexOf(w) === workouts.length - 1 ? 0.3 : 1 }}
+                        >
+                          <ChevronDown size={13} />
+                        </button>
                         <button
                           onClick={() => { setWkEditing(w); setWkModal(true); }}
                           title="Editar"
