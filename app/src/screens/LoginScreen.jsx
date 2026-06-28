@@ -40,7 +40,6 @@ export function LoginScreen() {
         {/* Brand */}
         <p style={styles.brandSub}>ACADEMIA</p>
         <h1 style={styles.brandName}>ESTILO LIVRE</h1>
-        <p style={styles.tagline}>Não saia do loop.</p>
 
         {/* Divider */}
         <div style={styles.divider} />

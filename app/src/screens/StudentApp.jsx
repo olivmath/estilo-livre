@@ -162,23 +162,55 @@ export function StudentApp() {
     });
 
     const W = 300;
-    const H = 70;
-    const PAD = 6;
+    const H = 110;
+    const PAD_X = 8;
+    const PAD_Y = 10;
 
     const svgPts = pts.map((v, i) => {
-      const x = PAD + (pts.length === 1 ? W / 2 : (i / (pts.length - 1)) * (W - PAD * 2));
-      const y = PAD + (1 - v / 10) * (H - PAD * 2);
+      const x = PAD_X + (pts.length === 1 ? (W - PAD_X * 2) / 2 : (i / (pts.length - 1)) * (W - PAD_X * 2));
+      const y = PAD_Y + (1 - v / 10) * (H - PAD_Y * 2);
       return { x, y, v };
     });
 
-    const polyline = svgPts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
-    const area = `${svgPts[0].x.toFixed(1)},${H} ` + polyline + ` ${svgPts[svgPts.length - 1].x.toFixed(1)},${H}`;
+    // smooth bezier path
+    const bezierPath = svgPts.reduce((acc, p, i, arr) => {
+      if (i === 0) return `M ${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+      const prev = arr[i - 1];
+      const cpx = ((prev.x + p.x) / 2).toFixed(1);
+      return `${acc} C ${cpx},${prev.y.toFixed(1)} ${cpx},${p.y.toFixed(1)} ${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+    }, "");
+
+    const last = svgPts[svgPts.length - 1];
+    const areaPath = `${bezierPath} L ${last.x.toFixed(1)},${H} L ${svgPts[0].x.toFixed(1)},${H} Z`;
+
+    // 3-point moving average (only computed when pts.length >= 3)
+    const WINDOW = 3;
+    const maPts = pts.length >= WINDOW
+      ? pts.slice(WINDOW - 1).map((_, i) => {
+          const slice = pts.slice(i, i + WINDOW);
+          const avg = slice.reduce((a, b) => a + b, 0) / WINDOW;
+          const srcIdx = i + WINDOW - 1;
+          return { x: svgPts[srcIdx].x, y: PAD_Y + (1 - avg / 10) * (H - PAD_Y * 2), avg };
+        })
+      : null;
+
+    const maPath = maPts
+      ? maPts.reduce((acc, p, i, arr) => {
+          if (i === 0) return `M ${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+          const prev = arr[i - 1];
+          const cpx = ((prev.x + p.x) / 2).toFixed(1);
+          return `${acc} C ${cpx},${prev.y.toFixed(1)} ${cpx},${p.y.toFixed(1)} ${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+        }, "")
+      : null;
 
     const trend = pts[pts.length - 1] - pts[0];
-    const trendColor = trend > 0.5 ? "var(--green)" : "var(--acc)";
-    const trendLabel = trend > 0.5 ? "↑ Evoluindo" : "↓ Acomodando";
+    const trendColor = trend > 0.5 ? "var(--green)" : trend < -0.5 ? "var(--red)" : "var(--acc)";
+    const trendLabel = trend > 0.5 ? "↑ Evoluindo" : trend < -0.5 ? "↓ Caindo" : "→ Estável";
 
-    return { polyline, area, svgPts, trendColor, trendLabel, W, H, sessionsList: sortedSess };
+    const avgRpe = pts.reduce((a, b) => a + b, 0) / pts.length;
+    const currentRpe = pts[pts.length - 1];
+
+    return { bezierPath, areaPath, maPath, svgPts, trendColor, trendLabel, W, H, sessionsList: sortedSess, avgRpe, currentRpe, trend };
   };
 
   // suggestions algorithm
@@ -768,42 +800,144 @@ export function StudentApp() {
               {(() => {
                 const chart = getTrendData();
                 if (!chart) return null;
+                const lastPt = chart.svgPts[chart.svgPts.length - 1];
+                const gridLevels = [2, 4, 6, 8, 10];
                 return (
                   <div style={styles.dashboardCard}>
-                    <h4 style={{ ...styles.cardTitle, display: "flex", alignItems: "center", gap: 6 }}>
-                      Intensidade do treino
-                      <button onClick={() => { setShowRpeTutorial(true); setRpeTutSlide(0); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--bg3,#162040)", border: "none", color: "var(--sub,#8899bb)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>i</button>
-                    </h4>
+                    {/* Header row */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                      <h4 style={{ ...styles.cardTitle, marginBottom: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                        Intensidade do treino
+                        <button onClick={() => { setShowRpeTutorial(true); setRpeTutSlide(0); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--bg3,#162040)", border: "none", color: "var(--sub,#8899bb)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>i</button>
+                      </h4>
+                      {/* Trend badge */}
+                      <span style={{ fontSize: 11, fontWeight: 700, color: chart.trendColor, background: `color-mix(in srgb, ${chart.trendColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${chart.trendColor} 30%, transparent)`, borderRadius: 99, padding: "3px 10px" }}>
+                        {chart.trendLabel}
+                      </span>
+                    </div>
+
+                    {/* RPE summary row */}
+                    <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                      <div style={{ flex: 1, background: "var(--bg3)", borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: chart.trendColor, lineHeight: 1.2 }}>{chart.currentRpe.toFixed(1)}</div>
+                        <div style={{ fontSize: 10, color: "var(--sub)", marginTop: 2 }}>RPE atual</div>
+                      </div>
+                      <div style={{ flex: 1, background: "var(--bg3)", borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text)", lineHeight: 1.2 }}>{chart.avgRpe.toFixed(1)}</div>
+                        <div style={{ fontSize: 10, color: "var(--sub)", marginTop: 2 }}>RPE médio</div>
+                      </div>
+                      <div style={{ flex: 1, background: "var(--bg3)", borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: "var(--text)", lineHeight: 1.2 }}>{chart.sessionsList.length}</div>
+                        <div style={{ fontSize: 10, color: "var(--sub)", marginTop: 2 }}>sessões</div>
+                      </div>
+                    </div>
+
+                    {/* Chart */}
                     <div style={{ position: "relative" }}>
-                      <svg width="100%" height={chart.H} viewBox={`0 0 ${chart.W} ${chart.H}`} style={{ display: "block" }}>
+                      <svg width="100%" height={chart.H} viewBox={`0 0 ${chart.W} ${chart.H}`} style={{ display: "block", overflow: "visible" }}>
                         <defs>
                           <linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={chart.trendColor} stopOpacity={0.25} />
+                            <stop offset="0%" stopColor={chart.trendColor} stopOpacity={0.3} />
                             <stop offset="100%" stopColor={chart.trendColor} stopOpacity={0} />
                           </linearGradient>
+                          <filter id="glow">
+                            <feGaussianBlur stdDeviation="2" result="blur" />
+                            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                          </filter>
                         </defs>
-                        <polygon points={chart.area} fill="url(#tg)" />
-                        <polyline
-                          points={chart.polyline}
+
+                        {/* Grid lines */}
+                        {gridLevels.map((lvl) => {
+                          const gy = 10 + (1 - lvl / 10) * (chart.H - 20);
+                          return (
+                            <g key={lvl}>
+                              <line x1={0} y1={gy} x2={chart.W} y2={gy} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                              <text x={chart.W - 2} y={gy - 2} fontSize="8" fill="rgba(136,153,187,0.5)" textAnchor="end">{lvl}</text>
+                            </g>
+                          );
+                        })}
+
+                        {/* Area fill */}
+                        <path d={chart.areaPath} fill="url(#tg)" />
+
+                        {/* Bezier line */}
+                        <path
+                          d={chart.bezierPath}
                           fill="none"
                           stroke={chart.trendColor}
                           strokeWidth="2.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
-                        {chart.svgPts.map((p, idx) => (
-                          <circle key={idx} cx={p.x} cy={p.y} r="3" fill={chart.trendColor} />
-                        ))}
+
+                        {/* Moving average line */}
+                        {chart.maPath && (
+                          <path
+                            d={chart.maPath}
+                            fill="none"
+                            stroke="rgba(136,153,187,0.7)"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeDasharray="4 3"
+                          />
+                        )}
+
+                        {/* Dots */}
+                        {chart.svgPts.map((p, idx) => {
+                          const isLast = idx === chart.svgPts.length - 1;
+                          return (
+                            <g key={idx}>
+                              {isLast && <circle cx={p.x} cy={p.y} r="8" fill={chart.trendColor} opacity={0.15} />}
+                              <circle
+                                cx={p.x} cy={p.y}
+                                r={isLast ? 5 : 3}
+                                fill={isLast ? chart.trendColor : "var(--bg2)"}
+                                stroke={chart.trendColor}
+                                strokeWidth={isLast ? 0 : 1.5}
+                              />
+                            </g>
+                          );
+                        })}
+
+                        {/* Tooltip on last point */}
+                        {(() => {
+                          const p = lastPt;
+                          const boxW = 38;
+                          const boxH = 18;
+                          const bx = Math.min(p.x - boxW / 2, chart.W - boxW - 2);
+                          const by = p.y - boxH - 8;
+                          return (
+                            <g filter="url(#glow)">
+                              <rect x={bx} y={by} width={boxW} height={boxH} rx="5" fill={chart.trendColor} opacity={0.9} />
+                              <text x={bx + boxW / 2} y={by + 12} fontSize="9" fill="#000" textAnchor="middle" fontWeight="800">
+                                {p.v.toFixed(1)}
+                              </text>
+                            </g>
+                          );
+                        })()}
                       </svg>
-                      <div style={{ position: "absolute", top: -4, right: 0, fontSize: 11, color: chart.trendColor, fontWeight: 700 }}>
-                        {chart.trendLabel}
+                    </div>
+
+                    {/* Legend */}
+                    <div style={{ display: "flex", gap: 12, marginTop: 8, alignItems: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke={chart.trendColor} strokeWidth="2.5" strokeLinecap="round" /></svg>
+                        <span style={{ fontSize: 10, color: "var(--sub)" }}>RPE</span>
                       </div>
+                      {chart.maPath && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          <svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="rgba(136,153,187,0.7)" strokeWidth="1.5" strokeDasharray="4 3" strokeLinecap="round" /></svg>
+                          <span style={{ fontSize: 10, color: "var(--sub)" }}>Média móvel (3)</span>
+                        </div>
+                      )}
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--sub)", marginTop: 8 }}>
+
+                    {/* Date axis */}
+                    {/* <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--sub)", marginTop: 4 }}>
                       <span>{fmtDate(chart.sessionsList[0].date)}</span>
-                      <span>RPE alto = você está se superando</span>
                       <span>{fmtDate(chart.sessionsList[chart.sessionsList.length - 1].date)}</span>
-                    </div>
+                    </div> */}
                   </div>
                 );
               })()}
