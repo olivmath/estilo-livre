@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getTemplates, createTemplate, updateTemplate, deleteTemplate, assignTemplate } from "@/services/workouts";
+import { getTreinos, createTreino, updateTreino, deleteTreino, assignTreino } from "@/services/workouts";
 import { getExercises } from "@/services/exercises";
 import { getStudents } from "@/services/users";
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,7 @@ function Field({ label, children }) {
 
 const EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [] };
 
-function TemplateModal({ open, onClose, initial, allExercises, onSaved }) {
+function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
   const [form, setForm] = useState(initial ?? EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -111,9 +111,9 @@ function TemplateModal({ open, onClose, initial, allExercises, onSaved }) {
     try {
       const payload = { label: form.label, name: form.name, color: form.color, exercises: form.exercises };
       if (form.id) {
-        await updateTemplate(form.id, payload);
+        await updateTreino(form.id, payload);
       } else {
-        await createTemplate(payload);
+        await createTreino(payload);
       }
       onSaved();
       onClose();
@@ -125,7 +125,7 @@ function TemplateModal({ open, onClose, initial, allExercises, onSaved }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={form.id ? "Editar Template" : "Novo Template"}>
+    <Modal open={open} onClose={onClose} title={form.id ? "Editar Treino" : "Novo Treino"}>
       <form onSubmit={submit}>
         {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
@@ -218,14 +218,14 @@ function TemplateModal({ open, onClose, initial, allExercises, onSaved }) {
         </div>
 
         <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
-          {loading ? "Salvando…" : "Salvar Template"}
+          {loading ? "Salvando…" : "Salvar Treino"}
         </Button>
       </form>
     </Modal>
   );
 }
 
-function AssignModal({ open, onClose, templateId, students }) {
+function AssignModal({ open, onClose, treinoId, students }) {
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -236,7 +236,7 @@ function AssignModal({ open, onClose, templateId, students }) {
     if (!selected) return;
     setLoading(true);
     try {
-      await assignTemplate(selected, templateId);
+      await assignTreino(selected, treinoId);
       setDone(true);
     } finally {
       setLoading(false);
@@ -246,7 +246,7 @@ function AssignModal({ open, onClose, templateId, students }) {
   return (
     <Modal open={open} onClose={onClose} title="Atribuir a Aluno">
       {done ? (
-        <p style={{ color: "var(--green)", fontSize: 13 }}>Template atribuído com sucesso!</p>
+        <p style={{ color: "var(--green)", fontSize: 13 }}>Treino atribuído com sucesso!</p>
       ) : (
         <>
           <select
@@ -270,8 +270,8 @@ function AssignModal({ open, onClose, templateId, students }) {
   );
 }
 
-export function TemplatesPage() {
-  const [templates, setTemplates] = useState([]);
+export function TreinosPage() {
+  const [treinos, setTreinos] = useState([]);
   const [exercises, setExercises] = useState([]);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -284,8 +284,8 @@ export function TemplatesPage() {
 
   const load = useCallback(() => {
     setLoading(true);
-    Promise.all([getTemplates(), getExercises(), getStudents()])
-      .then(([t, e, s]) => { setTemplates(t); setExercises(e); setStudents(s); })
+    Promise.all([getTreinos(), getExercises(), getStudents()])
+      .then(([t, e, s]) => { setTreinos(t); setExercises(e); setStudents(s); })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -293,8 +293,8 @@ export function TemplatesPage() {
   useEffect(() => { load(); }, [load]);
 
   async function handleDelete(id) {
-    if (!confirm("Deletar template?")) return;
-    await deleteTemplate(id);
+    if (!confirm("Deletar treino?")) return;
+    await deleteTreino(id);
     load();
   }
 
@@ -314,17 +314,17 @@ export function TemplatesPage() {
   return (
     <div style={{ padding: "24px 20px", maxWidth: 900 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Templates</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Treinos</h1>
         <Button size="sm" onClick={handleNew}>
           <Plus size={15} /> Novo
         </Button>
       </div>
 
-      {templates.length === 0 ? (
-        <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum template criado</p>
+      {treinos.length === 0 ? (
+        <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum treino criado</p>
       ) : (
         <div style={{ display: "grid", gap: 12 }} className="sm:grid-cols-2">
-          {templates.map((t) => (
+          {treinos.map((t) => (
             <div key={t.id} style={{
               background: "var(--bg2)", border: "1px solid var(--blue)",
               borderRadius: 12, padding: "16px 18px",
@@ -366,7 +366,7 @@ export function TemplatesPage() {
         </div>
       )}
 
-      <TemplateModal
+      <TreinoModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         initial={editing}
@@ -377,7 +377,7 @@ export function TemplatesPage() {
       <AssignModal
         open={assignOpen}
         onClose={() => setAssignOpen(false)}
-        templateId={assignTarget}
+        treinoId={assignTarget}
         students={students}
       />
     </div>

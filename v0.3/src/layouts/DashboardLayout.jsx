@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { key: "alunos",    label: "Alunos",    icon: Users },
   { key: "exercicios",label: "Exercícios",icon: Dumbbell },
-  { key: "templates", label: "Templates", icon: ClipboardList },
+  { key: "treinos",   label: "Treinos",   icon: ClipboardList },
   { key: "ranking",   label: "Ranking",   icon: Trophy },
   { key: "contas",    label: "Contas",    icon: UserCog, adminOnly: true },
 ];

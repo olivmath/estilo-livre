@@ -7,7 +7,7 @@ import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { AlunosPage } from "@/pages/AlunosPage";
 import { ExerciciosPage } from "@/pages/ExerciciosPage";
-import { TemplatesPage } from "@/pages/TemplatesPage";
+import { TreinosPage } from "@/pages/TreinosPage";
 import { RankingPage } from "@/pages/RankingPage";
 import { ContasPage } from "@/pages/ContasPage";
 
@@ -74,7 +74,7 @@ export default function App() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="alunos" element={<AlunosPage />} />
           <Route path="exercicios" element={<ExerciciosPage />} />
-          <Route path="templates" element={<TemplatesPage />} />
+          <Route path="treinos" element={<TreinosPage />} />
           <Route path="ranking" element={<RankingPage />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
@@ -90,7 +90,7 @@ export default function App() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="alunos" element={<AlunosPage />} />
           <Route path="exercicios" element={<ExerciciosPage />} />
-          <Route path="templates" element={<TemplatesPage />} />
+          <Route path="treinos" element={<TreinosPage />} />
           <Route path="ranking" element={<RankingPage />} />
           <Route path="contas" element={<ContasPage />} />
           <Route index element={<Navigate to="dashboard" replace />} />

@@ -5,7 +5,7 @@ import {
   deleteStudent, toggleBlock, getStudentStats,
 } from "@/services/users";
 import { getStudentSessions } from "@/services/sessions";
-import { getStudentWorkouts, getTemplates, assignTemplate, createCustomWorkout, deleteStudentWorkout } from "@/services/workouts";
+import { getStudentWorkouts, getTreinos, assignTreino, createCustomWorkout, deleteStudentWorkout } from "@/services/workouts";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus, Search, Edit2, Trash2, Lock, Unlock, ChevronRight } from "lucide-react";
@@ -184,11 +184,11 @@ function StudentDetail({ uid, onClose, role }) {
   const [stats, setStats] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [workouts, setWorkouts] = useState([]);
-  const [templates, setTemplates] = useState([]);
+  const [treinos, setTreinos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [assignOpen, setAssignOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [selectedTreino, setSelectedTreino] = useState("");
   const [assigning, setAssigning] = useState(false);
 
   const [newWkOpen, setNewWkOpen] = useState(false);
@@ -202,24 +202,24 @@ function StudentDetail({ uid, onClose, role }) {
       getStudentStats(uid),
       getStudentSessions(uid, 10),
       getStudentWorkouts(uid),
-      getTemplates(),
+      getTreinos(),
     ]).then(([s, sess, wks, tmpl]) => {
       setStats(s);
       setSessions(sess);
       setWorkouts(wks);
-      setTemplates(tmpl);
+      setTreinos(tmpl);
     }).finally(() => setLoading(false));
   }, [uid]);
 
   async function handleAssign() {
-    if (!selectedTemplate) return;
+    if (!selectedTreino) return;
     setAssigning(true);
     try {
-      await assignTemplate(uid, selectedTemplate);
+      await assignTreino(uid, selectedTreino);
       const wks = await getStudentWorkouts(uid);
       setWorkouts(wks);
       setAssignOpen(false);
-      setSelectedTemplate("");
+      setSelectedTreino("");
     } finally {
       setAssigning(false);
     }
@@ -320,7 +320,7 @@ function StudentDetail({ uid, onClose, role }) {
         <div>
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
             <Button size="sm" onClick={() => setAssignOpen(true)} style={{ flex: 1 }}>
-              Atribuir Template
+              Atribuir Treino
             </Button>
             <Button size="sm" variant="outline" onClick={() => setNewWkOpen(true)} style={{ flex: 1 }}>
               Novo Customizado
@@ -333,19 +333,19 @@ function StudentDetail({ uid, onClose, role }) {
               display: "flex", gap: 8, alignItems: "center",
             }}>
               <select
-                value={selectedTemplate}
-                onChange={(e) => setSelectedTemplate(e.target.value)}
+                value={selectedTreino}
+                onChange={(e) => setSelectedTreino(e.target.value)}
                 style={{
                   flex: 1, padding: "8px 10px", background: "var(--bg2)",
                   border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)", fontSize: 13,
                 }}
               >
                 <option value="">Selecione…</option>
-                {templates.map((t) => (
+                {treinos.map((t) => (
                   <option key={t.id} value={t.id}>{t.label} — {t.name}</option>
                 ))}
               </select>
-              <Button size="sm" onClick={handleAssign} disabled={assigning || !selectedTemplate}>
+              <Button size="sm" onClick={handleAssign} disabled={assigning || !selectedTreino}>
                 {assigning ? "…" : "OK"}
               </Button>
               <Button size="sm" variant="ghost" onClick={() => setAssignOpen(false)}>
