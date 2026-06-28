@@ -54,9 +54,12 @@ exports.getDashboardStats = onCall({ region: "us-central1" }, async (request) =>
   });
 
   const alerts = students
-    .map((st) => ({ uid: st.uid, name: st.name, daysAgo: Math.floor((now - (lastByUid[st.uid] ?? 0)) / msDay) }))
-    .filter((st) => st.daysAgo > 7)
-    .sort((a, b) => b.daysAgo - a.daysAgo);
+    .map((st) => {
+      const last = lastByUid[st.uid];
+      return { uid: st.uid, name: st.name, daysAgo: last != null ? Math.floor((now - last) / msDay) : null };
+    })
+    .filter((st) => st.daysAgo === null || st.daysAgo > 7)
+    .sort((a, b) => (b.daysAgo ?? Infinity) - (a.daysAgo ?? Infinity));
 
   return { totalStudents: students.length, todaySessions, weekSessions, inactiveCount, alertCount, recentActivity, weekChart, alerts };
 });
