@@ -1,8 +1,17 @@
-import { useState } from "react";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useState, useEffect } from "react";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  browserLocalPersistence,
+  setPersistence,
+} from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
 import logoImg from "@/assets/logo.jpeg";
+
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden>
@@ -18,11 +27,24 @@ export function LoginScreen() {
   const [error, setError]     = useState(null);
   const { notAuthorized, clearNotAuthorized } = useAuth();
 
+  useEffect(() => {
+    if (!isIOS) return;
+    getRedirectResult(auth).catch((err) => {
+      if (err.code !== "auth/cancelled-popup-request") setError(err.message);
+    });
+  }, []);
+
   async function handleGoogle() {
     setLoading(true);
     setError(null);
     try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
+      const provider = new GoogleAuthProvider();
+      if (isIOS) {
+        await setPersistence(auth, browserLocalPersistence);
+        await signInWithRedirect(auth, provider);
+      } else {
+        await signInWithPopup(auth, provider);
+      }
     } catch (err) {
       if (err.code !== "auth/popup-closed-by-user") setError(err.message);
     } finally {
