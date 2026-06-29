@@ -10,7 +10,7 @@ exports.getDashboardStats = onCall({ region: "us-central1" }, async (request) =>
   const msDay = 86400000;
 
   const [usersSnap, sessionsSnap] = await Promise.all([
-    db.collection("users").where("role", "in", ["aluno", "pendente"]).get(),
+    db.collection("users").where("role", "==", "aluno").get(),
     db.collectionGroup("sessions").orderBy("date", "desc").limit(200).get(),
   ]);
 
@@ -19,19 +19,21 @@ exports.getDashboardStats = onCall({ region: "us-central1" }, async (request) =>
     id: d.id, uid: d.ref.parent.parent.id, ...d.data(),
   }));
 
-  const todaySessions = sessionDocs.filter((s) => now - (s.date?.toMillis?.() ?? 0) < msDay).length;
-  const weekSessions  = sessionDocs.filter((s) => now - (s.date?.toMillis?.() ?? 0) < 7 * msDay).length;
+  const toMs = (d) => d?.toMillis?.() ?? (typeof d === "number" ? d : 0);
+
+  const todaySessions = sessionDocs.filter((s) => now - toMs(s.date) < msDay).length;
+  const weekSessions  = sessionDocs.filter((s) => now - toMs(s.date) < 7 * msDay).length;
 
   const lastByUid = {};
   for (const s of sessionDocs) {
-    const ms = s.date?.toMillis?.() ?? 0;
+    const ms = toMs(s.date);
     if (ms > 0 && (!lastByUid[s.uid] || ms > lastByUid[s.uid])) lastByUid[s.uid] = ms;
   }
 
-  const inactiveCount = students.filter((st) => now - (lastByUid[st.uid] ?? 0) > 14 * msDay).length;
+  const inactiveCount = students.filter((st) => now - (lastByUid[st.uid] ?? 0) > 30 * msDay).length;
   const alertCount    = students.filter((st) => {
     const diff = now - (lastByUid[st.uid] ?? 0);
-    return diff > 7 * msDay && diff <= 14 * msDay;
+    return diff > 7 * msDay && diff <= 30 * msDay;
   }).length;
 
   const cache = {};
@@ -48,7 +50,7 @@ exports.getDashboardStats = onCall({ region: "us-central1" }, async (request) =>
     const dayStart = now - (6 - i) * msDay;
     const dayEnd   = dayStart + msDay;
     const count    = sessionDocs.filter((s) => {
-      const ms = s.date?.toMillis?.() ?? 0;
+      const ms = toMs(s.date);
       return ms >= dayStart && ms < dayEnd;
     }).length;
     return { day: new Date(dayStart).toLocaleDateString("pt-BR", { weekday: "short" }), count };

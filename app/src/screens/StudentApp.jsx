@@ -57,7 +57,7 @@ export function StudentApp() {
     if (!user) return;
     try {
       setLoading(true);
-      const wksRef = collection(db, "users", user.uid, "workouts");
+      const wksRef = query(collection(db, "users", user.uid, "workouts"), orderBy("order"));
       const wksSnap = await getDocs(wksRef);
       const wksList = wksSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setWorkouts(wksList);

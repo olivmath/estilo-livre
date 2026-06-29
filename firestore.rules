@@ -66,5 +66,10 @@ service cloud.firestore {
       allow read: if isAuth();
       allow create, update, delete: if isAdminOrProf();
     }
+
+    // mail/ is written only by Admin SDK (Cloud Functions) — clients have no access
+    match /mail/{id} {
+      allow read, write: if false;
+    }
   }
 }

@@ -37,7 +37,7 @@ async function migrateUserSubcollections(oldUid, newUid) {
 exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
   const email = user.email;
   const inviteSnap = await db.collection("invites").doc(email).get();
-  let role = SEEDED_ROLES[email] ?? "pendente";
+  let role = SEEDED_ROLES[email] ?? "negado";
   let extra = {};
 
   if (inviteSnap.exists) {

@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import { collection, getDocs, setDoc, deleteDoc, doc, serverTimestamp, query, where } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
-import { setUserRole } from "@/services/accounts";
+import { createAccount, setUserRole } from "@/services/accounts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,19 +23,6 @@ async function getStaffUsers() {
   return snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
 }
 
-async function createStaffUser(data) {
-  const ref = doc(collection(db, "users"));
-  await setDoc(ref, {
-    name: data.name,
-    email: data.email,
-    role: data.role,
-    invitePending: true,
-    photoURL: "",
-    createdAt: serverTimestamp(),
-  });
-  return ref.id;
-}
-
 async function deleteStaffUser(uid) {
   await deleteDoc(doc(db, "users", uid));
 }
@@ -53,7 +40,7 @@ function NovoContaModal({ open, onClose, onCreated }) {
     setLoading(true);
     setError(null);
     try {
-      await createStaffUser(form);
+      await createAccount(form);
       setForm({ name: "", email: "", role: "professor" });
       onCreated();
       onClose();

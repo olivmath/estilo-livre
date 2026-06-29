@@ -1,7 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginScreen } from "@/screens/LoginScreen";
-import { PendingScreen } from "@/screens/PendingScreen";
 import { StudentApp } from "@/screens/StudentApp";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -40,7 +39,6 @@ function RoleGate() {
   if (error) return <Spinner />;
   if (!role) return <Spinner />;
 
-  if (role === "pendente") return <Navigate to="/pending" replace />;
   if (role === "aluno") return <Navigate to="/student" replace />;
   if (role === "professor") return <Navigate to="/prof/dashboard" replace />;
   if (role === "admin") return <Navigate to="/admin/dashboard" replace />;
@@ -60,7 +58,6 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<RoleGate />} />
-        <Route path="/pending" element={<PendingScreen />} />
         <Route
           path="/student"
           element={

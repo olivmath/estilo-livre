@@ -125,20 +125,18 @@ function Input({ ...props }) {
 }
 
 function NovoAlunoModal({ open, onClose, onCreated }) {
-  const [form, setForm] = useState({ name: "", email: "" });
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  function set(k, v) { setForm((p) => ({ ...p, [k]: v })); }
-
   async function submit(e) {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim()) return;
+    if (!email.trim()) return;
     setLoading(true);
     setError(null);
     try {
-      await createStudent({ name: form.name.trim(), email: form.email.trim() });
-      setForm({ name: "", email: "" });
+      await createStudent({ email: email.trim() });
+      setEmail("");
       onCreated();
       onClose();
     } catch (err) {
@@ -149,17 +147,17 @@ function NovoAlunoModal({ open, onClose, onCreated }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Novo Aluno">
+    <Modal open={open} onClose={onClose} title="Convidar Aluno">
       <form onSubmit={submit}>
         {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
-        <Field label="Nome">
-          <Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Nome completo" required />
+        <Field label="Email do aluno">
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" required />
         </Field>
-        <Field label="Email">
-          <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="email@exemplo.com" required />
-        </Field>
-        <Button type="submit" disabled={loading} style={{ width: "100%", height: 40, marginTop: 4 }}>
-          {loading ? "Criando…" : "Criar Aluno"}
+        <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 16 }}>
+          O aluno aparecerá na lista assim que fizer login com esse email pelo Google.
+        </p>
+        <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
+          {loading ? "Enviando…" : "Adicionar à lista"}
         </Button>
       </form>
     </Modal>
@@ -557,7 +555,7 @@ function StudentDetail({ uid, role }) {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {sessions.map((s) => {
-                const ms = s.date?.toMillis?.() ?? 0;
+                const ms = s.date?.toMillis?.() ?? (typeof s.date === "number" ? s.date : 0);
                 const days = Math.floor((Date.now() - ms) / 86400000);
                 return (
                   <div key={s.id} style={{
@@ -934,29 +932,27 @@ export function AlunosPage() {
 
         <div style={{ marginLeft: "auto", flexShrink: 0 }}>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                disabled={nSelected === 0}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
-                  padding: "6px 12px", borderRadius: 20, border: "1px solid",
-                  borderColor: nSelected > 0 ? "var(--blue2)" : "var(--blue)",
-                  background: nSelected > 0 ? "var(--blue2)" : "var(--bg3)",
-                  color: nSelected > 0 ? "var(--text)" : "var(--sub)",
-                  fontSize: 12, fontWeight: 600, cursor: nSelected > 0 ? "pointer" : "default",
-                  opacity: nSelected === 0 ? 0.45 : 1,
-                  transition: "background .15s, border-color .15s",
-                }}
-              >
-                Ações
-                {nSelected > 0 && (
-                  <span style={{
-                    background: "rgba(255,255,255,0.15)", borderRadius: 10,
-                    padding: "1px 6px", fontSize: 11, fontWeight: 700,
-                  }}>{nSelected}</span>
-                )}
-                <ChevronDown size={13} />
-              </button>
+            <DropdownMenuTrigger
+              disabled={nSelected === 0}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "6px 12px", borderRadius: 20, border: "1px solid",
+                borderColor: nSelected > 0 ? "var(--blue2)" : "var(--blue)",
+                background: nSelected > 0 ? "var(--blue2)" : "var(--bg3)",
+                color: nSelected > 0 ? "var(--text)" : "var(--sub)",
+                fontSize: 12, fontWeight: 600, cursor: nSelected > 0 ? "pointer" : "default",
+                opacity: nSelected === 0 ? 0.45 : 1,
+                transition: "background .15s, border-color .15s",
+              }}
+            >
+              Ações
+              {nSelected > 0 && (
+                <span style={{
+                  background: "rgba(255,255,255,0.15)", borderRadius: 10,
+                  padding: "1px 6px", fontSize: 11, fontWeight: 700,
+                }}>{nSelected}</span>
+              )}
+              <ChevronDown size={13} />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"

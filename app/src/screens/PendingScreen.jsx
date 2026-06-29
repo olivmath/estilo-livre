@@ -1,7 +1,19 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function PendingScreen() {
+  const { role } = useAuth();
+  const navigate = useNavigate();
+
+  // onUserCreate trigger may update the role asynchronously after login;
+  // redirect back to RoleGate so the new role is picked up
+  useEffect(() => {
+    if (role && role !== "pendente") navigate("/", { replace: true });
+  }, [role, navigate]);
+
   return (
     <div style={{
       minHeight: "100vh",

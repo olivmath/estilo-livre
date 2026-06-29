@@ -130,8 +130,8 @@ export function DashboardPage() {
                     fontSize: 11, fontWeight: 600,
                     padding: "2px 8px",
                     borderRadius: 20,
-                    background: a.daysAgo >= 14 ? "rgba(244,67,54,0.15)" : "rgba(245,196,0,0.12)",
-                    color: a.daysAgo >= 14 ? "var(--red)" : "var(--acc)",
+                    background: a.daysAgo >= 30 ? "rgba(244,67,54,0.15)" : "rgba(245,196,0,0.12)",
+                    color: a.daysAgo >= 30 ? "var(--red)" : "var(--acc)",
                   }}>
                     {a.daysAgo != null ? `${a.daysAgo}d sem treinar` : "sem sessão"}
                   </span>
@@ -179,8 +179,9 @@ export function DashboardPage() {
                     {a.studentName ?? a.name}
                   </p>
                   <p style={{ fontSize: 11, color: "var(--sub)" }}>
-                    {a.workout}
-                    {a.duration ? ` · ${fmtDuration(a.duration)}` : ""}
+                    {a.wkName ?? "Treino"}
+                    {a.dur ? ` · ${fmtDuration(a.dur)}` : ""}
+                    {a.exs?.length ? ` · ${a.exs.length} exercício${a.exs.length !== 1 ? "s" : ""}` : ""}
                   </p>
                 </div>
                 <span style={{ fontSize: 11, color: "var(--sub)", flexShrink: 0 }}>
