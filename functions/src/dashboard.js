@@ -25,7 +25,7 @@ exports.getDashboardStats = onCall({ region: "us-central1" }, async (request) =>
   const lastByUid = {};
   for (const s of sessionDocs) {
     const ms = s.date?.toMillis?.() ?? 0;
-    if (!lastByUid[s.uid] || ms > lastByUid[s.uid]) lastByUid[s.uid] = ms;
+    if (ms > 0 && (!lastByUid[s.uid] || ms > lastByUid[s.uid])) lastByUid[s.uid] = ms;
   }
 
   const inactiveCount = students.filter((st) => now - (lastByUid[st.uid] ?? 0) > 14 * msDay).length;
@@ -38,9 +38,10 @@ exports.getDashboardStats = onCall({ region: "us-central1" }, async (request) =>
   const recentActivity = await Promise.all(sessionDocs.slice(0, 12).map(async (s) => {
     if (!cache[s.uid]) {
       const u = await db.collection("users").doc(s.uid).get();
-      cache[s.uid] = u.exists ? u.data().name : "Unknown";
+      const d = u.exists ? u.data() : {};
+      cache[s.uid] = { name: d.name ?? "Unknown", photoURL: d.photoURL ?? null };
     }
-    return { ...s, studentName: cache[s.uid] };
+    return { ...s, studentName: cache[s.uid].name, studentPhoto: cache[s.uid].photoURL };
   }));
 
   const weekChart = Array.from({ length: 7 }, (_, i) => {

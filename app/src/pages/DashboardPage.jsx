@@ -165,14 +165,14 @@ export function DashboardPage() {
               }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: "50%",
-                  background: a.photoURL ? "transparent" : "var(--blue)",
+                  background: a.studentPhoto ? "transparent" : "var(--blue)",
                   overflow: "hidden", flexShrink: 0,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 14, fontWeight: 700, color: "var(--acc)",
                 }}>
-                  {a.photoURL
-                    ? <img src={a.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    : (a.name?.[0]?.toUpperCase() ?? "?")}
+                  {a.studentPhoto
+                    ? <img src={a.studentPhoto} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : (a.studentName?.[0]?.toUpperCase() ?? "?")}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>
