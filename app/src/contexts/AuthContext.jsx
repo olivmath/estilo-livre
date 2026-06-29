@@ -7,12 +7,11 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [firebaseUser, setFirebaseUser] = useState(undefined);
-  const [notAuthorized, setNotAuthorized] = useState(false);
+  const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
       setFirebaseUser(u ?? null);
-      if (!u) setNotAuthorized(false);
     });
   }, []);
 
@@ -22,7 +21,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (error) {
-      setNotAuthorized(true);
+      setAuthError(error);
       signOut(auth);
     }
   }, [error]);
@@ -50,8 +49,8 @@ export function AuthProvider({ children }) {
         profile,
         loading,
         error,
-        notAuthorized,
-        clearNotAuthorized: () => setNotAuthorized(false),
+        authError,
+        clearAuthError: () => setAuthError(null),
       }}
     >
       {children}

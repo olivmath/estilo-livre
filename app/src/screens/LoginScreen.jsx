@@ -2,6 +2,8 @@ import { useState } from "react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import logoImg from "@/assets/logo.jpeg";
 
 const GoogleIcon = () => (
@@ -16,7 +18,7 @@ const GoogleIcon = () => (
 export function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
-  const { notAuthorized, clearNotAuthorized } = useAuth();
+  const { authError, clearAuthError } = useAuth();
 
   async function handleGoogle() {
     setLoading(true);
@@ -32,20 +34,23 @@ export function LoginScreen() {
 
   return (
     <div style={styles.page}>
-      {notAuthorized && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modal}>
-            <span style={styles.modalIcon}>🚫</span>
-            <h2 style={styles.modalTitle}>Acesso negado</h2>
-            <p style={styles.modalBody}>
-              Sua conta não está cadastrada na academia. Entre em contato com o administrador.
-            </p>
-            <button style={styles.modalBtn} onClick={clearNotAuthorized}>
-              Voltar ao login
-            </button>
-          </div>
-        </div>
-      )}
+      <Dialog open={!!authError} onOpenChange={(open) => !open && clearAuthError()}>
+        <DialogContent style={{ background: "var(--bg2)", border: "1px solid var(--red)", borderRadius: 20, maxWidth: 340, textAlign: "center" }}>
+          <DialogHeader>
+            <span style={{ fontSize: 48, display: "block", marginBottom: 8 }}>🚫</span>
+            <DialogTitle style={{ color: "var(--text)", fontSize: 20 }}>Acesso negado</DialogTitle>
+          </DialogHeader>
+          <p style={{ fontSize: 14, color: "var(--sub)", lineHeight: 1.6, marginBottom: 8 }}>
+            {authError}
+          </p>
+          <Button
+            onClick={clearAuthError}
+            style={{ width: "100%", background: "var(--red)", color: "#fff", borderRadius: 12, padding: "13px 20px", fontSize: 15 }}
+          >
+            Voltar ao login
+          </Button>
+        </DialogContent>
+      </Dialog>
       <div style={styles.card}>
 
         {/* Logo */}
@@ -190,53 +195,5 @@ const styles = {
     fontSize: 12,
     color: "var(--sub)",
     opacity: 0.7,
-  },
-  modalOverlay: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.7)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 9999,
-    padding: "24px 16px",
-  },
-  modal: {
-    width: "100%",
-    maxWidth: 340,
-    background: "var(--bg2)",
-    border: "1px solid var(--red)",
-    borderRadius: 20,
-    padding: "36px 28px 28px",
-    textAlign: "center",
-    boxShadow: "0 0 40px rgba(244,67,54,0.2)",
-  },
-  modalIcon: {
-    fontSize: 48,
-    display: "block",
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 700,
-    color: "var(--text)",
-    marginBottom: 12,
-  },
-  modalBody: {
-    fontSize: 14,
-    color: "var(--sub)",
-    lineHeight: 1.6,
-    marginBottom: 24,
-  },
-  modalBtn: {
-    width: "100%",
-    padding: "13px 20px",
-    background: "var(--red)",
-    color: "#fff",
-    border: "none",
-    borderRadius: 12,
-    fontSize: 15,
-    fontWeight: 600,
-    cursor: "pointer",
   },
 };
