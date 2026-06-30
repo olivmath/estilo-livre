@@ -330,17 +330,20 @@ export function StudentApp() {
       setShowSummary(true);
     } else {
       // Move to next exercise, trigger rest
-      setActiveWk((prev) => ({
-        ...prev,
+      const nextState = {
+        ...activeWk,
         results: updatedResults,
         exIdx: nextIdx,
         set: 0,
-        currentWeight: lastWeightFor(prev.exercises[nextIdx].name, prev.exercises[nextIdx].wt || 0),
+        currentWeight: lastWeightFor(activeWk.exercises[nextIdx].name, activeWk.exercises[nextIdx].wt || 0),
         exStart: Date.now(),
-      }));
+      };
+      setActiveWk(nextState);
       setRestTotal(45);
       setRestType("transition");
-      setRestTime(45); // 45s rest between exercises
+      setRestTime(45);
+      // Auto-save progress so "Continuar depois" resumes from here
+      setDoc(doc(db, "users", user.uid, "drafts", "current"), { ...nextState, savedAt: Date.now() }).catch(() => {});
     }
   };
 
