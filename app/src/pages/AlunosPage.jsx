@@ -11,6 +11,7 @@ import {
 } from "@/services/workouts";
 import { getExercises } from "@/services/exercises";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -20,6 +21,8 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Spinner, UserAvatar, Field } from "@/components/shared";
 import { X, Plus, Search, Trash2, ChevronRight, ChevronDown, Lock, KeyRound, Edit2, ChevronUp } from "lucide-react";
 
 const PALETTE = [
@@ -37,31 +40,6 @@ const STATUS_COLORS = {
 const STATUS_FILTERS = ["todos", "active", "warning", "inactive", "blocked"];
 const STATUS_LABELS  = { todos: "Todos", ...Object.fromEntries(Object.entries(STATUS_COLORS).map(([k, v]) => [k, v.label])) };
 
-function Spinner() {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
-      <div className="w-8 h-8 rounded-full border-[3px] animate-spin"
-        style={{ borderColor: "var(--bg3)", borderTopColor: "var(--acc)" }} />
-    </div>
-  );
-}
-
-function Avatar({ name, photoURL, size = 36 }) {
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: "50%",
-      background: photoURL ? "transparent" : "var(--blue)",
-      overflow: "hidden", flexShrink: 0,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.4, fontWeight: 700, color: "var(--acc)",
-    }}>
-      {photoURL
-        ? <img src={photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        : (name?.[0]?.toUpperCase() ?? "?")}
-    </div>
-  );
-}
-
 function StatusBadge({ status }) {
   const c = STATUS_COLORS[status] ?? STATUS_COLORS.inactive;
   return (
@@ -72,56 +50,6 @@ function StatusBadge({ status }) {
       {c.label}
     </span>
   );
-}
-
-function Modal({ open, onClose, title, children }) {
-  if (!open) return null;
-  return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 200,
-      display: "flex", alignItems: "flex-end",
-      background: "rgba(0,0,0,0.6)",
-    }}
-      onClick={onClose}
-    >
-      <div
-        style={{
-          width: "100%", maxWidth: 520, margin: "0 auto",
-          background: "var(--bg2)", borderTopLeftRadius: 20, borderTopRightRadius: 20,
-          border: "1px solid var(--blue)", borderBottom: "none",
-          padding: "24px 20px 32px", maxHeight: "92vh", overflowY: "auto",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)" }}>{title}</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)" }}>
-            <X size={18} />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, children }) {
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <label style={{ display: "block", fontSize: 12, color: "var(--sub)", marginBottom: 6 }}>{label}</label>
-      {children}
-    </div>
-  );
-}
-
-const inputStyle = {
-  width: "100%", padding: "10px 12px", background: "var(--bg3)",
-  border: "1px solid var(--blue)", borderRadius: 8, color: "var(--text)",
-  fontSize: 14, outline: "none",
-};
-
-function Input({ ...props }) {
-  return <input style={inputStyle} {...props} />;
 }
 
 function NovoAlunoModal({ open, onClose, onCreated }) {
@@ -147,20 +75,25 @@ function NovoAlunoModal({ open, onClose, onCreated }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Convidar Aluno">
-      <form onSubmit={submit}>
-        {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
-        <Field label="Email do aluno">
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" required />
-        </Field>
-        <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 16 }}>
-          O aluno aparecerá na lista assim que fizer login com esse email pelo Google.
-        </p>
-        <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
-          {loading ? "Enviando…" : "Adicionar à lista"}
-        </Button>
-      </form>
-    </Modal>
+    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent side="bottom" style={{ maxWidth: 520, margin: "0 auto" }}>
+        <SheetHeader>
+          <SheetTitle>Convidar Aluno</SheetTitle>
+        </SheetHeader>
+        <form onSubmit={submit} style={{ padding: "0 0 16px" }}>
+          {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+          <Field label="Email do aluno">
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" required />
+          </Field>
+          <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 16 }}>
+            O aluno aparecerá na lista assim que fizer login com esse email pelo Google.
+          </p>
+          <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
+            {loading ? "Enviando…" : "Adicionar à lista"}
+          </Button>
+        </form>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -191,9 +124,10 @@ function RpeChart({ sessions }) {
   );
 }
 
+const WORKOUT_EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [] };
+
 function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
-  const EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [] };
-  const [form, setForm] = useState(EMPTY);
+  const [form, setForm] = useState(WORKOUT_EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [addingEx, setAddingEx] = useState(false);
@@ -201,12 +135,12 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
 
   useEffect(() => {
     if (open) {
-      setForm(initial ? { ...initial, exercises: [...(initial.exercises ?? [])] } : EMPTY);
+      setForm(initial ? { ...initial, exercises: [...(initial.exercises ?? [])] } : WORKOUT_EMPTY);
       setError(null);
       setAddingEx(false);
       setExSearch("");
     }
-  }, [open, initial]);
+  }, [open, initial, WORKOUT_EMPTY]);
 
   function set(k, v) { setForm((p) => ({ ...p, [k]: v })); }
 
@@ -266,8 +200,12 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
   });
 
   return (
-    <Modal open={open} onClose={onClose} title={initial?.id ? "Editar Treino" : "Novo Treino Customizado"}>
-      <form onSubmit={submit}>
+    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent side="bottom" style={{ maxWidth: 520, margin: "0 auto", maxHeight: "92vh", overflowY: "auto" }}>
+        <SheetHeader>
+          <SheetTitle>{initial?.id ? "Editar Treino" : "Novo Treino Customizado"}</SheetTitle>
+        </SheetHeader>
+      <form onSubmit={submit} style={{ padding: "0 0 16px" }}>
         {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
         <div style={{ display: "grid", gridTemplateColumns: "64px 1fr", gap: 12 }}>
@@ -326,16 +264,16 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
             <div style={{ marginBottom: 8 }}>
               <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
                 <div style={{ position: "relative", flex: 1 }}>
-                  <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--sub)" }} />
-                  <input
+                  <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--sub)", zIndex: 1 }} />
+                  <Input
                     autoFocus
                     value={exSearch}
                     onChange={(e) => setExSearch(e.target.value)}
                     placeholder="Buscar exercício…"
                     style={{
-                      width: "100%", padding: "8px 10px 8px 30px",
+                      paddingLeft: 30,
                       background: "var(--bg2)", border: "1px solid var(--blue)",
-                      borderRadius: 8, color: "var(--text)", fontSize: 13, outline: "none",
+                      color: "var(--text)", fontSize: 13,
                     }}
                   />
                 </div>
@@ -400,15 +338,15 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
                   ].map(({ k, label }) => (
                     <div key={k}>
                       <p style={{ fontSize: 10, color: "var(--sub)", marginBottom: 2 }}>{label}</p>
-                      <input
+                      <Input
                         type="number"
                         min={0}
                         value={ex[k] ?? 0}
                         onChange={(e) => updateEx(i, k, e.target.value)}
                         style={{
-                          width: "100%", padding: "6px 8px", background: "var(--bg2)",
-                          border: "1px solid var(--blue)", borderRadius: 6, color: "var(--text)",
-                          fontSize: 13, outline: "none",
+                          padding: "6px 8px", background: "var(--bg2)",
+                          border: "1px solid var(--blue)", color: "var(--text)",
+                          fontSize: 13,
                         }}
                       />
                     </div>
@@ -423,7 +361,8 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
           {loading ? "Salvando…" : initial?.id ? "Salvar Alterações" : "Criar Treino"}
         </Button>
       </form>
-    </Modal>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -905,15 +844,15 @@ export function AlunosPage() {
       </div>
 
       <div style={{ position: "relative", marginBottom: 12 }}>
-        <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--sub)" }} />
-        <input
+        <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--sub)", zIndex: 1 }} />
+        <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar por nome ou email…"
           style={{
-            width: "100%", padding: "10px 12px 10px 36px",
+            paddingLeft: 36,
             background: "var(--bg2)", border: "1px solid var(--blue)",
-            borderRadius: 8, color: "var(--text)", fontSize: 14, outline: "none",
+            color: "var(--text)", fontSize: 14,
           }}
         />
       </div>
@@ -1053,7 +992,7 @@ export function AlunosPage() {
                   )}
                 </button>
 
-                <Avatar name={s.name} photoURL={s.photoURL} />
+                <UserAvatar name={s.name} photoURL={s.photoURL} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {s.name}
@@ -1117,32 +1056,14 @@ export function AlunosPage() {
       </AlertDialog>
 
       {/* Student detail slide-over */}
-      {detailUid && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 100,
-          display: "flex", justifyContent: "flex-end",
-          background: "rgba(0,0,0,0.5)",
-        }}
-          onClick={() => setDetailUid(null)}
-        >
-          <div
-            style={{
-              width: "100%", maxWidth: 480, height: "100%",
-              background: "var(--bg2)", borderLeft: "1px solid var(--blue)",
-              overflowY: "auto", padding: "24px 20px",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)" }}>{detailName}</h2>
-              <button onClick={() => setDetailUid(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)" }}>
-                <X size={18} />
-              </button>
-            </div>
-            <StudentDetail uid={detailUid} role={role} />
-          </div>
-        </div>
-      )}
+      <Sheet open={!!detailUid} onOpenChange={(o) => !o && setDetailUid(null)}>
+        <SheetContent side="right" style={{ maxWidth: 480, background: "var(--bg2)", borderLeft: "1px solid var(--blue)", padding: "24px 20px", overflowY: "auto" }}>
+          <SheetHeader>
+            <SheetTitle style={{ fontSize: 16, fontWeight: 700, color: "var(--text)" }}>{detailName}</SheetTitle>
+          </SheetHeader>
+          <StudentDetail uid={detailUid} role={role} />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
