@@ -796,13 +796,13 @@ export function StudentApp() {
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       onClick={() => resumeWorkout(draft)}
-                      style={{ ...styles.btnPrimary, flex: 3, padding: "13px 0", fontSize: 14 }}
+                      style={{ ...styles.btnPrimary, flex: 3, padding: "13px 0", fontSize: 14, whiteSpace: "nowrap" }}
                     >
                       ▶ Continuar treino
                     </button>
                     <button
                       onClick={() => startFromScratch(draft.id)}
-                      style={{ ...styles.btnSecondary, flex: 2, padding: "13px 0", fontSize: 13 }}
+                      style={{ ...styles.btnSecondary, flex: 2, padding: "13px 0", fontSize: 13, whiteSpace: "nowrap" }}
                     >
                       Começar do zero
                     </button>
@@ -1382,12 +1382,12 @@ const styles = {
     cursor: "pointer",
   },
   resumeBanner: {
-    margin: "0 16px 20px",
+    marginBottom: 24,
     padding: 20,
     borderRadius: 16,
     background: "linear-gradient(135deg, rgba(245,196,0,0.12), rgba(245,196,0,0.04))",
     border: "1.5px solid rgba(245,196,0,0.4)",
-    boxShadow: "0 4px 20px rgba(245,196,0,0.08)",
+    boxShadow: "0 8px 24px rgba(245,196,0,0.08)",
   },
   nextWkBanner: {
     padding: 20,
