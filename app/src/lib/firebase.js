@@ -5,7 +5,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey:            "AIzaSyCfTXw6Q4ccI3d1QOBp2f7h1dlpkDpZ4lw",
-  authDomain:        "academia-estilo-livre.firebaseapp.com",
+  authDomain:        "academia-estilo-livre.web.app",
   projectId:         "academia-estilo-livre",
   storageBucket:     "academia-estilo-livre.firebasestorage.app",
   messagingSenderId: "398048202907",
