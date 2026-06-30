@@ -766,68 +766,79 @@ export function StudentApp() {
                 )}
               </div>
 
-              {/* Resume Draft Banner */}
-              {draft && (
+              {/* Resume Draft Banner — shown alone when a draft exists */}
+              {draft ? (
                 <div style={styles.resumeBanner}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--acc)" }} />
-                    <span style={{ fontSize: 10, fontWeight: 700, color: "var(--acc)", letterSpacing: 1, textTransform: "uppercase" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--acc)", boxShadow: "0 0 8px var(--acc)" }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "var(--acc)", letterSpacing: 1.5, textTransform: "uppercase" }}>
                       Treino pausado
                     </span>
                   </div>
-                  <p style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", marginBottom: 2 }}>
+                  <p style={{ fontSize: 20, fontWeight: 900, color: "var(--text)", marginBottom: 6, lineHeight: 1.2 }}>
                     Treino {draft.label} — {draft.name}
                   </p>
-                  <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 14 }}>
-                    <span style={{ color: "var(--acc)", fontWeight: 600 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, color: "var(--acc)", fontWeight: 700 }}>
                       {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
-                    </span>{" "}
-                    concluídos
-                  </p>
+                    </span>
+                    <span style={{ fontSize: 13, color: "var(--sub)" }}>concluídos</span>
+                  </div>
+                  <div style={{ height: 4, borderRadius: 4, background: "rgba(245,196,0,0.15)", overflow: "hidden", marginBottom: 20 }}>
+                    <div style={{
+                      height: "100%",
+                      borderRadius: 4,
+                      background: "var(--acc)",
+                      width: `${((draft.results?.length ?? 0) / (draft.exercises?.length ?? 1)) * 100}%`,
+                      transition: "width 0.3s ease",
+                    }} />
+                  </div>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       onClick={() => resumeWorkout(draft)}
-                      style={{ ...styles.btnPrimary, flex: 2, padding: "12px 0" }}
+                      style={{ ...styles.btnPrimary, flex: 2, padding: "14px 0", fontSize: 15 }}
                     >
                       ▶ Continuar treino
                     </button>
                     <button
                       onClick={() => startFromScratch(draft.id)}
-                      style={{ ...styles.btnSecondary, flex: 1, padding: "12px 0" }}
+                      style={{ ...styles.btnSecondary, flex: 1, padding: "14px 0", fontSize: 13 }}
                     >
                       Começar do zero
                     </button>
                   </div>
                 </div>
-              )}
+              ) : null}
 
-              {/* Next Workout Recommendation Banner */}
-              {workouts.length > 0 ? (
-                (() => {
-                  const nextWk = workouts.find((w) => w.id === cycleInfoObj.next) || workouts[0];
-                  return (
-                    <div
-                      onClick={() => startWorkout(nextWk.id)}
-                      style={{
-                        ...styles.nextWkBanner,
-                        background: `linear-gradient(135deg, ${nextWk.color || "var(--blue)"}dd, ${nextWk.color || "var(--blue)"}88)`,
-                      }}
-                    >
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, opacity: 0.85 }}>PRÓXIMO TREINO DO CICLO</span>
-                        <h3 style={{ fontSize: 18, fontWeight: 800, marginTop: 2 }}>Treino {nextWk.label} - {nextWk.name}</h3>
-                        <p style={{ fontSize: 13, marginTop: 4, opacity: 0.8 }}>{nextWk.exercises?.length || 0} exercícios cadastrados</p>
+              {/* Next Workout / Empty — only shown when no draft */}
+              {!draft && (
+                workouts.length > 0 ? (
+                  (() => {
+                    const nextWk = workouts.find((w) => w.id === cycleInfoObj.next) || workouts[0];
+                    return (
+                      <div
+                        onClick={() => startWorkout(nextWk.id)}
+                        style={{
+                          ...styles.nextWkBanner,
+                          background: `linear-gradient(135deg, ${nextWk.color || "var(--blue)"}dd, ${nextWk.color || "var(--blue)"}88)`,
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, opacity: 0.85 }}>PRÓXIMO TREINO DO CICLO</span>
+                          <h3 style={{ fontSize: 18, fontWeight: 800, marginTop: 2 }}>Treino {nextWk.label} - {nextWk.name}</h3>
+                          <p style={{ fontSize: 13, marginTop: 4, opacity: 0.8 }}>{nextWk.exercises?.length || 0} exercícios cadastrados</p>
+                        </div>
+                        <div style={styles.playIconContainer}>
+                          <Play size={20} fill="#000" stroke="#000" />
+                        </div>
                       </div>
-                      <div style={styles.playIconContainer}>
-                        <Play size={20} fill="#000" stroke="#000" />
-                      </div>
-                    </div>
-                  );
-                })()
-              ) : (
-                <div style={styles.cardEmpty}>
-                  <p>Sem treinos atribuídos pelo professor. Fale com seu instrutor.</p>
-                </div>
+                    );
+                  })()
+                ) : (
+                  <div style={styles.cardEmpty}>
+                    <p>Sem treinos atribuídos pelo professor. Fale com seu instrutor.</p>
+                  </div>
+                )
               )}
 
               {/* Cycle Tracker Card */}
@@ -1372,10 +1383,11 @@ const styles = {
   },
   resumeBanner: {
     margin: "0 16px 20px",
-    padding: 16,
+    padding: 20,
     borderRadius: 16,
-    background: "linear-gradient(135deg, rgba(245,196,0,0.08), rgba(245,196,0,0.04))",
-    border: "1px solid rgba(245,196,0,0.3)",
+    background: "linear-gradient(135deg, rgba(245,196,0,0.12), rgba(245,196,0,0.04))",
+    border: "1.5px solid rgba(245,196,0,0.4)",
+    boxShadow: "0 4px 20px rgba(245,196,0,0.08)",
   },
   nextWkBanner: {
     padding: 20,
