@@ -775,7 +775,7 @@ export function StudentApp() {
                       Treino pausado
                     </span>
                   </div>
-                  <p style={{ fontSize: 20, fontWeight: 900, color: "var(--text)", marginBottom: 6, lineHeight: 1.2 }}>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", marginBottom: 6, lineHeight: 1.3 }}>
                     Treino {draft.label} — {draft.name}
                   </p>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -784,7 +784,7 @@ export function StudentApp() {
                     </span>
                     <span style={{ fontSize: 13, color: "var(--sub)" }}>concluídos</span>
                   </div>
-                  <div style={{ height: 4, borderRadius: 4, background: "rgba(245,196,0,0.15)", overflow: "hidden", marginBottom: 20 }}>
+                  <div style={{ height: 4, borderRadius: 4, background: "rgba(245,196,0,0.15)", overflow: "hidden", marginBottom: 16 }}>
                     <div style={{
                       height: "100%",
                       borderRadius: 4,
@@ -796,13 +796,13 @@ export function StudentApp() {
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       onClick={() => resumeWorkout(draft)}
-                      style={{ ...styles.btnPrimary, flex: 2, padding: "14px 0", fontSize: 15 }}
+                      style={{ ...styles.btnPrimary, flex: 3, padding: "13px 0", fontSize: 14 }}
                     >
                       ▶ Continuar treino
                     </button>
                     <button
                       onClick={() => startFromScratch(draft.id)}
-                      style={{ ...styles.btnSecondary, flex: 1, padding: "14px 0", fontSize: 13 }}
+                      style={{ ...styles.btnSecondary, flex: 2, padding: "13px 0", fontSize: 13 }}
                     >
                       Começar do zero
                     </button>
