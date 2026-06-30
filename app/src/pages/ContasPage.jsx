@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Spinner, UserAvatar, Field } from "@/components/shared";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -107,7 +106,7 @@ function NovoContaModal({ open, onClose, onCreated }) {
 }
 
 export function ContasPage() {
-  const { user, profile, role: myRole } = useAuth();
+  const { user, role: myRole } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

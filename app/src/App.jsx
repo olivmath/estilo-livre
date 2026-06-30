@@ -22,14 +22,6 @@ function Spinner() {
   );
 }
 
-function ErrorScreen({ message }) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
-      <span className="text-5xl mb-4">⚠️</span>
-      <p className="text-sm mb-6" style={{ color: "var(--red)" }}>{message}</p>
-    </div>
-  );
-}
 
 function RoleGate() {
   const { user, role, loading, error } = useAuth();

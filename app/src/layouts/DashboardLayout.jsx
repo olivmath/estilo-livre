@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,7 +26,6 @@ const ROLE_LABEL = {
 export function DashboardLayout() {
   const { profile, role } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const base = location.pathname.startsWith("/admin") ? "/admin" : "/prof";
 
