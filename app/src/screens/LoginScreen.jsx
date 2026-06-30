@@ -11,8 +11,6 @@ import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
 import logoImg from "@/assets/logo.jpeg";
 
-const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden>
     <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
@@ -28,10 +26,15 @@ export function LoginScreen() {
   const { notAuthorized, clearNotAuthorized } = useAuth();
 
   useEffect(() => {
-    if (!isIOS) return;
-    getRedirectResult(auth).catch((err) => {
-      if (err.code !== "auth/cancelled-popup-request") setError(err.message);
-    });
+    // Handle redirect result (fallback path when popup was blocked)
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) setLoading(false);
+      })
+      .catch((err) => {
+        if (err.code !== "auth/cancelled-popup-request") setError(err.message);
+        setLoading(false);
+      });
   }, []);
 
   async function handleGoogle() {
@@ -39,15 +42,16 @@ export function LoginScreen() {
     setError(null);
     try {
       const provider = new GoogleAuthProvider();
-      if (isIOS) {
-        await setPersistence(auth, browserLocalPersistence);
-        await signInWithRedirect(auth, provider);
-      } else {
-        await signInWithPopup(auth, provider);
-      }
+      await setPersistence(auth, browserLocalPersistence);
+      await signInWithPopup(auth, provider);
     } catch (err) {
+      if (err.code === "auth/popup-blocked" || err.code === "auth/popup-cancelled") {
+        // Popup was blocked (rare on modern iOS/Safari from user gesture) — fallback to redirect
+        const provider = new GoogleAuthProvider();
+        await signInWithRedirect(auth, provider);
+        return; // page will reload, loading stays true
+      }
       if (err.code !== "auth/popup-closed-by-user") setError(err.message);
-    } finally {
       setLoading(false);
     }
   }
