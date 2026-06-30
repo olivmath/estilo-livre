@@ -26,7 +26,7 @@
           { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firestore.googleapis.com wss://*.firebaseio.com https://us-central1-academia-estilo-livre.cloudfunctions.net; frame-src https://academia-estilo-livre.firebaseapp.com https://accounts.google.com"
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firestore.googleapis.com wss://*.firebaseio.com https://us-central1-academia-estilo-livre.cloudfunctions.net; frame-src 'self' https://academia-estilo-livre.firebaseapp.com https://academia-estilo-livre.web.app https://accounts.google.com"
           }
         ]
       }
