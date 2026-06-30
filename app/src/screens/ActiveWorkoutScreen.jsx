@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Slider } from "@/components/ui/slider";
 
 const RING_CIRC = 2 * Math.PI * 82; // ≈ 515
 const RPE_LABELS = [
@@ -6,16 +7,6 @@ const RPE_LABELS = [
   "Moderado intenso", "Intenso", "Muito intenso", "Exaustivo", "Quase máximo", "Máximo",
 ];
 
-function diffColor(v) {
-  if (v <= 4) return "var(--green)";
-  if (v <= 7) return "var(--acc)";
-  return "var(--red)";
-}
-
-function fmtVol(exs) {
-  const vol = exs.reduce((a, r) => a + r.wt * r.sets * r.reps, 0);
-  return vol >= 1000 ? `${(vol / 1000).toFixed(1)}t` : `${vol}kg`;
-}
 
 function fmtDur(sec) {
   const m = String(Math.floor(sec / 60)).padStart(2, "0");
@@ -94,10 +85,10 @@ function RpeOverlay({ exName, rpeValue, setRpeValue, onConfirm }) {
         {RPE_LABELS[rpeValue] || ""}
       </p>
 
-      <input
-        type="range" min="0" max="10" value={rpeValue}
-        onChange={(e) => setRpeValue(parseInt(e.target.value))}
-        style={{ width: "100%", WebkitAppearance: "none", height: 6, borderRadius: 3, background: "var(--bg3)", outline: "none", marginBottom: 10, cursor: "pointer", accentColor: "var(--acc)" }}
+      <Slider
+        min={0} max={10} step={1} value={[rpeValue]}
+        onValueChange={([v]) => setRpeValue(v)}
+        style={{ marginBottom: 10 }}
       />
 
       <div style={{ display: "flex", width: "100%", marginBottom: 36 }}>
@@ -161,14 +152,15 @@ function SummaryOverlay({ summaryData, onSave, onDiscard }) {
 }
 
 /* ── ExitSheet ── */
-function ExitSheet({ onConfirm, onCancel }) {
+function ExitSheet({ onSavePartial, onCancel }) {
   return (
     <div style={S.exitBackdrop}>
       <div style={S.exitSheet}>
         <p style={{ fontSize: 18, fontWeight: 800, marginBottom: 6, color: "var(--text)" }}>Sair do treino?</p>
-        <p style={{ fontSize: 13, color: "var(--sub)", marginBottom: 24 }}>O progresso desta sessão será perdido.</p>
-        <button onClick={onConfirm} style={S.exitDangerBtn}>Sair sem salvar</button>
-        <button onClick={onCancel} style={S.exitCancelBtn}>Continuar treinando</button>
+        <p style={{ fontSize: 13, color: "var(--sub)", marginBottom: 24 }}>Seu progresso será salvo para continuar depois.</p>
+        <button onClick={onCancel} style={S.ctaBtn}>Voltar ao treino</button>
+        <div style={{ height: 10 }} />
+        <button onClick={onSavePartial} style={S.exitCancelBtn}>Continuar depois</button>
       </div>
     </div>
   );
@@ -197,6 +189,7 @@ export function ActiveWorkoutScreen({
   onShowExit,
   onHideExit,
   onConfirmExit,
+  onSavePartial,
 }) {
   const ex = activeWk.exercises[activeWk.exIdx];
   const currentSet = activeWk.set + 1;
@@ -237,7 +230,7 @@ export function ActiveWorkoutScreen({
         />
       )}
       {showExit && (
-        <ExitSheet onConfirm={onConfirmExit} onCancel={onHideExit} />
+        <ExitSheet onSavePartial={onSavePartial} onCancel={onHideExit} />
       )}
 
       {/* ── Top Nav ── */}

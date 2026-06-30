@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { signOut } from "firebase/auth";
-import { collection, query, getDocs, addDoc, doc, updateDoc, orderBy } from "firebase/firestore";
+import { collection, query, getDocs, addDoc, doc, updateDoc, orderBy, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { auth, db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -10,7 +12,6 @@ import {
   User,
   Play,
   ChevronLeft,
-  X,
   Plus,
   Clock,
 } from "lucide-react";
@@ -22,6 +23,9 @@ export function StudentApp() {
   const [workouts, setWorkouts] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Draft (partial workout saved for later)
+  const [draft, setDraft] = useState(null);
 
   // Active workout states
   const [activeWk, setActiveWk] = useState(null); // { id, label, name, color, exercises: [...], exIdx: 0, set: 0, start: 0, results: [], currentWeight: 0, exStart: 0 }
@@ -67,6 +71,9 @@ export function StudentApp() {
       const sessSnap = await getDocs(sessQuery);
       const sessList = sessSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setSessions(sessList);
+
+      const draftSnap = await getDoc(doc(db, "users", user.uid, "draft"));
+      setDraft(draftSnap.exists() ? draftSnap.data() : null);
     } catch (e) {
       console.error("Error loading data from Firestore: ", e);
     } finally {
@@ -376,6 +383,29 @@ export function StudentApp() {
     setShowExit(false);
   };
 
+  const deleteDraft = async () => {
+    await deleteDoc(doc(db, "users", user.uid, "draft"));
+    setDraft(null);
+  };
+
+  const savePartialWorkout = async () => {
+    const draftRef = doc(db, "users", user.uid, "draft");
+    await setDoc(draftRef, { ...activeWk, savedAt: Date.now() });
+    setDraft({ ...activeWk, savedAt: Date.now() });
+    discardWorkout();
+  };
+
+  const resumeWorkout = (d) => {
+    const { savedAt, ...wkState } = d;
+    setActiveWk({ ...wkState, start: Date.now() - (savedAt - wkState.start) });
+    deleteDraft();
+  };
+
+  const startFromScratch = async (wkId) => {
+    await deleteDraft();
+    startWorkout(wkId);
+  };
+
   const skipRest = () => {
     setRestTime(null);
     setRestType(null);
@@ -559,6 +589,7 @@ export function StudentApp() {
         onShowExit={() => setShowExit(true)}
         onHideExit={() => setShowExit(false)}
         onConfirmExit={discardWorkout}
+        onSavePartial={savePartialWorkout}
       />
     );
   }
@@ -575,7 +606,7 @@ export function StudentApp() {
             </div>
             <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 16 }}>Defina a carga padrão de: <br /><b>{editingEx.name}</b></p>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-              <input
+              <Input
                 type="number"
                 value={exWeightInput}
                 step="2.5"
@@ -731,6 +762,41 @@ export function StudentApp() {
                   </div>
                 )}
               </div>
+
+              {/* Resume Draft Banner */}
+              {draft && (
+                <div style={styles.resumeBanner}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--acc)" }} />
+                    <span style={{ fontSize: 10, fontWeight: 700, color: "var(--acc)", letterSpacing: 1, textTransform: "uppercase" }}>
+                      Treino pausado
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", marginBottom: 2 }}>
+                    Treino {draft.label} — {draft.name}
+                  </p>
+                  <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 14 }}>
+                    <span style={{ color: "var(--acc)", fontWeight: 600 }}>
+                      {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
+                    </span>{" "}
+                    concluídos
+                  </p>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      onClick={() => resumeWorkout(draft)}
+                      style={{ ...styles.btnPrimary, flex: 2, padding: "12px 0" }}
+                    >
+                      ▶ Continuar treino
+                    </button>
+                    <button
+                      onClick={() => startFromScratch(draft.id)}
+                      style={{ ...styles.btnSecondary, flex: 1, padding: "12px 0" }}
+                    >
+                      Começar do zero
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Next Workout Recommendation Banner */}
               {workouts.length > 0 ? (
@@ -1085,7 +1151,7 @@ export function StudentApp() {
                     )}
                     <label style={styles.btnUploadPhoto}>
                       <Plus size={16} />
-                      <input type="file" accept="image/*" onChange={uploadPhoto} style={{ display: "none" }} />
+                      <Input type="file" accept="image/*" onChange={uploadPhoto} style={{ display: "none" }} />
                     </label>
                   </div>
 
@@ -1163,10 +1229,8 @@ export function StudentApp() {
       </nav>
 
       {/* RPE Tutorial Modal */}
-      {showRpeTutorial && (
-        <>
-          <div onClick={() => setShowRpeTutorial(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 300 }} />
-          <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "#0b1228", borderRadius: "20px 20px 0 0", padding: "20px 20px 44px", zIndex: 301, maxHeight: "88vh", overflowY: "auto" }}>
+      <Sheet open={showRpeTutorial} onOpenChange={setShowRpeTutorial}>
+        <SheetContent side="bottom" style={{ background: "#0b1228", border: "none", borderRadius: "20px 20px 0 0", padding: "20px 20px 44px", maxHeight: "88vh", overflowY: "auto", maxWidth: 430, margin: "0 auto" }}>
             <div style={{ width: 40, height: 4, background: "#162040", borderRadius: 2, margin: "0 auto 18px" }} />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
               <span style={{ fontSize: 17, fontWeight: 700 }}>Entendendo o gráfico</span>
@@ -1249,8 +1313,8 @@ export function StudentApp() {
               }
             </div>
           </div>
-        </>
-      )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
@@ -1303,6 +1367,13 @@ const styles = {
     color: "var(--acc)",
     border: "1px solid var(--blue)",
     cursor: "pointer",
+  },
+  resumeBanner: {
+    margin: "0 16px 20px",
+    padding: 16,
+    borderRadius: 16,
+    background: "linear-gradient(135deg, rgba(245,196,0,0.08), rgba(245,196,0,0.04))",
+    border: "1px solid rgba(245,196,0,0.3)",
   },
   nextWkBanner: {
     padding: 20,
