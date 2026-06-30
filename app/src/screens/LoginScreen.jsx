@@ -40,16 +40,20 @@ export function LoginScreen() {
   async function handleGoogle() {
     setLoading(true);
     setError(null);
+    const provider = new GoogleAuthProvider();
     try {
-      const provider = new GoogleAuthProvider();
       await setPersistence(auth, browserLocalPersistence);
+      // iOS Safari doesn't support signInWithPopup reliably — use redirect on all mobile
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        await signInWithRedirect(auth, provider);
+        return; // page navigates away
+      }
       await signInWithPopup(auth, provider);
     } catch (err) {
       if (err.code === "auth/popup-blocked" || err.code === "auth/popup-cancelled") {
-        // Popup was blocked (rare on modern iOS/Safari from user gesture) — fallback to redirect
-        const provider = new GoogleAuthProvider();
         await signInWithRedirect(auth, provider);
-        return; // page will reload, loading stays true
+        return;
       }
       if (err.code !== "auth/popup-closed-by-user") setError(err.message);
       setLoading(false);

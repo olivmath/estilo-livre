@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
       setFirebaseUser(u ?? null);
-      if (!u) setNotAuthorized(false);
+      if (u) setNotAuthorized(false);
     });
   }, []);
 
