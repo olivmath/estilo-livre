@@ -287,8 +287,8 @@ export function ActiveWorkoutScreen({
               <span style={{ fontSize: 18, fontWeight: 600, color: "var(--sub)", letterSpacing: 0, marginLeft: 4 }}>kg</span>
             </div>
             <div style={{ display: "flex", gap: 6 }}>
-              <button onClick={() => onAdjustWeight(-2.5)} style={S.wBtn}>−</button>
-              <button onClick={() => onAdjustWeight(2.5)} style={S.wBtn}>+</button>
+              <button onClick={() => onAdjustWeight(-0.5)} style={S.wBtn}>−</button>
+              <button onClick={() => onAdjustWeight(0.5)} style={S.wBtn}>+</button>
             </div>
           </div>
         </div>
