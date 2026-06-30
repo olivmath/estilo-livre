@@ -72,7 +72,7 @@ export function StudentApp() {
       const sessList = sessSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setSessions(sessList);
 
-      const draftSnap = await getDoc(doc(db, "users", user.uid, "draft"));
+      const draftSnap = await getDoc(doc(db, "users", user.uid, "drafts", "current"));
       setDraft(draftSnap.exists() ? draftSnap.data() : null);
     } catch (e) {
       console.error("Error loading data from Firestore: ", e);
@@ -384,12 +384,12 @@ export function StudentApp() {
   };
 
   const deleteDraft = async () => {
-    await deleteDoc(doc(db, "users", user.uid, "draft"));
+    await deleteDoc(doc(db, "users", user.uid, "drafts", "current"));
     setDraft(null);
   };
 
   const savePartialWorkout = async () => {
-    const draftRef = doc(db, "users", user.uid, "draft");
+    const draftRef = doc(db, "users", user.uid, "drafts", "current");
     await setDoc(draftRef, { ...activeWk, savedAt: Date.now() });
     setDraft({ ...activeWk, savedAt: Date.now() });
     discardWorkout();
