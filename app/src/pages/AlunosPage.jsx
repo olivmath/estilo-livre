@@ -140,7 +140,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
       setAddingEx(false);
       setExSearch("");
     }
-  }, [open, initial, WORKOUT_EMPTY]);
+  }, [open, initial]);
 
   function set(k, v) { setForm((p) => ({ ...p, [k]: v })); }
 
@@ -366,7 +366,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
   );
 }
 
-function StudentDetail({ uid, role }) {
+function StudentDetail({ uid, role: _role }) {
   const [tab, setTab] = useState("progresso");
   const [stats, setStats] = useState(null);
   const [sessions, setSessions] = useState([]);
@@ -439,7 +439,7 @@ function StudentDetail({ uid, role }) {
   function toggleExpand(wkId) {
     setExpandedWk((prev) => {
       const next = new Set(prev);
-      next.has(wkId) ? next.delete(wkId) : next.add(wkId);
+      if (next.has(wkId)) next.delete(wkId); else next.add(wkId);
       return next;
     });
   }
@@ -788,7 +788,7 @@ export function AlunosPage() {
   function toggleSelect(uid) {
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(uid) ? next.delete(uid) : next.add(uid);
+      if (next.has(uid)) next.delete(uid); else next.add(uid);
       return next;
     });
   }
