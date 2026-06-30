@@ -1312,7 +1312,6 @@ export function StudentApp() {
                 : <button onClick={() => setShowRpeTutorial(false)} style={{ background: "#F5C400", border: "none", color: "#06091a", fontSize: 14, fontWeight: 600, padding: "10px 20px", borderRadius: 10, cursor: "pointer" }}>Fechar ✓</button>
               }
             </div>
-          </div>
         </SheetContent>
       </Sheet>
     </div>
