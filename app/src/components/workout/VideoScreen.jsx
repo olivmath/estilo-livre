@@ -1,10 +1,12 @@
 import { ChevronLeft, Play } from "lucide-react";
+import { getExerciseGif } from "@/lib/exerciseGifs";
 
 export function VideoScreen({ exercise, onClose }) {
   if (!exercise) return null;
   const { name, sets, reps, machine, alteres } = exercise;
   const hasMachine = machine && machine !== "0";
   const equipment = hasMachine ? `Máquina ${machine}` : alteres ? "Alteres" : "Livre";
+  const gif = getExerciseGif(name);
 
   return (
     <div style={S.screen}>
@@ -23,12 +25,18 @@ export function VideoScreen({ exercise, onClose }) {
         </div>
       </div>
 
-      {/* Video placeholder */}
+      {/* Gif de execução */}
       <div style={S.videoBox}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--acc)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Play size={28} color="#000" fill="#000" style={{ marginLeft: 3 }} />
-        </div>
-        <p style={{ color: "var(--sub)", fontSize: 12, marginTop: 12 }}>Vídeo disponível em breve</p>
+        {gif ? (
+          <img src={gif} alt={name} style={{ width: "100%", height: "100%", objectFit: "contain", background: "#fff" }} />
+        ) : (
+          <>
+            <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--acc)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Play size={28} color="#000" fill="#000" style={{ marginLeft: 3 }} />
+            </div>
+            <p style={{ color: "var(--sub)", fontSize: 12, marginTop: 12 }}>Vídeo disponível em breve</p>
+          </>
+        )}
       </div>
 
       {/* Stats */}
