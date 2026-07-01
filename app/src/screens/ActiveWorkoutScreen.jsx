@@ -15,7 +15,7 @@ function fmtDur(sec) {
 }
 
 /* ── RestOverlay ── */
-function RestOverlay({ restTime, restTotal, restType, nextExName, onSkip }) {
+function RestOverlay({ restTime, restTotal, restType, nextExName, nextExMachine, onSkip }) {
   const ringRef = useRef(null);
 
   useEffect(() => {
@@ -55,6 +55,11 @@ function RestOverlay({ restTime, restTotal, restType, nextExName, onSkip }) {
       {isTransition && nextExName && (
         <p style={{ fontSize: 13, color: "var(--sub)", marginBottom: 36, textAlign: "center" }}>
           Próximo: <strong style={{ color: "var(--text)" }}>{nextExName}</strong>
+          {nextExMachine && (
+            <span style={{ display: "block", fontSize: 12, color: "var(--acc)", marginTop: 4, fontWeight: 600 }}>
+              {nextExMachine}
+            </span>
+          )}
         </p>
       )}
 
@@ -211,6 +216,7 @@ export function ActiveWorkoutScreen({
           restTotal={restTotal}
           restType={restType}
           nextExName={nextEx?.name}
+          nextExMachine={nextEx?.machine}
           onSkip={onSkipRest}
         />
       )}
@@ -298,6 +304,21 @@ export function ActiveWorkoutScreen({
           {exItems.map((e, i) => {
             const isDone = e.status === "done";
             const isCurrent = e.status === "current";
+
+            const equipLabel = !isDone && e.machine && e.machine !== "0"
+              ? `Máq. ${e.machine}`
+              : !isDone && e.alteres
+              ? "Alteres"
+              : null;
+
+            const statusText = isDone
+              ? `✓ ${e.sets} séries · ${e.result?.wt ?? 0}kg`
+              : isCurrent
+              ? `Série ${currentSet}/${e.sets}`
+              : `${e.sets}×${e.reps}`;
+
+            const statusLine = equipLabel ? `${equipLabel}  ·  ${statusText}` : statusText;
+
             return (
               <div
                 key={i}
@@ -309,41 +330,45 @@ export function ActiveWorkoutScreen({
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
-                  gap: 3,
+                  gap: 4,
                   background: isDone
                     ? "rgba(0,200,83,0.08)"
                     : isCurrent
-                    ? "rgba(245,196,0,0.08)"
+                    ? "rgba(245,196,0,0.06)"
                     : "var(--bg2)",
                   border: isDone
                     ? "1px solid rgba(0,200,83,0.2)"
                     : isCurrent
-                    ? "1.5px solid rgba(245,196,0,0.4)"
+                    ? "1.5px solid rgba(245,196,0,0.35)"
                     : "1px solid var(--blue)",
+                  boxShadow: isCurrent ? "inset 3px 0 0 var(--acc)" : "none",
                 }}
               >
                 <span
                   style={{
-                    lineHeight: 1.2,
-                    fontSize: isDone ? 13 : isCurrent ? 15 : 13,
-                    fontWeight: isDone ? 600 : isCurrent ? 800 : 500,
+                    fontSize: isCurrent ? 14 : 13,
+                    fontWeight: isCurrent ? 700 : isDone ? 600 : 500,
                     color: isDone ? "var(--green)" : isCurrent ? "var(--acc)" : "var(--sub)",
+                    lineHeight: 1.2,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                 >
                   {e.name}
                 </span>
                 <span
                   style={{
-                    fontSize: isDone ? 10 : isCurrent ? 11 : 10,
-                    letterSpacing: 0.3,
-                    color: isDone ? "rgba(0,200,83,0.6)" : isCurrent ? "rgba(245,196,0,0.6)" : "var(--blue2)",
+                    fontSize: 11,
+                    letterSpacing: 0.2,
+                    color: isDone
+                      ? "rgba(0,200,83,0.55)"
+                      : isCurrent
+                      ? "rgba(245,196,0,0.65)"
+                      : "var(--blue2)",
                   }}
                 >
-                  {isDone
-                    ? `✓ ${e.sets} séries · ${e.result?.wt ?? 0}kg`
-                    : isCurrent
-                    ? `Série ${currentSet}/${e.sets}`
-                    : `${e.sets}×${e.reps}`}
+                  {statusLine}
                 </span>
               </div>
             );

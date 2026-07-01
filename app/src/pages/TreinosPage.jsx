@@ -36,7 +36,7 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
     if (!ex) return;
     setForm((p) => ({
       ...p,
-      exercises: [...p.exercises, { id: ex.id, name: ex.name, sets: ex.sets ?? 3, reps: ex.reps ?? 12, wt: 0, notes: "" }],
+      exercises: [...p.exercises, { id: ex.id, name: ex.name, machine: ex.machine ?? "", sets: ex.sets ?? 3, reps: ex.reps ?? 12, wt: 0, notes: "" }],
     }));
     setExPick("");
     setAddingEx(false);

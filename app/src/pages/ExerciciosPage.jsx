@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Spinner, Field } from "@/components/shared";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Plus, Edit2, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 
 const GROUPS = [
@@ -14,7 +16,7 @@ const GROUPS = [
 
 const inputStyle = { background: "var(--bg3)", border: "1px solid var(--blue)", color: "var(--text)" };
 
-const EMPTY_FORM = { name: "", machine: "", group: GROUPS[0], sets: 3, reps: 12 };
+const EMPTY_FORM = { name: "", machine: "", group: GROUPS[0], sets: 3, reps: 12, alteres: false };
 
 function ExerciseModal({ open, onClose, initial, onSaved }) {
   const [form, setForm] = useState(initial ?? EMPTY_FORM);
@@ -31,10 +33,11 @@ function ExerciseModal({ open, onClose, initial, onSaved }) {
     setLoading(true);
     setError(null);
     try {
+      const payload = { name: form.name, machine: form.machine, group: form.group, sets: Number(form.sets), reps: Number(form.reps), alteres: Boolean(form.alteres) };
       if (form.id) {
-        await updateExercise(form.id, { name: form.name, machine: form.machine, group: form.group, sets: Number(form.sets), reps: Number(form.reps) });
+        await updateExercise(form.id, payload);
       } else {
-        await createExercise({ name: form.name, machine: form.machine, group: form.group, sets: Number(form.sets), reps: Number(form.reps) });
+        await createExercise(payload);
       }
       onSaved();
       onClose();
@@ -77,6 +80,12 @@ function ExerciseModal({ open, onClose, initial, onSaved }) {
               <Input id="ex-reps" style={inputStyle} type="number" min={1} max={100} value={form.reps} onChange={(e) => set("reps", e.target.value)} />
             </Field>
           </div>
+          <Field label="Equipamento">
+            <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40 }}>
+              <Checkbox id="ex-alteres" checked={!!form.alteres} onCheckedChange={(v) => set("alteres", v)} />
+              <Label htmlFor="ex-alteres" style={{ color: "var(--text)", fontSize: 13, cursor: "pointer" }}>Usa alteres (halter)</Label>
+            </div>
+          </Field>
           <Button type="submit" disabled={loading} style={{ width: "100%", height: 40, marginTop: 4 }}>
             {loading ? "Salvando…" : "Salvar"}
           </Button>

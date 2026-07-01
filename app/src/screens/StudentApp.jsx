@@ -61,19 +61,43 @@ export function StudentApp() {
     if (!user) return;
     try {
       setLoading(true);
-      const wksRef = query(collection(db, "users", user.uid, "workouts"), orderBy("order"));
-      const wksSnap = await getDocs(wksRef);
-      const wksList = wksSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      const [wksSnap, sessSnap, exSnap, draftSnap] = await Promise.all([
+        getDocs(query(collection(db, "users", user.uid, "workouts"), orderBy("order"))),
+        getDocs(query(collection(db, "users", user.uid, "sessions"), orderBy("date", "desc"))),
+        getDocs(collection(db, "exercises")),
+        getDoc(doc(db, "users", user.uid, "drafts", "current")),
+      ]);
+
+      const catalogById = {};
+      const catalogByName = {};
+      exSnap.forEach((d) => {
+        const data = d.data();
+        const entry = { machine: data.machine ?? "", alteres: data.alteres ?? false };
+        catalogById[d.id] = entry;
+        catalogByName[(data.name ?? "").toLowerCase().trim()] = entry;
+      });
+
+      const enrich = (exs) =>
+        (exs ?? []).map((e) => {
+          const cat = catalogById[e.id] || catalogByName[(e.name ?? "").toLowerCase().trim()] || {};
+          return { ...e, machine: cat.machine ?? "", alteres: cat.alteres ?? false };
+        });
+
+      const wksList = wksSnap.docs.map((d) => {
+        const wk = { id: d.id, ...d.data() };
+        return { ...wk, exercises: enrich(wk.exercises) };
+      });
       setWorkouts(wksList);
 
-      const sessRef = collection(db, "users", user.uid, "sessions");
-      const sessQuery = query(sessRef, orderBy("date", "desc"));
-      const sessSnap = await getDocs(sessQuery);
-      const sessList = sessSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setSessions(sessList);
+      setSessions(sessSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
 
-      const draftSnap = await getDoc(doc(db, "users", user.uid, "drafts", "current"));
-      setDraft(draftSnap.exists() ? draftSnap.data() : null);
+      if (draftSnap.exists()) {
+        const draftData = draftSnap.data();
+        setDraft({ ...draftData, exercises: enrich(draftData.exercises) });
+      } else {
+        setDraft(null);
+      }
     } catch (e) {
       console.error("Error loading data from Firestore: ", e);
     } finally {
