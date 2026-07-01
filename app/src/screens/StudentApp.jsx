@@ -839,7 +839,7 @@ export function StudentApp() {
               {!draft && (
                 workouts.length > 0 ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
-                    {workouts.map((w) => {
+                    {workouts.filter((w) => w.id === cycleInfoObj.next).map((w) => {
                       const isDone = cycleInfoObj.done.has(w.id);
                       const isNext = w.id === cycleInfoObj.next;
                       return (
