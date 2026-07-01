@@ -23,14 +23,17 @@ cd functions && npm run serve  # Cloud Functions emulator
 app/src/
 ├── main.jsx / App.jsx          # Entry + role-based router
 ├── contexts/AuthContext.jsx    # Firebase Auth state, profile, role
-├── hooks/useUserProfile.js     # Firestore user doc fetch
+├── hooks/                      # useUserProfile + StudentApp data/session hooks (ver catálogo abaixo)
 ├── lib/firebase.js             # Auth, Firestore, Functions init; call() helper
+├── lib/confetti.js             # Canvas confetti burst (loop completo)
 ├── layouts/DashboardLayout.jsx # Prof/admin shell
 ├── pages/                      # Admin/prof pages (Dashboard, Alunos, Exercicios, Treinos, Ranking, Contas)
 ├── screens/                    # Role entry points (Login, Pending, StudentApp, ActiveWorkout, Hello)
 ├── services/                   # Thin wrappers over call() per domain
 │   └── accounts / dashboard / exercises / ranking / sessions / users / workouts
-└── components/ui/              # shadcn components (button, badge, checkbox, …)
+├── components/ui/              # shadcn components (button, badge, checkbox, …)
+├── components/student/         # StudentApp tab/overlay components (ver catálogo abaixo)
+└── components/workout/         # ActiveWorkoutScreen components (ver catálogo abaixo)
 
 functions/
 ├── index.js                    # Aggregates all exports
@@ -49,6 +52,51 @@ functions/
     ├── assign-workouts.js      # Bulk workout assignment
     └── sync-claims.js          # Sync custom claims for all users
 ```
+
+## Catálogo de Componentes — StudentApp / ActiveWorkout
+
+Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar sempre** — não duplicar.
+
+**Hooks (`app/src/hooks/`):**
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `useStudentData.js` | Carrega workouts/sessions/draft do Firestore |
+| `useWorkoutCycle.js` | `getCycleInfo` (próximo treino + loops) e `lastWeightFor` |
+| `useTrendData.js` | Pontos do gráfico SVG de intensidade (RPE) |
+| `useSuggestions.js` | Sugestões de progressão de carga |
+| `useActiveWorkoutSession.js` | Orquestra a sessão ativa (sets, RPE, salvar) |
+| `useWorkoutTimers.js` | Cronômetro da sessão + contagem de descanso |
+| `useWorkoutDraft.js` | Draft (`drafts/current`) + `switchWorkout` |
+| `useSaveWorkoutSession.js` | Persiste sessão concluída no Firestore |
+| `useEditWeight.js` | Estado/persistência do modal de ajustar carga |
+| `useUploadPhoto.js` | Upload/crop de foto de perfil |
+| `useCelebrateCycle.js` | Dispara confete ao completar o loop |
+
+**Componentes (`app/src/components/student/`):**
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `HomeTab.jsx` / `WorkoutsTab.jsx` / `HistoryTab.jsx` / `ProfileTab.jsx` | As 4 abas do StudentApp |
+| `BottomNav.jsx` | Barra de navegação inferior |
+| `WorkoutListItem.jsx` | Linha "Treino X" (reusada em Home e Treinos) |
+| `CycleTracker.jsx` | Dots + barra de progresso do loop |
+| `DraftBanner.jsx` | Card "Treino pausado" |
+| `TrendChart.jsx` | Gráfico SVG de RPE |
+| `SuggestionsCard.jsx` | Card de sugestões de progressão |
+| `WorkoutDetailOverlay.jsx` / `SessionReportOverlay.jsx` | Overlays full-bleed (detalhe do treino / relatório de sessão) |
+| `EditWeightModal.jsx` | shadcn `Dialog` para ajustar carga padrão |
+| `RpeTutorialSheet.jsx` | shadcn `Sheet` explicando o RPE |
+| `shared.js` | Tokens de estilo + helpers (`diffColor`, `fmtDateFull`, …) |
+
+**Componentes (`app/src/components/workout/`):**
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `ActiveWorkoutTopNav.jsx` | Header com nome do treino (toque abre `WorkoutSwitchSheet`) |
+| `ActiveWorkoutMetrics.jsx` | Cards de Repetições/Carga |
+| `WorkoutSwitchSheet.jsx` | shadcn `Sheet` pra trocar de treino em sessão ativa |
+| `ExerciseList.jsx`, `RestOverlay.jsx`, `RpeOverlay.jsx`, `SummaryOverlay.jsx`, `ExitSheet.jsx`, `WeightSheet.jsx`, `VideoScreen.jsx` | Overlays/telas da sessão ativa |
 
 ## Roles & Routing
 
@@ -163,6 +211,12 @@ import { Label } from "@/components/ui/label"
 
 - Classes Tailwind devem referenciar os tokens via `style={{ color: "var(--acc)" }}` ou via CSS custom properties — nunca `text-yellow-400` ou similares
 - Ícones: sempre `lucide-react`, tamanho padrão `size={16}` ou `size={20}`
+
+## Tamanho de Arquivo — OBRIGATÓRIO
+
+- Todo arquivo que for editado deve ficar com **menos de 150 linhas** ao final da mudança.
+- Sempre quebrar em componentes menores (usando shadcn/ui, ver Design System acima) em vez de deixar um arquivo crescer.
+- Ao tocar um arquivo acima do limite, extrair partes para novos componentes/hooks como parte da mudança — não apenas adicionar código ao arquivo grande.
 
 ## Constraints
 
