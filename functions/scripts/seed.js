@@ -1,5 +1,4 @@
 const admin = require("firebase-admin");
-const EXERCISE_GIFS = require("./exercise-gifs");
 
 admin.initializeApp({ credential: admin.credential.applicationDefault(), projectId: "academia-estilo-livre" });
 const db = admin.firestore();
@@ -124,7 +123,6 @@ async function seed() {
       exBatch.set(db.collection("exercises").doc(), {
         name: ex.name, machine: ex.mac || null, group: group.group,
         defaultSets: ex.sets, defaultReps: ex.reps,
-        gif: EXERCISE_GIFS[ex.name] || null,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
   await exBatch.commit();
