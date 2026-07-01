@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { readFileSync } from 'fs'
 
-const { name: version } = JSON.parse(readFileSync('./package.json', 'utf-8'))
+const { version } = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
