@@ -33,6 +33,7 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
       exercises: wk.exercises.map((ex) => ({ ...ex })),
       exIdx: 0,
       set: 0,
+      progress: {},
       start: Date.now(),
       results: [],
       currentWeight: lastWeightFor(sessions, wk.exercises[0]?.name, wk.exercises[0]?.wt || 0),
@@ -51,7 +52,7 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
     setActiveWk((prev) => ({
       ...prev,
       exIdx: idx,
-      set: 0,
+      set: prev.progress?.[prev.exercises[idx].name] || 0,
       currentWeight: lastWeightFor(sessions, prev.exercises[idx].name, prev.exercises[idx].wt || 0),
       exStart: Date.now(),
     }));
@@ -64,7 +65,7 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
       setRpeValue(5);
       setShowRpe(true);
     } else {
-      setActiveWk((prev) => ({ ...prev, set: newSet }));
+      setActiveWk((prev) => ({ ...prev, set: newSet, progress: { ...prev.progress, [ex.name]: newSet } }));
       setRestTotal(30);
       setRestType("rest");
       setRestTime(30);
@@ -93,9 +94,10 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
       });
       setShowSummary(true);
     } else {
+      const nextExName = activeWk.exercises[nextIdx].name;
       const nextState = {
-        ...activeWk, results: updatedResults, exIdx: nextIdx, set: 0,
-        currentWeight: lastWeightFor(sessions, activeWk.exercises[nextIdx].name, activeWk.exercises[nextIdx].wt || 0),
+        ...activeWk, results: updatedResults, exIdx: nextIdx, set: activeWk.progress?.[nextExName] || 0,
+        currentWeight: lastWeightFor(sessions, nextExName, activeWk.exercises[nextIdx].wt || 0),
         exStart: Date.now(),
       };
       setActiveWk(nextState);
