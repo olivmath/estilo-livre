@@ -96,7 +96,8 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | `ActiveWorkoutTopNav.jsx` | Header com nome do treino (toque abre `WorkoutSwitchSheet`) |
 | `ActiveWorkoutMetrics.jsx` | Cards de Repetições/Carga |
 | `WorkoutSwitchSheet.jsx` | shadcn `Sheet` pra trocar de treino em sessão ativa |
-| `ExerciseList.jsx`, `RestOverlay.jsx`, `RpeOverlay.jsx`, `SummaryOverlay.jsx`, `ExitSheet.jsx`, `WeightSheet.jsx`, `VideoScreen.jsx` | Overlays/telas da sessão ativa |
+| `ExerciseList.jsx` / `ExerciseCard.jsx` | Lista de exercícios da sessão / linha individual do exercício |
+| `RestOverlay.jsx`, `RpeOverlay.jsx`, `SummaryOverlay.jsx`, `ExitSheet.jsx`, `WeightSheet.jsx`, `VideoScreen.jsx` | Overlays/telas da sessão ativa |
 
 ## Roles & Routing
 
