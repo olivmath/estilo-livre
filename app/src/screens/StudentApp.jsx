@@ -12,6 +12,7 @@ import {
   User,
   Play,
   ChevronLeft,
+  ChevronRight,
   Plus,
   Clock,
 } from "lucide-react";
@@ -396,7 +397,7 @@ export function StudentApp() {
       setSummaryData(null);
       launchConfetti();
       await loadData();
-      setTab("home");
+      setTab("workouts");
     } catch (e) {
       console.error("Error saving session: ", e);
       alert("Erro ao salvar treino. Tente novamente.");
@@ -834,30 +835,56 @@ export function StudentApp() {
                 </div>
               ) : null}
 
-              {/* Next Workout / Empty — only shown when no draft */}
+              {/* Workout list — always shown when no draft */}
               {!draft && (
                 workouts.length > 0 ? (
-                  (() => {
-                    const nextWk = workouts.find((w) => w.id === cycleInfoObj.next) || workouts[0];
-                    return (
-                      <div
-                        onClick={() => startWorkout(nextWk.id)}
-                        style={{
-                          ...styles.nextWkBanner,
-                          background: `linear-gradient(135deg, ${nextWk.color || "var(--blue)"}dd, ${nextWk.color || "var(--blue)"}88)`,
-                        }}
-                      >
-                        <div style={{ flex: 1 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, opacity: 0.85 }}>PRÓXIMO TREINO DO CICLO</span>
-                          <h3 style={{ fontSize: 18, fontWeight: 800, marginTop: 2 }}>Treino {nextWk.label} - {nextWk.name}</h3>
-                          <p style={{ fontSize: 13, marginTop: 4, opacity: 0.8 }}>{nextWk.exercises?.length || 0} exercícios cadastrados</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+                    {workouts.map((w) => {
+                      const isDone = cycleInfoObj.done.has(w.id);
+                      const isNext = w.id === cycleInfoObj.next;
+                      return (
+                        <div
+                          key={w.id}
+                          onClick={() => startWorkout(w.id)}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 14,
+                            padding: "14px 16px", borderRadius: 16, cursor: "pointer",
+                            touchAction: "manipulation", WebkitTapHighlightColor: "transparent", userSelect: "none",
+                            background: isNext
+                              ? `linear-gradient(135deg, ${w.color || "var(--blue)"}22, ${w.color || "var(--blue)"}0a)`
+                              : "var(--bg2)",
+                            border: isNext
+                              ? `1.5px solid ${w.color || "var(--acc)"}88`
+                              : "1px solid var(--blue)",
+                          }}
+                        >
+                          <div style={{
+                            width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+                            background: isDone ? "var(--green)" : isNext ? (w.color || "var(--acc)") : "var(--bg3)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontWeight: 800, fontSize: 14, color: "#fff",
+                            border: isDone ? "none" : isNext ? "none" : "1px solid var(--blue)",
+                          }}>
+                            {isDone ? "✓" : w.label}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontWeight: 700, fontSize: 15, color: "var(--text)", margin: 0 }}>
+                              Treino {w.label} — {w.name}
+                            </p>
+                            <p style={{ fontSize: 12, margin: "2px 0 0", color: isNext ? (w.color || "var(--acc)") : "var(--sub)", fontWeight: isNext ? 700 : 400 }}>
+                              {w.exercises?.length || 0} exercícios{isNext ? " · Próximo" : isDone ? " · Concluído" : ""}
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setSelectedWk(w); }}
+                            style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--blue)", background: "var(--bg3)", color: "var(--sub)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                          >
+                            <ChevronRight size={16} />
+                          </button>
                         </div>
-                        <div style={styles.playIconContainer}>
-                          <Play size={20} fill="#000" stroke="#000" />
-                        </div>
-                      </div>
-                    );
-                  })()
+                      );
+                    })}
+                  </div>
                 ) : (
                   <div style={styles.cardEmpty}>
                     <p>Sem treinos atribuídos pelo professor. Fale com seu instrutor.</p>
@@ -876,12 +903,14 @@ export function StudentApp() {
                       return (
                         <div
                           key={i}
+                          onClick={() => startWorkout(w.id)}
                           style={{
                             ...styles.cycleDot,
                             background: isDone ? "var(--green)" : isNext ? w.color : "var(--bg3)",
                             border: isNext ? `2.5px solid ${w.color}` : "none",
                             boxShadow: isNext ? `0 0 10px ${w.color}88` : "none",
                             color: isDone || isNext ? "#fff" : "var(--sub)",
+                            cursor: "pointer",
                           }}
                         >
                           {isDone ? "✓" : w.label}
@@ -1104,25 +1133,31 @@ export function StudentApp() {
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
                 {workouts.map((w, idx) => {
                   const isDone = cycleInfoObj.done.has(w.id);
+                  const isNext = w.id === cycleInfoObj.next;
                   return (
-                    <div key={idx} style={styles.wkListItem} onClick={() => setSelectedWk(w)}>
+                    <div
+                      key={idx}
+                      style={{
+                        ...styles.wkListItem,
+                        border: isNext ? `1.5px solid ${w.color || "var(--acc)"}` : "1px solid var(--blue)",
+                        boxShadow: isNext ? `0 0 12px ${w.color || "var(--acc)"}33` : "none",
+                      }}
+                      onClick={() => startWorkout(w.id)}
+                    >
                       <div style={{ ...styles.wkBadgeIcon, background: isDone ? "var(--green)" : w.color || "var(--acc)" }}>
                         {isDone ? "✓" : w.label}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <h4 style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>Treino {w.label} - {w.name}</h4>
-                        <span style={{ fontSize: 12, color: "var(--sub)" }}>
-                          {w.exercises?.length || 0} exercícios {w.id === cycleInfoObj.next ? "· Próximo" : ""}
+                        <span style={{ fontSize: 12, color: isNext ? w.color || "var(--acc)" : "var(--sub)", fontWeight: isNext ? 700 : 400 }}>
+                          {w.exercises?.length || 0} exercícios{isNext ? " · Próximo" : isDone ? " · Concluído" : ""}
                         </span>
                       </div>
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          startWorkout(w.id);
-                        }}
-                        style={styles.btnStartWk}
+                        onClick={(e) => { e.stopPropagation(); setSelectedWk(w); }}
+                        style={{ ...styles.btnStartWk, color: "var(--sub)" }}
                       >
-                        <Play size={14} fill="currentColor" />
+                        <ChevronRight size={16} />
                       </button>
                     </div>
                   );
@@ -1466,6 +1501,9 @@ const styles = {
     fontSize: 13,
     fontWeight: 700,
     transition: "all 0.25s ease",
+    touchAction: "manipulation",
+    WebkitTapHighlightColor: "transparent",
+    userSelect: "none",
   },
   progressBarWrap: {
     width: "100%",
@@ -1510,6 +1548,9 @@ const styles = {
     gap: 14,
     cursor: "pointer",
     transition: "transform 0.15s ease",
+    touchAction: "manipulation",
+    WebkitTapHighlightColor: "transparent",
+    userSelect: "none",
   },
   wkBadgeIcon: {
     width: 40,
