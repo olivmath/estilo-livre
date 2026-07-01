@@ -401,7 +401,7 @@ export function StudentApp() {
   const resumeWorkout = (d) => {
     const { savedAt, ...wkState } = d;
     setActiveWk({ ...wkState, start: Date.now() - (savedAt - wkState.start) });
-    deleteDraft();
+    // draft stays in Firestore until workout is saved or discarded
   };
 
   const startFromScratch = async (wkId) => {
