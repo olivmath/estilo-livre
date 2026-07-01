@@ -70,6 +70,7 @@ export function StudentApp() {
         onConfirmExit={session.discardWorkout}
         onSavePartial={session.savePartialWorkout}
         onSwitchWorkout={session.switchWorkout}
+        onSelectExercise={session.selectExercise}
       />
     );
   }

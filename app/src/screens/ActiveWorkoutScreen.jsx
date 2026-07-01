@@ -33,6 +33,7 @@ export function ActiveWorkoutScreen({
   onConfirmExit,
   onSavePartial,
   onSwitchWorkout,
+  onSelectExercise,
 }) {
   const [videoEx, setVideoEx] = useState(null);
   const [weightOpen, setWeightOpen] = useState(false);
@@ -43,9 +44,9 @@ export function ActiveWorkoutScreen({
 
   const exItems = activeWk.exercises.map((e, i) => {
     const doneIdx = activeWk.results.findIndex((r) => r.name === e.name);
-    if (doneIdx !== -1) return { ...e, status: "done", result: activeWk.results[doneIdx] };
-    if (i === activeWk.exIdx) return { ...e, status: "current" };
-    return { ...e, status: "upcoming" };
+    if (doneIdx !== -1) return { ...e, idx: i, status: "done", result: activeWk.results[doneIdx] };
+    if (i === activeWk.exIdx) return { ...e, idx: i, status: "current" };
+    return { ...e, idx: i, status: "upcoming" };
   });
 
   return (
@@ -102,7 +103,7 @@ export function ActiveWorkoutScreen({
           onAdjustWeight={onAdjustWeight}
         />
         <div style={S.colRight}>
-          <ExerciseList exItems={exItems} currentSet={activeWk.set + 1} onVideoClick={setVideoEx} />
+          <ExerciseList exItems={exItems} currentSet={activeWk.set + 1} onVideoClick={setVideoEx} onSelect={onSelectExercise} />
         </div>
       </div>
 

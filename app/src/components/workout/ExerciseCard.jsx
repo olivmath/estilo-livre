@@ -1,19 +1,25 @@
 import { Dumbbell } from "lucide-react";
 
-export function ExerciseCard({ item, currentSet, onVideoClick }) {
+export function ExerciseCard({ item, currentSet, onVideoClick, onSelect }) {
   const { status, name, sets, reps, machine, result } = item;
   const isDone = status === "done";
   const isCurrent = status === "current";
   const hasMachine = machine && machine !== "0";
+  const canSelect = onSelect && !isDone && !isCurrent;
 
   return (
-    <div style={{
-      flexShrink: 0, height: 68, borderRadius: 12,
-      display: "flex", alignItems: "center", gap: 8, padding: "0 8px 0 10px",
-      background: isDone ? "rgba(0,200,83,0.08)" : isCurrent ? "rgba(245,196,0,0.06)" : "var(--bg2)",
-      border: isDone ? "1px solid rgba(0,200,83,0.2)" : isCurrent ? "1.5px solid rgba(245,196,0,0.35)" : "1px solid var(--blue)",
-      boxShadow: isCurrent ? "inset 3px 0 0 var(--acc)" : "none",
-    }}>
+    <div
+      onClick={canSelect ? onSelect : undefined}
+      style={{
+        flexShrink: 0, height: 68, borderRadius: 12,
+        display: "flex", alignItems: "center", gap: 8, padding: "0 8px 0 10px",
+        background: isDone ? "rgba(0,200,83,0.08)" : isCurrent ? "rgba(245,196,0,0.06)" : "var(--bg2)",
+        border: isDone ? "1px solid rgba(0,200,83,0.2)" : isCurrent ? "1.5px solid rgba(245,196,0,0.35)" : "1px solid var(--blue)",
+        boxShadow: isCurrent ? "inset 3px 0 0 var(--acc)" : "none",
+        cursor: canSelect ? "pointer" : "default",
+        touchAction: "manipulation", WebkitTapHighlightColor: "transparent",
+      }}
+    >
       {/* Icon widget */}
       <div style={{
         width: 30, height: 30, borderRadius: 9, flexShrink: 0,
@@ -51,7 +57,7 @@ export function ExerciseCard({ item, currentSet, onVideoClick }) {
 
       {/* › button */}
       <button
-        onClick={() => onVideoClick(item)}
+        onClick={(e) => { e.stopPropagation(); onVideoClick(item); }}
         style={{
           width: 24, height: 24, borderRadius: 6, border: "1px solid var(--blue)",
           background: "var(--bg3)", color: "var(--sub)", fontSize: 13, fontWeight: 700,

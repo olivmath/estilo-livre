@@ -44,6 +44,19 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
     setElapsedTime("00:00");
   };
 
+  const selectExercise = (idx) => {
+    if (idx === activeWk.exIdx) return;
+    const isDone = activeWk.results.some((r) => r.name === activeWk.exercises[idx].name);
+    if (isDone) return;
+    setActiveWk((prev) => ({
+      ...prev,
+      exIdx: idx,
+      set: 0,
+      currentWeight: lastWeightFor(sessions, prev.exercises[idx].name, prev.exercises[idx].wt || 0),
+      exStart: Date.now(),
+    }));
+  };
+
   const handleNextSet = () => {
     const ex = activeWk.exercises[activeWk.exIdx];
     const newSet = activeWk.set + 1;
@@ -68,10 +81,11 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
       sets: ex.sets, reps: ex.reps, time: timeSpent,
     };
     const updatedResults = [...activeWk.results, resultItem];
-    const nextIdx = activeWk.exIdx + 1;
+    const doneNames = new Set(updatedResults.map((r) => r.name));
+    const nextIdx = activeWk.exercises.findIndex((e, i) => i !== activeWk.exIdx && !doneNames.has(e.name));
     setShowRpe(false);
 
-    if (nextIdx >= activeWk.exercises.length) {
+    if (nextIdx === -1) {
       const sec = Math.floor((Date.now() - activeWk.start) / 1000);
       setSummaryData({
         wkId: activeWk.id, wkLabel: activeWk.label, wkName: activeWk.name, wkColor: activeWk.color,
@@ -125,7 +139,7 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
     showExit, setShowExit, showRpe, rpeValue, setRpeValue,
     showSummary, summaryData,
     startWorkout, handleNextSet, confirmRpe, saveWorkoutSession, discardWorkout,
-    skipRest, adjustActiveWeight,
+    skipRest, adjustActiveWeight, selectExercise,
     ...draftActions,
   };
 }
