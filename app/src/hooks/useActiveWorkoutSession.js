@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useWorkoutTimers } from "./useWorkoutTimers";
 import { useWorkoutDraft } from "./useWorkoutDraft";
@@ -116,6 +116,11 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
     setShowExit(false);
   };
 
+  const exitWithoutSave = async () => {
+    await deleteDoc(doc(db, "users", user.uid, "drafts", "current")).catch(() => {});
+    discardWorkout();
+  };
+
   const saveWorkoutSession = useSaveWorkoutSession({
     user, workouts, summaryData, reload, onSaved,
     closeSummary: () => { setActiveWk(null); setShowSummary(false); setSummaryData(null); },
@@ -140,7 +145,7 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
     activeWk, elapsedTime, restTime, restTotal, restType,
     showExit, setShowExit, showRpe, rpeValue, setRpeValue,
     showSummary, summaryData,
-    startWorkout, handleNextSet, confirmRpe, saveWorkoutSession, discardWorkout,
+    startWorkout, handleNextSet, confirmRpe, saveWorkoutSession, discardWorkout, exitWithoutSave,
     skipRest, adjustActiveWeight, selectExercise,
     ...draftActions,
   };

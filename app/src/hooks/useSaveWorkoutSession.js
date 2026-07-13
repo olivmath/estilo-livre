@@ -1,4 +1,4 @@
-import { doc, updateDoc, addDoc, collection } from "firebase/firestore";
+import { doc, updateDoc, addDoc, collection, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 // Persists a finished workout: writes the session doc and carries the
@@ -17,6 +17,8 @@ export function useSaveWorkoutSession({ user, workouts, summaryData, closeSummar
         });
         await updateDoc(doc(db, "users", user.uid, "workouts", summaryData.wkId), { exercises: updatedExs });
       }
+
+      await deleteDoc(doc(db, "users", user.uid, "drafts", "current")).catch(() => {});
 
       closeSummary();
       await reload();

@@ -34,6 +34,7 @@ export function ActiveWorkoutScreen({
   onSavePartial,
   onSwitchWorkout,
   onSelectExercise,
+  onExitWithoutSave,
 }) {
   const [videoEx, setVideoEx] = useState(null);
   const [weightOpen, setWeightOpen] = useState(false);
@@ -62,7 +63,7 @@ export function ActiveWorkoutScreen({
         <SummaryOverlay summaryData={summaryData} onSave={onSaveSession} onDiscard={onConfirmExit} />
       )}
       {showExit && (
-        <ExitSheet onSavePartial={onSavePartial} onCancel={onHideExit} />
+        <ExitSheet onSavePartial={onSavePartial} onCancel={onHideExit} onExitWithoutSave={onExitWithoutSave} />
       )}
       {videoEx && (
         <VideoScreen exercise={videoEx} onClose={() => setVideoEx(null)} />

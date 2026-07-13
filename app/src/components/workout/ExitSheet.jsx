@@ -1,4 +1,4 @@
-export function ExitSheet({ onSavePartial, onCancel }) {
+export function ExitSheet({ onSavePartial, onCancel, onExitWithoutSave }) {
   return (
     <div style={S.backdrop}>
       <div style={S.sheet}>
@@ -7,6 +7,8 @@ export function ExitSheet({ onSavePartial, onCancel }) {
         <button onClick={onCancel} style={S.ctaBtn}>Voltar ao treino</button>
         <div style={{ height: 10 }} />
         <button onClick={onSavePartial} style={S.cancelBtn}>Continuar depois</button>
+        <div style={{ height: 10 }} />
+        <button onClick={onExitWithoutSave} style={S.dangerBtn}>Sair sem salvar</button>
       </div>
     </div>
   );
@@ -31,5 +33,10 @@ const S = {
     width: "100%", padding: 16, borderRadius: 13,
     border: "1px solid var(--blue)", fontSize: 16, fontWeight: 700,
     cursor: "pointer", background: "var(--bg3)", color: "var(--sub)",
+  },
+  dangerBtn: {
+    width: "100%", padding: 16, borderRadius: 13,
+    border: "1px solid var(--red)", fontSize: 16, fontWeight: 700,
+    cursor: "pointer", background: "rgba(244, 67, 54, 0.1)", color: "var(--red)",
   },
 };
