@@ -104,7 +104,7 @@ export function StudentApp() {
           {tab === "home" && (
             <HomeTab
               profile={profile} workouts={workouts} draft={draft} cycleInfo={cycleInfo}
-              trendChart={trendChart} suggestions={suggestions}
+              trendChart={trendChart} suggestions={suggestions} sessions={sessions}
               onAvatarClick={() => changeTab("profile")}
               onStart={session.startWorkout} onOpenDetail={setSelectedWk}
               onResumeDraft={session.resumeWorkout} onStartFromScratch={session.startFromScratch}
