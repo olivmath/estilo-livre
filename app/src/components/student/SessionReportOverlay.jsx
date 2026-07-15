@@ -1,9 +1,42 @@
+import { useState } from "react";
 import { S, diffColor, fmtDateFull, fmtDur, fmtVol } from "@/components/student/shared";
+import { SessionEditOverlay } from "./SessionEditOverlay";
+import { updateStudentSession } from "@/services/sessions";
+import { useAuth } from "@/contexts/AuthContext";
 
-// Read-only report for a past session, opened by tapping a HistoryTab row.
-export function SessionReportOverlay({ session, onClose }) {
+// Read-only report for a past session, with option to edit; opened by tapping a HistoryTab row.
+export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
+  const { user } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
   const avgDiff = session.exs?.length ? session.exs.reduce((a, r) => a + r.diff, 0) / session.exs.length : 5;
   const volume = session.exs?.reduce((a, r) => a + r.wt * r.sets * r.reps, 0) || 0;
+
+  const handleSaveEdit = async (updatedExs) => {
+    setIsSaving(true);
+    try {
+      await updateStudentSession(user.uid, session.id, updatedExs);
+      onSessionUpdated?.();
+      setIsEditing(false);
+    } catch (e) {
+      console.error("Error updating session:", e);
+      alert("Erro ao atualizar treino. Tente novamente.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <SessionEditOverlay
+        session={session}
+        onClose={() => setIsEditing(false)}
+        onSave={handleSaveEdit}
+        isSaving={isSaving}
+      />
+    );
+  }
 
   return (
     <div style={{ ...S.overlay, overflowY: "auto" }}>
@@ -40,7 +73,10 @@ export function SessionReportOverlay({ session, onClose }) {
           ))}
         </div>
 
-        <button onClick={onClose} style={{ ...S.btnSecondary, width: "100%" }}>Fechar</button>
+        <div style={{ display: "flex", gap: 12 }}>
+          <button onClick={onClose} style={{ ...S.btnSecondary, flex: 1 }}>Fechar</button>
+          <button onClick={() => setIsEditing(true)} style={{ ...S.btnPrimary, flex: 1 }}>Editar</button>
+        </div>
       </div>
     </div>
   );

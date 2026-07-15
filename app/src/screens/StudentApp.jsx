@@ -91,7 +91,7 @@ export function StudentApp() {
       )}
 
       {viewingSession && (
-        <SessionReportOverlay session={viewingSession} onClose={() => setViewingSession(null)} />
+        <SessionReportOverlay session={viewingSession} onClose={() => setViewingSession(null)} onSessionUpdated={reload} />
       )}
 
       {loading ? (
