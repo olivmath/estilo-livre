@@ -44,7 +44,7 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
         {/* Label */}
         <text
           x={110}
-          y={137}
+          y={150}
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={12}
