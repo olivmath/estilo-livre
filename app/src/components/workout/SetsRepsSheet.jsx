@@ -64,20 +64,20 @@ const S = {
   },
   row: {
     display: "flex", alignItems: "center", justifyContent: "center",
-    gap: 16, marginBottom: 24,
+    gap: 12, marginBottom: 24,
   },
   sep: {
     fontSize: 28, fontWeight: 700, color: "var(--sub)", marginTop: 20,
   },
   counter: { display: "flex", flexDirection: "column", alignItems: "center", gap: 8 },
   counterLabel: { fontSize: 10, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", color: "var(--sub)" },
-  counterRow: { display: "flex", alignItems: "center", gap: 12 },
+  counterRow: { display: "flex", alignItems: "center", gap: 8 },
   counterValue: {
-    fontSize: 48, fontWeight: 900, color: "var(--acc)",
-    width: 80, textAlign: "center", lineHeight: 1, fontVariantNumeric: "tabular-nums",
+    fontSize: 42, fontWeight: 900, color: "var(--acc)",
+    width: 56, textAlign: "center", lineHeight: 1, fontVariantNumeric: "tabular-nums",
   },
   btn: {
-    width: 44, height: 44, borderRadius: 12,
+    width: 40, height: 40, borderRadius: 12,
     border: "1px solid var(--blue)", background: "var(--bg3)",
     color: "var(--acc)", cursor: "pointer",
     display: "flex", alignItems: "center", justifyContent: "center",
