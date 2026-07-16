@@ -1,62 +1,8 @@
 import { UserAvatar } from "@/components/shared";
 import { S } from "@/components/student/shared";
 import { LoopRingHero } from "@/components/student/LoopRingHero";
+import { LoopDots } from "@/components/student/LoopDots";
 import { DraftBanner } from "@/components/student/DraftBanner";
-import { Button } from "@/components/ui/button";
-
-// LoopDots: horizontal dots showing workouts + current position
-function LoopDots({ workouts, cycleInfo, onSelect, spacing }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "clamp(6px, 2vw, 10px)",
-        marginTop: spacing.sm,
-        flexWrap: "wrap",
-      }}
-      role="group"
-      aria-label="Seletor de treinos"
-    >
-      {workouts.map((w, idx) => {
-        const letter = w.label?.charAt(0).toUpperCase() || String.fromCharCode(65 + idx);
-        const isDone = cycleInfo.done.has(w.id);
-        const isNext = w.id === cycleInfo.next;
-
-        let variant = "outline";
-        if (isNext) variant = "default";
-        if (isDone) variant = "secondary";
-
-        const status = isDone ? "concluído" : isNext ? "próximo" : "não iniciado";
-        const label = `Treino ${letter} — ${w.name} (${status})`;
-
-        return (
-          <Button
-            key={w.id}
-            variant={variant}
-            size="icon"
-            onClick={() => onSelect?.(w.id)}
-            style={{
-              width: "clamp(40px, 10vw, 48px)",
-              height: "clamp(40px, 10vw, 48px)",
-              borderRadius: "50%",
-              boxShadow: isNext
-                ? "0 0 clamp(8px, 2vw, 12px) rgba(245,196,0,0.3)"
-                : isDone
-                  ? "0 0 clamp(8px, 2vw, 12px) rgba(0,200,83,0.2)"
-                  : "none",
-            }}
-            className={isDone ? "bg-[var(--green)] hover:bg-[var(--green)]" : isNext ? "bg-[var(--acc)] hover:bg-[var(--acc)]" : ""}
-            aria-label={label}
-            aria-pressed={isNext}
-          >
-            {letter}
-          </Button>
-        );
-      })}
-    </div>
-  );
-}
 
 export function HomeTab({
   profile, workouts, cycleInfo, draft,
