@@ -21,7 +21,7 @@ export function TrendChart({ chart, onInfoClick }) {
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        {[[chart.currentRpe.toFixed(1), "RPE atual", chart.trendColor], [chart.avgRpe.toFixed(1), "RPE médio", "var(--text)"], [chart.sessionsList.length, "sessões", "var(--text)"]].map(([val, label, color], i) => (
+        {[[chart.currentRpe.toFixed(1), chart.cardLabels?.[0] || "Valor atual", chart.trendColor], [chart.avgRpe.toFixed(1), chart.cardLabels?.[1] || "Valor médio", "var(--text)"], [chart.sessionsList.length, chart.cardLabels?.[2] || "sessões", "var(--text)"]].map(([val, label, color], i) => (
           <div key={i} style={{ flex: 1, background: "var(--bg3)", borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
             <div style={{ fontSize: 18, fontWeight: 800, color, lineHeight: 1.2 }}>{val}</div>
             <div style={{ fontSize: 10, color: "var(--sub)", marginTop: 2 }}>{label}</div>

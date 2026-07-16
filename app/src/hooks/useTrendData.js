@@ -71,50 +71,50 @@ export function getTrendData(sessions) {
       ? { status: "Caindo", message: "RPE em queda, foque na recuperação" }
       : { status: "Estável", message: "RPE consistente com as últimas semanas" };
 
-  return { bezierPath: bPath, areaPath, maPath, svgPts, trendColor, trendLabel, title: "Intensidade do treino", W, H, sessionsList: sortedSess, avgRpe, currentRpe, trend, avgLoad, streak, avgDuration, insight };
+  return { bezierPath: bPath, areaPath, maPath, svgPts, trendColor, trendLabel, title: "Intensidade do treino", cardLabels: ["RPE atual", "RPE médio", "sessões"], W, H, sessionsList: sortedSess, avgRpe, currentRpe, trend, avgLoad, streak, avgDuration, insight };
 }
 
 export function getTrendChartForMetric(sessions, metricId) {
   const sortedSess = [...sessions].sort((a, b) => a.date - b.date).slice(-12);
   if (sortedSess.length < 2) return null;
 
-  let pts, title, color;
+  let pts, title, color, cardLabels;
 
   if (metricId === "load") {
-    // Average load per session (not RPE, actual weight)
     pts = sortedSess.map((s) => {
       const weights = (s.exs || []).map(e => e.wt || 0).filter(w => w > 0);
       if (weights.length === 0) return 0;
       return weights.reduce((a, b) => a + b, 0) / weights.length;
     });
     title = "Carga média por sessão";
-    color = "#00D9FF"; // Cyan (accessible)
+    color = "#00D9FF";
+    cardLabels = ["Carga atual", "Carga média", "sessões"];
   } else if (metricId === "streak") {
-    // Days with sessions in last weeks (scale to 1-10)
-    pts = sortedSess.map((s) => (s.exs?.length || 0) > 0 ? 5 : 2); // Simplified: has session = 5, no session = 2
+    pts = sortedSess.map((s) => (s.exs?.length || 0) > 0 ? 5 : 2);
     title = "Sessões completadas";
-    color = "#B366FF"; // Purple (accessible)
+    color = "#B366FF";
+    cardLabels = ["Taxa atual", "Taxa média", "sessões"];
   } else if (metricId === "session") {
-    // Duration in minutes (scale to 1-10 range)
     pts = sortedSess.map((s) => {
-      const dur = (s.duration || 0) / 60; // Already in minutes
-      return Math.min(dur / 10, 10); // Scale: 60min = 10, cap at 10
+      const dur = (s.duration || 0) / 60;
+      return Math.min(dur / 10, 10);
     });
     title = "Duração da sessão";
-    color = "#00D9FF"; // Cyan (accessible)
+    color = "#00D9FF";
+    cardLabels = ["Duração atual", "Duração média", "sessões"];
   } else {
-    // RPE (default)
     pts = sortedSess.map((s) => {
       const exs = s.exs || [];
       return exs.length ? exs.reduce((acc, curr) => acc + (curr.diff || 5), 0) / exs.length : 5;
     });
     title = "Intensidade do treino";
-    color = "#FFB366"; // Orange (accessible, replaces yellow)
+    color = "#FFB366";
+    cardLabels = ["RPE atual", "RPE médio", "sessões"];
   }
 
   const { svgPts, bezierPath: bPath, areaPath, W, H } = buildChartPath(pts);
   const avgValue = pts.reduce((a, b) => a + b, 0) / pts.length;
   const currentValue = pts[pts.length - 1];
 
-  return { bezierPath: bPath, areaPath, svgPts, W, H, sessionsList: sortedSess, trendColor: color, currentRpe: currentValue, avgRpe: avgValue, title, trendLabel: title };
+  return { bezierPath: bPath, areaPath, svgPts, W, H, sessionsList: sortedSess, trendColor: color, currentRpe: currentValue, avgRpe: avgValue, title, trendLabel: title, cardLabels };
 }
