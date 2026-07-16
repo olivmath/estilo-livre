@@ -2,11 +2,16 @@ import { ChevronRight } from "lucide-react";
 
 // Trend metrics cards showing RPE, load, streak, and session duration
 export function TrendCards({ trendData, onSelectTrend, selectedTrendId }) {
+  const rpe = trendData?.currentRpe ?? 0;
+  const load = trendData?.avgLoad ?? 0;
+  const streak = trendData?.streak ?? "0d";
+  const duration = trendData?.avgDuration ?? 0;
+
   const cards = [
-    { id: "rpe", label: "RPE", value: trendData?.currentRpe?.toFixed(1) ?? "—", color: "var(--acc)" },
-    { id: "load", label: "Carga", value: trendData?.avgLoad ? `+${trendData.avgLoad.toFixed(1)}` : "—", color: "var(--green)", unit: "kg" },
-    { id: "streak", label: "Streak", value: trendData?.streak ?? "—", color: "var(--green)" },
-    { id: "session", label: "Sessão", value: trendData?.avgDuration ? `${Math.round(trendData.avgDuration)}m` : "—", color: "var(--blue2)" },
+    { id: "rpe", label: "RPE", value: rpe > 0 ? rpe.toFixed(1) : "—", color: "var(--acc)" },
+    { id: "load", label: "Carga", value: load > 0 ? `+${load.toFixed(1)}` : "—", color: "var(--green)" },
+    { id: "streak", label: "Streak", value: streak !== "0d" ? streak : "—", color: "var(--green)" },
+    { id: "session", label: "Sessão", value: duration > 0 ? `${Math.round(duration)}m` : "—", color: "var(--blue2)" },
   ];
 
   return (

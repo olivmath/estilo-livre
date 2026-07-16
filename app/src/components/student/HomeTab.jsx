@@ -6,12 +6,15 @@ import { LoopDots } from "@/components/student/LoopDots";
 import { TrendCards } from "@/components/student/TrendCards";
 import { TrendChart } from "@/components/student/TrendChart";
 import { DraftBanner } from "@/components/student/DraftBanner";
+import { getTrendChartForMetric } from "@/hooks/useTrendData";
 
 export function HomeTab({
-  profile, workouts, cycleInfo, draft, trendChart,
+  profile, workouts, cycleInfo, draft, trendChart, sessions,
   onAvatarClick, onStart, onResumeDraft, onStartFromScratch, onShowRpeTutorial,
 }) {
   const [selectedTrend, setSelectedTrend] = useState("rpe");
+  const dynamicChart = selectedTrend && selectedTrend !== "rpe" ? getTrendChartForMetric(sessions || [], selectedTrend) : trendChart;
+  const displayChart = dynamicChart || trendChart;
   const spacing = {
     px: "clamp(4px, 1.5vw, 8px)",
     sm: "clamp(6px, 2vw, 10px)",
@@ -91,7 +94,7 @@ export function HomeTab({
             selectedTrendId={selectedTrend}
             onSelectTrend={setSelectedTrend}
           />
-          <TrendChart chart={trendChart} onInfoClick={() => onShowRpeTutorial?.()} />
+          {displayChart && <TrendChart chart={displayChart} onInfoClick={() => onShowRpeTutorial?.()} />}
         </>
       )}
 
