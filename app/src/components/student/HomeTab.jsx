@@ -5,14 +5,14 @@ import { DraftBanner } from "@/components/student/DraftBanner";
 import { Button } from "@/components/ui/button";
 
 // LoopDots: horizontal dots showing workouts + current position
-function LoopDots({ workouts, cycleInfo, onSelect }) {
+function LoopDots({ workouts, cycleInfo, onSelect, spacing }) {
   return (
     <div
       style={{
         display: "flex",
         justifyContent: "center",
         gap: "clamp(6px, 2vw, 10px)",
-        marginTop: "clamp(12px, 4vw, 18px)",
+        marginTop: spacing.sm,
         flexWrap: "wrap",
       }}
       role="group"
@@ -120,7 +120,7 @@ export function HomeTab({
         </div>
       )}
 
-      {/* Hero: Loop Ring + Dots */}
+      {/* Hero: Loop Ring + Dots — all same spacing (spacing.sm) */}
       {workouts.length > 0 && (
         <div style={{ marginBottom: spacing.md }}>
           <LoopRingHero
@@ -129,7 +129,7 @@ export function HomeTab({
             done={cycleInfo.done}
             hasDraft={!!draft}
           />
-          <LoopDots workouts={workouts} cycleInfo={cycleInfo} onSelect={onStart} />
+          <LoopDots workouts={workouts} cycleInfo={cycleInfo} onSelect={onStart} spacing={spacing} />
         </div>
       )}
 
