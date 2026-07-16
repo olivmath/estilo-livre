@@ -39,7 +39,7 @@ export function TrendCards({ trendData, onSelectTrend, selectedTrendId }) {
       </div>
 
       {/* Cards horizontal scroll */}
-      <div style={{ display: "flex", gap: "clamp(8px, 2vw, 12px)", marginBottom: "clamp(12px, 3vw, 16px)", overflowX: "auto", paddingBottom: 8, scrollBehavior: "smooth" }}>
+      <div style={{ display: "flex", gap: "clamp(6px, 1.5vw, 10px)", marginBottom: "clamp(12px, 3vw, 16px)", overflowX: "auto", overflowY: "hidden", paddingBottom: 8, scrollBehavior: "smooth", marginLeft: "-4px", marginRight: "-4px", paddingLeft: "4px", paddingRight: "4px" }}>
         {cards.map((card) => {
           const isSelected = selectedTrendId === card.id;
           return (
@@ -50,11 +50,11 @@ export function TrendCards({ trendData, onSelectTrend, selectedTrendId }) {
                 background: isSelected ? `rgba(${parseInt(card.color.slice(1, 3), 16)}, ${parseInt(card.color.slice(3, 5), 16)}, ${parseInt(card.color.slice(5, 7), 16)}, 0.15)` : "transparent",
                 border: `2px solid ${card.color}`,
                 borderRadius: 12,
-                padding: "clamp(12px, 2.5vw, 16px)",
+                padding: "clamp(10px, 2vw, 14px)",
                 textAlign: "center",
                 cursor: "pointer",
                 transition: "all 0.25s ease",
-                minWidth: "clamp(95px, 22vw, 120px)",
+                minWidth: "clamp(80px, 19vw, 100px)",
                 flexShrink: 0,
                 boxShadow: isSelected ? `0 0 16px ${card.color}40, inset 0 0 8px ${card.color}20` : "none",
                 transform: isSelected ? "scale(1.05)" : "scale(1)",
