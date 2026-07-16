@@ -2,18 +2,19 @@ import { UserAvatar } from "@/components/shared";
 import { S } from "@/components/student/shared";
 
 // LoopRing: hero component showing completed loops + current progress
-function LoopRing({ loopsCompleted, totalWorkouts, done }) {
+function LoopRing({ loopsCompleted, totalWorkouts, done, hasDraft }) {
   const radius = 50;
   const circumference = 2 * Math.PI * radius;
-  const progress = totalWorkouts > 0 ? (done.size / totalWorkouts) : 0;
-  const offset = circumference * (1 - progress);
+  let progress = totalWorkouts > 0 ? (done.size / totalWorkouts) : 0;
+  if (hasDraft) progress += 0.5 / totalWorkouts;
+  const offset = circumference - circumference * progress;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, marginBottom: 40 }}>
-      <svg width={140} height={140} style={{ transform: "rotate(-90deg)" }}>
+      <svg width={140} height={140} viewBox="0 0 140 140">
         {/* Background ring (thick) */}
         <circle cx={70} cy={70} r={radius} fill="none" stroke="var(--bg3)" strokeWidth={8} strokeLinecap="round" />
-        {/* Progress ring (thick) */}
+        {/* Progress ring (thick) - starts at top */}
         <circle
           cx={70}
           cy={70}
@@ -24,7 +25,8 @@ function LoopRing({ loopsCompleted, totalWorkouts, done }) {
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 0.6s ease" }}
+          style={{ transition: "stroke-dashoffset 0.6s ease", transformOrigin: "70px 70px" }}
+          transform="rotate(-90 70 70)"
         />
       </svg>
       <div style={{ textAlign: "center", marginTop: -110 }}>
@@ -75,7 +77,7 @@ function LoopDots({ workouts, cycleInfo, onSelect }) {
 }
 
 export function HomeTab({
-  profile, workouts, cycleInfo,
+  profile, workouts, cycleInfo, draft,
   onAvatarClick, onStart,
 }) {
   return (
@@ -95,7 +97,7 @@ export function HomeTab({
 
       {/* Hero: Loop Ring */}
       {workouts.length > 0 && (
-        <LoopRing loopsCompleted={cycleInfo.cycles} totalWorkouts={workouts.length} done={cycleInfo.done} />
+        <LoopRing loopsCompleted={cycleInfo.cycles} totalWorkouts={workouts.length} done={cycleInfo.done} hasDraft={!!draft} />
       )}
 
       {/* Loop Dots */}
