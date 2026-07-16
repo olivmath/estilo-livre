@@ -63,9 +63,9 @@ export function HomeTab({
   onAvatarClick, onStart, onResumeDraft, onStartFromScratch,
 }) {
   const spacing = {
-    px: "clamp(6px, 2vw, 12px)",
-    sm: "clamp(8px, 3vw, 14px)",
-    md: "clamp(12px, 4vw, 20px)",
+    px: "clamp(4px, 1.5vw, 8px)",
+    sm: "clamp(6px, 2vw, 10px)",
+    md: "clamp(10px, 3vw, 16px)",
   };
 
   return (
