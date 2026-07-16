@@ -14,26 +14,41 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
         padding: "12px 16px",
         borderRadius: "4px",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
+        flexDirection: "column",
         gap: 12,
+        position: "relative",
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: "var(--acc)" }}>
-          {draft.label} — {draft.name}
-        </div>
-        <div style={{ fontSize: 12, color: "var(--sub)" }}>
-          {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
-        </div>
-      </div>
+      {/* Close button — top right */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setConfirmReset(true)}
+        style={{
+          position: "absolute",
+          top: 8,
+          right: 8,
+          width: 32,
+          height: 32,
+        }}
+        aria-label="Fechar banner"
+      >
+        <X size={16} />
+      </Button>
 
-      <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-        <Button size="sm" onClick={() => onResume(draft)}>
+      {/* Content + Resume button */}
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: "var(--acc)" }}>
+            {draft.label} — {draft.name}
+          </div>
+          <div style={{ fontSize: 12, color: "var(--sub)" }}>
+            {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
+          </div>
+        </div>
+
+        <Button size="sm" onClick={() => onResume(draft)} style={{ flexShrink: 0 }}>
           Retomar
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => setConfirmReset(true)}>
-          <X size={16} />
         </Button>
       </div>
 

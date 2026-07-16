@@ -11,8 +11,8 @@ function LoopDots({ workouts, cycleInfo, onSelect }) {
       style={{
         display: "flex",
         justifyContent: "center",
-        gap: "clamp(8px, 2vw, 12px)",
-        marginTop: "clamp(16px, 5vw, 24px)",
+        gap: "clamp(6px, 2vw, 10px)",
+        marginTop: "clamp(12px, 4vw, 18px)",
         flexWrap: "wrap",
       }}
       role="group"
@@ -59,9 +59,9 @@ export function HomeTab({
   onAvatarClick, onStart, onResumeDraft, onStartFromScratch,
 }) {
   const spacing = {
-    px: "clamp(12px, 4vw, 24px)",
-    sm: "clamp(16px, 5vw, 32px)",
-    md: "clamp(24px, 6vw, 40px)",
+    px: "clamp(8px, 3vw, 16px)",
+    sm: "clamp(12px, 4vw, 20px)",
+    md: "clamp(16px, 5vw, 28px)",
   };
 
   return (
