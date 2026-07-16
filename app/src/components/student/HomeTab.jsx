@@ -44,7 +44,7 @@ export function HomeTab({
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 32, marginBottom: 40 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 32, marginBottom: 20 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800, marginTop: 4 }}>
             Bom treino, {profile?.name?.split(" ")[0] ?? "Atleta"} 👋
