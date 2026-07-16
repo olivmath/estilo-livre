@@ -30,12 +30,12 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
         {/* Number */}
         <text
           x={80}
-          y={80}
+          y={72}
           textAnchor="middle"
           dominantBaseline="central"
-          fontSize={48}
-          fontWeight={900}
-          fill="var(--acc)"
+          fontSize={56}
+          fontWeight={700}
+          fill="white"
           fontFamily="system-ui"
         >
           {loopsCompleted}
@@ -44,16 +44,15 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
         {/* Label */}
         <text
           x={80}
-          y={105}
+          y={102}
           textAnchor="middle"
           dominantBaseline="central"
-          fontSize={10}
-          fontWeight={700}
+          fontSize={12}
+          fontWeight={400}
           fill="var(--sub)"
-          letterSpacing={1}
           fontFamily="system-ui"
         >
-          LOOPS
+          loops completos
         </text>
       </svg>
     </div>
