@@ -24,35 +24,47 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
         position: "relative",
       }}
     >
-      {/* Close button — top right corner */}
+      {/* Close — pill centered on top-right corner */}
       <Button
         variant="ghost"
         size="icon"
         onClick={() => setConfirmReset(true)}
         style={{
           position: "absolute",
-          top: 0,
-          right: "clamp(4px, 1.5vw, 8px)",
-          width: "clamp(28px, 8vw, 36px)",
-          height: "clamp(28px, 8vw, 36px)",
-          transform: "translateY(-25%)",
+          top: -10,
+          right: 6,
+          width: 24,
+          height: 24,
+          borderRadius: "50%",
+          background: "var(--bg2)",
+          border: "1px solid var(--blue)",
+          padding: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
         aria-label="Fechar banner"
       >
-        <X size={16} />
+        <X size={12} />
       </Button>
 
-      {/* Content + Resume button */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "clamp(2px, 1vw, 4px)" }}>
-        <div style={{ fontWeight: 700, fontSize: "clamp(13px, 3.5vw, 16px)", color: "var(--acc)" }}>
-          {draft.label} — {draft.name}
+      {/* Content + Resume on same row */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: spacing.sm,
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontWeight: 700, fontSize: "clamp(13px, 3.5vw, 16px)", color: "var(--acc)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {draft.label} — {draft.name}
+          </div>
+          <div style={{ fontSize: "clamp(11px, 3vw, 14px)", color: "var(--sub)" }}>
+            {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
+          </div>
         </div>
-        <div style={{ fontSize: "clamp(11px, 3vw, 14px)", color: "var(--sub)" }}>
-          {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
-        </div>
-      </div>
 
-      <div>
         <Button size="sm" onClick={() => onResume(draft)} style={{ flexShrink: 0 }}>
           Retomar
         </Button>
