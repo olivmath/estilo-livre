@@ -87,12 +87,12 @@ export function getTrendChartForMetric(sessions, metricId) {
       return weights.reduce((a, b) => a + b, 0) / weights.length;
     });
     title = "Carga média por sessão";
-    color = "#00D9FF";
+    color = "#00E5FF";
     cardLabels = ["Carga atual", "Carga média", "sessões"];
   } else if (metricId === "streak") {
     pts = sortedSess.map((s) => (s.exs?.length || 0) > 0 ? 5 : 2);
     title = "Sessões completadas";
-    color = "#B366FF";
+    color = "#FF66D9";
     cardLabels = ["Taxa atual", "Taxa média", "sessões"];
   } else if (metricId === "session") {
     pts = sortedSess.map((s) => {
@@ -100,7 +100,7 @@ export function getTrendChartForMetric(sessions, metricId) {
       return Math.min(dur / 10, 10);
     });
     title = "Duração da sessão";
-    color = "#00D9FF";
+    color = "#CCFF00";
     cardLabels = ["Duração atual", "Duração média", "sessões"];
   } else {
     pts = sortedSess.map((s) => {
@@ -108,7 +108,7 @@ export function getTrendChartForMetric(sessions, metricId) {
       return exs.length ? exs.reduce((acc, curr) => acc + (curr.diff || 5), 0) / exs.length : 5;
     });
     title = "Intensidade do treino";
-    color = "#FFB366";
+    color = "#5BA3FF";
     cardLabels = ["RPE atual", "RPE médio", "sessões"];
   }
 
