@@ -1,20 +1,14 @@
-import { useState } from "react";
 import { UserAvatar } from "@/components/shared";
 import { S } from "@/components/student/shared";
 import { LoopRingHero } from "@/components/student/LoopRingHero";
 import { LoopDots } from "@/components/student/LoopDots";
-import { TrendCards } from "@/components/student/TrendCards";
 import { TrendChart } from "@/components/student/TrendChart";
 import { DraftBanner } from "@/components/student/DraftBanner";
-import { getTrendChartForMetric } from "@/hooks/useTrendData";
 
 export function HomeTab({
-  profile, workouts, cycleInfo, draft, trendChart, sessions,
+  profile, workouts, cycleInfo, draft, trendChart,
   onAvatarClick, onStart, onResumeDraft, onStartFromScratch, onShowRpeTutorial,
 }) {
-  const [selectedTrend, setSelectedTrend] = useState("rpe");
-  const dynamicChart = selectedTrend && selectedTrend !== "rpe" ? getTrendChartForMetric(sessions || [], selectedTrend) : trendChart;
-  const displayChart = dynamicChart || trendChart;
   const spacing = {
     px: "clamp(4px, 1.5vw, 8px)",
     sm: "clamp(6px, 2vw, 10px)",
@@ -86,17 +80,21 @@ export function HomeTab({
         </div>
       )}
 
-      {/* Trends section */}
-      {trendChart && (
-        <>
-          <TrendCards
-            trendData={trendChart}
-            selectedTrendId={selectedTrend}
-            onSelectTrend={setSelectedTrend}
-          />
-          {displayChart && <TrendChart chart={displayChart} onInfoClick={() => onShowRpeTutorial?.()} />}
-        </>
+      {/* Insights card */}
+      {trendChart?.insight && (
+        <div style={{ background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 16, padding: 16, marginBottom: spacing.md }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <div style={{ fontSize: 28 }}>💡</div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--acc)" }}>{trendChart.insight.status}</div>
+              <div style={{ fontSize: 12, color: "var(--sub)", lineHeight: 1.4 }}>{trendChart.insight.message}</div>
+            </div>
+          </div>
+        </div>
       )}
+
+      {/* Trend chart */}
+      {trendChart && <TrendChart chart={trendChart} onInfoClick={() => onShowRpeTutorial?.()} />}
 
       {/* Empty state */}
       {workouts.length === 0 && (
