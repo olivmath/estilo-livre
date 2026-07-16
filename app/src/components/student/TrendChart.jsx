@@ -43,10 +43,11 @@ export function TrendChart({ chart, onInfoClick }) {
 
         {GRID_LEVELS.map((lvl) => {
           const gy = 10 + (1 - lvl / 10) * (chart.H - 20);
+          const isThreshold = lvl === 6;
           return (
             <g key={lvl}>
-              <line x1={0} y1={gy} x2={chart.W} y2={gy} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-              <text x={chart.W - 2} y={gy - 2} fontSize="8" fill="rgba(136,153,187,0.5)" textAnchor="end">{lvl}</text>
+              <line x1={0} y1={gy} x2={chart.W} y2={gy} stroke={isThreshold ? "rgba(245,196,0,0.25)" : "rgba(255,255,255,0.05)"} strokeWidth={isThreshold ? 1.5 : 1} strokeDasharray={isThreshold ? "6 4" : "none"} />
+              <text x={chart.W - 2} y={gy - 2} fontSize="8" fill={isThreshold ? "rgba(245,196,0,0.6)" : "rgba(136,153,187,0.5)"} textAnchor="end">{lvl}</text>
             </g>
           );
         })}
@@ -84,6 +85,10 @@ export function TrendChart({ chart, onInfoClick }) {
             <span style={{ fontSize: 10, color: "var(--sub)" }}>Média móvel (3)</span>
           </div>
         )}
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="rgba(245,196,0,0.5)" strokeWidth="1.5" strokeDasharray="6 4" /></svg>
+          <span style={{ fontSize: 10, color: "var(--sub)" }}>Progressão (≤6)</span>
+        </div>
       </div>
     </div>
   );

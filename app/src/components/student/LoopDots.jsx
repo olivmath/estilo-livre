@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 // Horizontal dots showing workouts + current position with keyboard accessibility
-export function LoopDots({ workouts, cycleInfo, onSelect, spacing }) {
+export function LoopDots({ workouts, cycleInfo, onSelect }) {
   return (
     <div
       style={{

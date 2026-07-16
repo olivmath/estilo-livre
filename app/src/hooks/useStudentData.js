@@ -17,7 +17,7 @@ export function useStudentData(user) {
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
-    if (!user) return;
+    if (!user) { setLoading(false); return; }
     try {
       setLoading(true);
 

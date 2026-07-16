@@ -35,7 +35,7 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
           dominantBaseline="central"
           fontSize={56}
           fontWeight={700}
-          fill="white"
+          fill="var(--text)"
           fontFamily="system-ui"
         >
           {loopsCompleted}

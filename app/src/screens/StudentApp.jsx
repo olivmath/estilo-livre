@@ -103,7 +103,7 @@ export function StudentApp() {
         <div style={{ paddingBottom: 80 }}>
           {tab === "home" && (
             <HomeTab
-              profile={profile} workouts={workouts} draft={draft} cycleInfo={cycleInfo} sessions={sessions}
+              profile={profile} workouts={workouts} draft={draft} cycleInfo={cycleInfo}
               trendChart={trendChart} suggestions={suggestions}
               onAvatarClick={() => changeTab("profile")}
               onStart={session.startWorkout} onOpenDetail={setSelectedWk}

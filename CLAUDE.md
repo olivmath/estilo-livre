@@ -258,7 +258,7 @@ const spacing = {
 - Mobile-first: max-width 430px (StudentApp); admin/prof uses full-width dashboard
 - Rest timers: 30s (sets) / 45s (exercises) — hardcoded
 - Weight increment: 2.5kg — hardcoded
-- RPE scale 0–10; weight increase suggested at average ≤ 4
+- RPE scale 0–10; weight increase suggested at average ≤ 6
 - Passwords: Firebase Auth (Google/Email) — no plaintext
 
 <!-- token-policy: v1.0 -->
