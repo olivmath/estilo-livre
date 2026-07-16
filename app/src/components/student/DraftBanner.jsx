@@ -8,8 +8,8 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
   const [confirmReset, setConfirmReset] = useState(false);
 
   const spacing = {
-    px: "clamp(8px, 3vw, 16px)",
-    sm: "clamp(12px, 4vw, 20px)",
+    px: "clamp(6px, 2vw, 12px)",
+    sm: "clamp(8px, 3vw, 14px)",
   };
 
   return (
