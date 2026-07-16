@@ -33,8 +33,8 @@ export function TrendCards({ trendData, onSelectTrend, selectedTrendId }) {
         </button>
       </div>
 
-      {/* Cards grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "clamp(10px, 2.5vw, 14px)", marginBottom: "clamp(12px, 3vw, 16px)" }}>
+      {/* Cards horizontal scroll */}
+      <div style={{ display: "flex", gap: "clamp(8px, 2vw, 12px)", marginBottom: "clamp(12px, 3vw, 16px)", overflowX: "auto", paddingBottom: 8, scrollBehavior: "smooth" }}>
         {cards.map((card) => (
           <button
             key={card.id}
@@ -42,15 +42,17 @@ export function TrendCards({ trendData, onSelectTrend, selectedTrendId }) {
             style={{
               background: selectedTrendId === card.id ? "rgba(245,196,0,0.1)" : "transparent",
               border: `2px solid ${selectedTrendId === card.id ? "var(--acc)" : card.color}`,
-              borderRadius: "clamp(10px, 2vw, 12px)",
+              borderRadius: 10,
               padding: "clamp(10px, 2vw, 14px)",
               textAlign: "center",
               cursor: "pointer",
               transition: "all 0.2s",
+              minWidth: "clamp(90px, 20vw, 110px)",
+              flexShrink: 0,
             }}
           >
-            <div style={{ fontSize: 10, fontWeight: 600, color: "var(--sub)", marginBottom: 4 }}>{card.label}</div>
-            <div style={{ fontSize: "clamp(20px, 5vw, 24px)", fontWeight: 800, color: card.color }}>{card.value}</div>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "var(--sub)", marginBottom: 2 }}>{card.label}</div>
+            <div style={{ fontSize: "clamp(18px, 4vw, 22px)", fontWeight: 800, color: card.color }}>{card.value}</div>
           </button>
         ))}
       </div>
