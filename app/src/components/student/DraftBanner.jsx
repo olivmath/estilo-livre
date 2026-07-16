@@ -1,36 +1,66 @@
-import { S } from "@/components/student/shared";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
-// "Treino pausado" card shown on the home tab while a draft exists in Firestore.
+// Draft banner (paused workout) — compact alert bar
 export function DraftBanner({ draft, onResume, onStartFromScratch }) {
-  const pct = ((draft.results?.length ?? 0) / (draft.exercises?.length ?? 1)) * 100;
+  const [confirmReset, setConfirmReset] = useState(false);
+
   return (
-    <div style={{ marginBottom: 24, padding: 20, borderRadius: 16, background: "linear-gradient(135deg, rgba(245,196,0,0.12), rgba(245,196,0,0.04))", border: "1.5px solid rgba(245,196,0,0.4)", boxShadow: "0 8px 24px rgba(245,196,0,0.08)" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--acc)", boxShadow: "0 0 8px var(--acc)" }} />
-        <span style={{ fontSize: 11, fontWeight: 800, color: "var(--acc)", letterSpacing: 1.5, textTransform: "uppercase" }}>
-          Treino pausado
-        </span>
-      </div>
-      <p style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", marginBottom: 6, lineHeight: 1.3 }}>
-        Treino {draft.label} — {draft.name}
-      </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-        <span style={{ fontSize: 13, color: "var(--acc)", fontWeight: 700 }}>
+    <div
+      style={{
+        background: "var(--bg3)",
+        padding: "12px 16px",
+        borderRadius: "4px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 12,
+        marginBottom: 24,
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
+        <div style={{ fontWeight: 700, fontSize: 14, color: "var(--acc)" }}>
+          {draft.label} — {draft.name}
+        </div>
+        <div style={{ fontSize: 12, color: "var(--sub)" }}>
           {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
-        </span>
-        <span style={{ fontSize: 13, color: "var(--sub)" }}>concluídos</span>
+        </div>
       </div>
-      <div style={{ height: 4, borderRadius: 4, background: "rgba(245,196,0,0.15)", overflow: "hidden", marginBottom: 16 }}>
-        <div style={{ height: "100%", borderRadius: 4, background: "var(--acc)", width: `${pct}%`, transition: "width 0.3s ease" }} />
+
+      <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+        <Button size="sm" onClick={() => onResume(draft)}>
+          Retomar
+        </Button>
+        <Button variant="ghost" size="icon" onClick={() => setConfirmReset(true)}>
+          <X size={16} />
+        </Button>
       </div>
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={() => onResume(draft)} style={{ ...S.btnPrimary, flex: 3, padding: "13px 0", fontSize: 14, whiteSpace: "nowrap" }}>
-          ▶ Continuar treino
-        </button>
-        <button onClick={() => onStartFromScratch(draft.id)} style={{ ...S.btnSecondary, flex: 2, padding: "13px 0", fontSize: 13, whiteSpace: "nowrap" }}>
-          Começar do zero
-        </button>
-      </div>
+
+      <Dialog open={confirmReset} onOpenChange={setConfirmReset}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>⚠️ Resetar treino?</DialogTitle>
+          </DialogHeader>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text)" }}>
+              {draft.label} — {draft.name}
+            </div>
+            <div style={{ fontSize: 13, color: "var(--sub)", lineHeight: 1.6 }}>
+              Vai deletar <strong>{draft.results?.length ?? 0} exercícios completados</strong> e recomeçar do zero.
+            </div>
+          </div>
+          <DialogFooter style={{ gap: 8 }}>
+            <Button variant="outline" onClick={() => setConfirmReset(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={() => { setConfirmReset(false); onStartFromScratch(draft.id); }}>
+              Resetar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

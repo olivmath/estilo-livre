@@ -1,6 +1,8 @@
 import { UserAvatar } from "@/components/shared";
 import { S } from "@/components/student/shared";
 import { LoopRingHero } from "@/components/student/LoopRingHero";
+import { DraftBanner } from "@/components/student/DraftBanner";
+import { Button } from "@/components/ui/button";
 
 // LoopDots: horizontal dots showing workouts + current position
 function LoopDots({ workouts, cycleInfo, onSelect }) {
@@ -11,26 +13,26 @@ function LoopDots({ workouts, cycleInfo, onSelect }) {
         const isDone = cycleInfo.done.has(w.id);
         const isNext = w.id === cycleInfo.next;
 
+        let variant = "outline";
+        if (isNext) variant = "default";
+        if (isDone) variant = "secondary";
+
         return (
-          <button
+          <Button
             key={w.id}
-            onClick={() => onSelect?.(w)}
+            variant={variant}
+            size="icon"
+            onClick={() => onSelect?.(w.id)}
             style={{
               width: 44,
               height: 44,
               borderRadius: "50%",
-              border: "2px solid",
-              borderColor: isNext ? "var(--acc)" : isDone ? "var(--green)" : "var(--bg3)",
-              backgroundColor: isNext ? "var(--acc)" : isDone ? "var(--green)" : "transparent",
-              color: isNext || isDone ? "var(--bg)" : "var(--sub)",
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: "pointer",
-              transition: "all 0.2s",
+              boxShadow: isNext ? "0 0 12px rgba(245,196,0,0.3)" : isDone ? "0 0 12px rgba(0,200,83,0.2)" : "none",
             }}
+            className={isDone ? "bg-[var(--green)] hover:bg-[var(--green)]" : isNext ? "bg-[var(--acc)] hover:bg-[var(--acc)]" : ""}
           >
             {letter}
-          </button>
+          </Button>
         );
       })}
     </div>
@@ -39,7 +41,7 @@ function LoopDots({ workouts, cycleInfo, onSelect }) {
 
 export function HomeTab({
   profile, workouts, cycleInfo, draft,
-  onAvatarClick, onStart,
+  onAvatarClick, onStart, onResumeDraft, onStartFromScratch,
 }) {
   return (
     <div style={{ paddingLeft: 16, paddingRight: 16 }}>
@@ -55,6 +57,11 @@ export function HomeTab({
           <UserAvatar name={profile?.name} photoURL={profile?.photoURL} size={44} />
         </div>
       </div>
+
+      {/* Draft Banner */}
+      {draft && (
+        <DraftBanner draft={draft} onResume={onResumeDraft} onStartFromScratch={onStartFromScratch} />
+      )}
 
       {/* Hero: Loop Ring */}
       {workouts.length > 0 && (
