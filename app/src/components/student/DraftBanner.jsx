@@ -17,58 +17,37 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
       style={{
         background: "var(--bg3)",
         padding: spacing.sm,
-        borderRadius: "4px",
+        borderRadius: 10,
         display: "flex",
-        flexDirection: "column",
-        gap: spacing.px,
-        position: "relative",
+        alignItems: "center",
+        gap: spacing.sm,
       }}
     >
-      {/* Close — pill centered on top-right corner */}
-      <Button
-        variant="ghost"
-        size="icon"
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontWeight: 700, fontSize: "clamp(13px, 3.5vw, 16px)", color: "var(--acc)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {draft.label} — {draft.name}
+        </div>
+        <div style={{ fontSize: "clamp(11px, 3vw, 14px)", color: "var(--sub)" }}>
+          {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
+        </div>
+      </div>
+
+      <Button size="sm" onClick={() => onResume(draft)} style={{ flexShrink: 0 }}>
+        Retomar
+      </Button>
+
+      <button
         onClick={() => setConfirmReset(true)}
         style={{
-          position: "absolute",
-          top: -10,
-          right: 6,
-          width: 24,
-          height: 24,
-          borderRadius: "50%",
-          background: "var(--bg2)",
-          border: "1px solid var(--blue)",
-          padding: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          flexShrink: 0, width: 28, height: 28, borderRadius: "50%",
+          background: "none", border: "1px solid var(--blue)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: "pointer", padding: 0,
         }}
         aria-label="Fechar banner"
       >
-        <X size={12} />
-      </Button>
-
-      {/* Content + Resume on same row */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: spacing.sm,
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: "clamp(13px, 3.5vw, 16px)", color: "var(--acc)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {draft.label} — {draft.name}
-          </div>
-          <div style={{ fontSize: "clamp(11px, 3vw, 14px)", color: "var(--sub)" }}>
-            {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
-          </div>
-        </div>
-
-        <Button size="sm" onClick={() => onResume(draft)} style={{ flexShrink: 0 }}>
-          Retomar
-        </Button>
-      </div>
+        <X size={14} color="var(--sub)" />
+      </button>
 
       <Dialog open={confirmReset} onOpenChange={setConfirmReset}>
         <DialogContent>
