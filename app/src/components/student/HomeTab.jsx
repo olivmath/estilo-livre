@@ -5,7 +5,7 @@ import { LoopRingHero } from "@/components/student/LoopRingHero";
 // LoopDots: horizontal dots showing workouts + current position
 function LoopDots({ workouts, cycleInfo, onSelect }) {
   return (
-    <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: -24, marginBottom: 32 }}>
+    <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: -22, marginBottom: 32, flexWrap: "wrap" }}>
       {workouts.map((w, idx) => {
         const letter = w.label?.charAt(0).toUpperCase() || String.fromCharCode(65 + idx);
         const isDone = cycleInfo.done.has(w.id);
@@ -42,16 +42,16 @@ export function HomeTab({
   onAvatarClick, onStart,
 }) {
   return (
-    <div>
+    <div style={{ paddingLeft: 16, paddingRight: 16 }}>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 32, marginBottom: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 24, marginBottom: 8 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800, marginTop: 4 }}>
             Bom treino, {profile?.name?.split(" ")[0] ?? "Atleta"} 👋
           </h2>
           <span style={{ fontSize: 10, color: "var(--acc)", fontWeight: 700, letterSpacing: 2 }}>ACADEMIA ESTILO LIVRE</span>
         </div>
-        <div onClick={onAvatarClick} style={{ cursor: "pointer" }}>
+        <div onClick={onAvatarClick} style={{ cursor: "pointer", flexShrink: 0 }}>
           <UserAvatar name={profile?.name} photoURL={profile?.photoURL} size={44} />
         </div>
       </div>
