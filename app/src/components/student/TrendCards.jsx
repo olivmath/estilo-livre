@@ -1,0 +1,68 @@
+import { ChevronRight } from "lucide-react";
+
+// Trend metrics cards showing RPE, load, streak, and session duration
+export function TrendCards({ trendData, onSelectTrend, selectedTrendId }) {
+  const cards = [
+    { id: "rpe", label: "RPE", value: trendData?.currentRpe?.toFixed(1) ?? "—", color: "var(--acc)" },
+    { id: "load", label: "Carga", value: trendData?.avgLoad ? `+${trendData.avgLoad.toFixed(1)}` : "—", color: "var(--green)", unit: "kg" },
+    { id: "streak", label: "Streak", value: trendData?.streak ?? "—", color: "var(--green)" },
+    { id: "session", label: "Sessão", value: trendData?.avgDuration ? `${Math.round(trendData.avgDuration)}m` : "—", color: "var(--blue2)" },
+  ];
+
+  return (
+    <div style={{ marginBottom: "clamp(16px, 4vw, 24px)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "clamp(12px, 3vw, 16px)" }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Tendências</h3>
+        <button
+          onClick={() => onSelectTrend?.(null)}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            background: "rgba(27,52,135,0.6)",
+            border: "1px solid var(--blue)",
+            color: "var(--text)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.2s",
+          }}
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+
+      {/* Cards grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "clamp(10px, 2.5vw, 14px)", marginBottom: "clamp(12px, 3vw, 16px)" }}>
+        {cards.map((card) => (
+          <button
+            key={card.id}
+            onClick={() => onSelectTrend?.(card.id)}
+            style={{
+              background: selectedTrendId === card.id ? "rgba(245,196,0,0.1)" : "transparent",
+              border: `2px solid ${selectedTrendId === card.id ? "var(--acc)" : card.color}`,
+              borderRadius: "clamp(10px, 2vw, 12px)",
+              padding: "clamp(10px, 2vw, 14px)",
+              textAlign: "center",
+              cursor: "pointer",
+              transition: "all 0.2s",
+            }}
+          >
+            <div style={{ fontSize: 10, fontWeight: 600, color: "var(--sub)", marginBottom: 4 }}>{card.label}</div>
+            <div style={{ fontSize: "clamp(20px, 5vw, 24px)", fontWeight: 800, color: card.color }}>{card.value}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Insight text */}
+      {trendData?.insight && (
+        <div style={{ fontSize: 12, color: "var(--sub)", lineHeight: 1.4 }}>
+          <span style={{ color: "var(--acc)", fontWeight: 700 }}>{trendData.insight.status}</span>
+          {" · "}
+          {trendData.insight.message}
+        </div>
+      )}
+    </div>
+  );
+}

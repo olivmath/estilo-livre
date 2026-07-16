@@ -1,13 +1,17 @@
+import { useState } from "react";
 import { UserAvatar } from "@/components/shared";
 import { S } from "@/components/student/shared";
 import { LoopRingHero } from "@/components/student/LoopRingHero";
 import { LoopDots } from "@/components/student/LoopDots";
+import { TrendCards } from "@/components/student/TrendCards";
+import { TrendChart } from "@/components/student/TrendChart";
 import { DraftBanner } from "@/components/student/DraftBanner";
 
 export function HomeTab({
-  profile, workouts, cycleInfo, draft,
-  onAvatarClick, onStart, onResumeDraft, onStartFromScratch,
+  profile, workouts, cycleInfo, draft, trendChart,
+  onAvatarClick, onStart, onResumeDraft, onStartFromScratch, onShowRpeTutorial,
 }) {
+  const [selectedTrend, setSelectedTrend] = useState("rpe");
   const spacing = {
     px: "clamp(4px, 1.5vw, 8px)",
     sm: "clamp(6px, 2vw, 10px)",
@@ -77,6 +81,18 @@ export function HomeTab({
           />
           <LoopDots workouts={workouts} cycleInfo={cycleInfo} onSelect={onStart} spacing={spacing} />
         </div>
+      )}
+
+      {/* Trends section */}
+      {trendChart && (
+        <>
+          <TrendCards
+            trendData={trendChart}
+            selectedTrendId={selectedTrend}
+            onSelectTrend={setSelectedTrend}
+          />
+          <TrendChart chart={trendChart} onInfoClick={() => onShowRpeTutorial?.()} />
+        </>
       )}
 
       {/* Empty state */}

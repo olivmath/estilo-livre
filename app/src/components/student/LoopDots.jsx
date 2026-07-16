@@ -7,8 +7,8 @@ export function LoopDots({ workouts, cycleInfo, onSelect, spacing }) {
       style={{
         display: "flex",
         justifyContent: "center",
-        gap: "clamp(6px, 2vw, 10px)",
-        marginTop: spacing.sm,
+        gap: "clamp(8px, 2.5vw, 12px)",
+        marginTop: "clamp(4px, 1vw, 8px)",
         flexWrap: "wrap",
       }}
       role="group"
