@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginScreen } from "@/screens/LoginScreen";
+import { PendingScreen } from "@/screens/PendingScreen";
 import { StudentApp } from "@/screens/StudentApp";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -28,14 +29,14 @@ function RoleGate() {
 
   if (loading) return <Spinner />;
   if (!user) return <LoginScreen />;
-  if (error) return <Spinner />;
-  if (!role) return <Spinner />;
+  if (error) return <LoginScreen />;
+  if (!role || role === "pendente") return <Navigate to="/pending" replace />;
 
   if (role === "aluno") return <Navigate to="/student" replace />;
   if (role === "professor") return <Navigate to="/prof/dashboard" replace />;
   if (role === "admin") return <Navigate to="/admin/dashboard" replace />;
 
-  return <Spinner />;
+  return <Navigate to="/pending" replace />;
 }
 
 function ProtectedRoute({ roles, children }) {
@@ -50,6 +51,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<RoleGate />} />
+        <Route path="/pending" element={<PendingScreen />} />
         <Route
           path="/student"
           element={
