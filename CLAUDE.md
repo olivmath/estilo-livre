@@ -213,6 +213,40 @@ import { Label } from "@/components/ui/label"
 - Classes Tailwind devem referenciar os tokens via `style={{ color: "var(--acc)" }}` ou via CSS custom properties — nunca `text-yellow-400` ou similares
 - Ícones: sempre `lucide-react`, tamanho padrão `size={16}` ou `size={20}`
 
+## Spacing & Responsiveness — OBRIGATÓRIO
+
+**NUNCA hardcoded pixel values.** Todo spacing deve ser dinâmico:
+
+```jsx
+// ❌ PROIBIDO: hardcoded pixels
+<div style={{ padding: 16, marginBottom: 24, gap: 12 }} />
+
+// ✅ CORRETO: CSS clamp() para escala fluida
+const spacing = {
+  px: "clamp(12px, 4vw, 24px)",    // Header gaps
+  sm: "clamp(16px, 5vw, 32px)",    // Section spacing
+  md: "clamp(24px, 6vw, 40px)",    // Large gaps
+};
+<div style={{ padding: spacing.px, marginBottom: spacing.sm, gap: spacing.px }} />
+```
+
+**Padrão clamp():**
+- `clamp(min, preferred, max)`
+- `min`: mobile (430px) — valor mínimo
+- `preferred`: 4-6vw (escala com viewport)
+- `max`: desktop (1200px+) — valor máximo
+
+**Comportamento:**
+- 430px (mobile): clamp(12px, 4vw, 24px) = ~12px
+- 768px (tablet): clamp(12px, 4vw, 24px) = ~18px
+- 1200px (desktop): clamp(12px, 4vw, 24px) = ~24px
+
+**Implementação:**
+1. Defina spacing vars no componente com clamp()
+2. Use `const spacing = { px, sm, md }` reutilizável
+3. Nunca use media queries para spacing (clamp() substitui)
+4. Teste em 3+ tamanhos (mobile, tablet, desktop)
+
 ## Tamanho de Arquivo — OBRIGATÓRIO
 
 - Todo arquivo que for editado deve ficar com **menos de 150 linhas** ao final da mudança.
