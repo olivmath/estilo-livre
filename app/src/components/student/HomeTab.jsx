@@ -5,7 +5,7 @@ import { LoopRingHero } from "@/components/student/LoopRingHero";
 // LoopDots: horizontal dots showing workouts + current position
 function LoopDots({ workouts, cycleInfo, onSelect }) {
   return (
-    <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 32 }}>
+    <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: -24, marginBottom: 32 }}>
       {workouts.map((w, idx) => {
         const letter = w.label?.charAt(0).toUpperCase() || String.fromCharCode(65 + idx);
         const isDone = cycleInfo.done.has(w.id);

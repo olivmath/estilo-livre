@@ -7,7 +7,7 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
   const offset = circumference * (1 - progress);
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
+    <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
       <svg width={220} height={220} viewBox="0 0 220 220" style={{ overflow: "visible" }}>
         {/* Background ring */}
         <circle cx={110} cy={110} r={radius} fill="none" stroke="var(--bg3)" strokeWidth={8} strokeLinecap="round" />
