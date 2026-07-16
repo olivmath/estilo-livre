@@ -32,10 +32,10 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
         style={{
           position: "absolute",
           top: 0,
-          right: 0,
+          right: "clamp(4px, 1.5vw, 8px)",
           width: "clamp(28px, 8vw, 36px)",
           height: "clamp(28px, 8vw, 36px)",
-          transform: "translate(25%, -25%)",
+          transform: "translateY(-25%)",
         }}
         aria-label="Fechar banner"
       >
@@ -43,23 +43,16 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
       </Button>
 
       {/* Content + Resume button */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "space-between",
-          gap: spacing.px,
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "clamp(2px, 1vw, 4px)", flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: "clamp(13px, 3.5vw, 16px)", color: "var(--acc)" }}>
-            {draft.label} — {draft.name}
-          </div>
-          <div style={{ fontSize: "clamp(11px, 3vw, 14px)", color: "var(--sub)" }}>
-            {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
-          </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "clamp(2px, 1vw, 4px)" }}>
+        <div style={{ fontWeight: 700, fontSize: "clamp(13px, 3.5vw, 16px)", color: "var(--acc)" }}>
+          {draft.label} — {draft.name}
         </div>
+        <div style={{ fontSize: "clamp(11px, 3vw, 14px)", color: "var(--sub)" }}>
+          {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
+        </div>
+      </div>
 
+      <div>
         <Button size="sm" onClick={() => onResume(draft)} style={{ flexShrink: 0 }}>
           Retomar
         </Button>

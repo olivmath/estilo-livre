@@ -11,6 +11,7 @@ import { WorkoutSwitchSheet } from "@/components/workout/WorkoutSwitchSheet";
 import { ExerciseDrawer } from "@/components/workout/ExerciseDrawer";
 import { ActiveWorkoutTopNav } from "@/components/workout/ActiveWorkoutTopNav";
 import { ActiveWorkoutMetrics } from "@/components/workout/ActiveWorkoutMetrics";
+import { ExerciseGifPreview } from "@/components/workout/ExerciseGifPreview";
 
 export function ActiveWorkoutScreen({
   activeWk, workouts, elapsedTime,
@@ -91,6 +92,7 @@ export function ActiveWorkoutScreen({
       </div>
 
       <div style={S.body}>
+        <ExerciseGifPreview name={ex.name} onVideoClick={() => setVideoEx(ex)} />
         <ActiveWorkoutMetrics ex={ex} currentSetIdx={activeWk.set}
           currentWeight={activeWk.currentWeight}
           onWeightClick={() => setWeightOpen(true)}
