@@ -70,6 +70,7 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | `useWorkoutDraft.js` | Draft (`drafts/current`) + `switchWorkout` |
 | `useSaveWorkoutSession.js` | Persiste sessão concluída no Firestore |
 | `useEditWeight.js` | Estado/persistência do modal de ajustar carga |
+| `useUpdateSetsReps.js` | Persiste edição de séries/reps no Firestore |
 | `useUploadPhoto.js` | Upload/crop de foto de perfil |
 | `useCelebrateCycle.js` | Dispara confete ao completar o loop |
 
@@ -94,7 +95,9 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | Arquivo | Responsabilidade |
 |---|---|
 | `ActiveWorkoutTopNav.jsx` | Header com nome do treino (toque abre `WorkoutSwitchSheet`) |
-| `ActiveWorkoutMetrics.jsx` | Cards de Repetições/Carga |
+| `ActiveWorkoutMetrics.jsx` | Cards de Repetições/Carga com botões de edit (Pencil) |
+| `ExerciseDrawer.jsx` | Gaveta lateral direita com lista de exercícios |
+| `SetsRepsSheet.jsx` | shadcn `Sheet` para editar séries e repetições |
 | `WorkoutSwitchSheet.jsx` | shadcn `Sheet` pra trocar de treino em sessão ativa |
 | `ExerciseList.jsx` / `ExerciseCard.jsx` | Lista de exercícios da sessão / linha individual do exercício |
 | `RestOverlay.jsx`, `RpeOverlay.jsx`, `SummaryOverlay.jsx`, `ExitSheet.jsx`, `WeightSheet.jsx`, `VideoScreen.jsx` | Overlays/telas da sessão ativa |

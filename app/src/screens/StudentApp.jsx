@@ -72,6 +72,7 @@ export function StudentApp() {
         onSwitchWorkout={session.switchWorkout}
         onSelectExercise={session.selectExercise}
         onExitWithoutSave={session.exitWithoutSave}
+        onUpdateSetsReps={session.updateSetsReps}
       />
     );
   }
