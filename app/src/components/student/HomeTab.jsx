@@ -3,7 +3,7 @@ import { S } from "@/components/student/shared";
 
 // LoopRing: hero component showing completed loops + current progress
 function LoopRing({ loopsCompleted, totalWorkouts, done }) {
-  const radius = 60;
+  const radius = 50;
   const circumference = 2 * Math.PI * radius;
   const progress = totalWorkouts > 0 ? (done.size / totalWorkouts) : 0;
   const offset = circumference * (1 - progress);
@@ -11,23 +11,23 @@ function LoopRing({ loopsCompleted, totalWorkouts, done }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, marginBottom: 40 }}>
       <svg width={140} height={140} style={{ transform: "rotate(-90deg)" }}>
-        {/* Background ring */}
-        <circle cx={70} cy={70} r={radius} fill="none" stroke="var(--bg3)" strokeWidth={3} />
-        {/* Progress ring */}
+        {/* Background ring (thick) */}
+        <circle cx={70} cy={70} r={radius} fill="none" stroke="var(--bg3)" strokeWidth={8} strokeLinecap="round" />
+        {/* Progress ring (thick) */}
         <circle
           cx={70}
           cy={70}
           r={radius}
           fill="none"
           stroke="var(--acc)"
-          strokeWidth={3}
+          strokeWidth={8}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
           style={{ transition: "stroke-dashoffset 0.6s ease" }}
         />
       </svg>
-      <div style={{ textAlign: "center", marginTop: -120 }}>
+      <div style={{ textAlign: "center", marginTop: -110 }}>
         <div style={{ fontSize: 48, fontWeight: 900, color: "var(--acc)" }}>
           {loopsCompleted}
         </div>
