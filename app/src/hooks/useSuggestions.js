@@ -10,8 +10,9 @@ export function getSuggestions(workouts, sessions) {
       if (rows.length < 2) return;
       const avg = rows.reduce((acc, curr) => acc + curr.diff, 0) / rows.length;
       const lastWeight = rows[0]?.wt ?? ex.wt;
-      if (avg <= 4) {
+      if (avg <= 6) {
         out.push({
+          wkId: wk.id,
           wkName: wk.name,
           wkLabel: wk.label,
           name: ex.name,

@@ -70,6 +70,7 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | `useWorkoutDraft.js` | Draft (`drafts/current`) + `switchWorkout` |
 | `useSaveWorkoutSession.js` | Persiste sessão concluída no Firestore |
 | `useEditWeight.js` | Estado/persistência do modal de ajustar carga |
+| `useUpdateSetsReps.js` | Persiste edição de séries/reps no Firestore |
 | `useUploadPhoto.js` | Upload/crop de foto de perfil |
 | `useCelebrateCycle.js` | Dispara confete ao completar o loop |
 
@@ -94,7 +95,9 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | Arquivo | Responsabilidade |
 |---|---|
 | `ActiveWorkoutTopNav.jsx` | Header com nome do treino (toque abre `WorkoutSwitchSheet`) |
-| `ActiveWorkoutMetrics.jsx` | Cards de Repetições/Carga |
+| `ActiveWorkoutMetrics.jsx` | Cards de Repetições/Carga com botões de edit (Pencil) |
+| `ExerciseDrawer.jsx` | Gaveta lateral direita com lista de exercícios |
+| `SetsRepsSheet.jsx` | shadcn `Sheet` para editar séries e repetições |
 | `WorkoutSwitchSheet.jsx` | shadcn `Sheet` pra trocar de treino em sessão ativa |
 | `ExerciseList.jsx` / `ExerciseCard.jsx` | Lista de exercícios da sessão / linha individual do exercício |
 | `RestOverlay.jsx`, `RpeOverlay.jsx`, `SummaryOverlay.jsx`, `ExitSheet.jsx`, `WeightSheet.jsx`, `VideoScreen.jsx` | Overlays/telas da sessão ativa |
@@ -213,6 +216,40 @@ import { Label } from "@/components/ui/label"
 - Classes Tailwind devem referenciar os tokens via `style={{ color: "var(--acc)" }}` ou via CSS custom properties — nunca `text-yellow-400` ou similares
 - Ícones: sempre `lucide-react`, tamanho padrão `size={16}` ou `size={20}`
 
+## Spacing & Responsiveness — OBRIGATÓRIO
+
+**NUNCA hardcoded pixel values.** Todo spacing deve ser dinâmico:
+
+```jsx
+// ❌ PROIBIDO: hardcoded pixels
+<div style={{ padding: 16, marginBottom: 24, gap: 12 }} />
+
+// ✅ CORRETO: CSS clamp() para escala fluida
+const spacing = {
+  px: "clamp(12px, 4vw, 24px)",    // Header gaps
+  sm: "clamp(16px, 5vw, 32px)",    // Section spacing
+  md: "clamp(24px, 6vw, 40px)",    // Large gaps
+};
+<div style={{ padding: spacing.px, marginBottom: spacing.sm, gap: spacing.px }} />
+```
+
+**Padrão clamp():**
+- `clamp(min, preferred, max)`
+- `min`: mobile (430px) — valor mínimo
+- `preferred`: 4-6vw (escala com viewport)
+- `max`: desktop (1200px+) — valor máximo
+
+**Comportamento:**
+- 430px (mobile): clamp(12px, 4vw, 24px) = ~12px
+- 768px (tablet): clamp(12px, 4vw, 24px) = ~18px
+- 1200px (desktop): clamp(12px, 4vw, 24px) = ~24px
+
+**Implementação:**
+1. Defina spacing vars no componente com clamp()
+2. Use `const spacing = { px, sm, md }` reutilizável
+3. Nunca use media queries para spacing (clamp() substitui)
+4. Teste em 3+ tamanhos (mobile, tablet, desktop)
+
 ## Tamanho de Arquivo — OBRIGATÓRIO
 
 - Todo arquivo que for editado deve ficar com **menos de 150 linhas** ao final da mudança.
@@ -224,7 +261,7 @@ import { Label } from "@/components/ui/label"
 - Mobile-first: max-width 430px (StudentApp); admin/prof uses full-width dashboard
 - Rest timers: 30s (sets) / 45s (exercises) — hardcoded
 - Weight increment: 2.5kg — hardcoded
-- RPE scale 0–10; weight increase suggested at average ≤ 4
+- RPE scale 0–10; weight increase suggested at average ≤ 6
 - Passwords: Firebase Auth (Google/Email) — no plaintext
 
 <!-- token-policy: v1.0 -->

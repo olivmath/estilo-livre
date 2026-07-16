@@ -4,11 +4,9 @@ import { db } from "@/lib/firebase";
 import { useWorkoutTimers } from "./useWorkoutTimers";
 import { useWorkoutDraft } from "./useWorkoutDraft";
 import { useSaveWorkoutSession } from "./useSaveWorkoutSession";
+import { useUpdateSetsReps } from "./useUpdateSetsReps";
 import { lastWeightFor } from "./useWorkoutCycle";
 
-// Orchestrates one active workout session: set/exercise progression, rest
-// timers, RPE capture, and saving/discarding/switching the session — wires
-// together useWorkoutTimers, useWorkoutDraft and useSaveWorkoutSession.
 export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, reload, onSaved }) {
   const [activeWk, setActiveWk] = useState(null);
   const [restTime, setRestTime] = useState(null);
@@ -128,11 +126,7 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
 
   const draftActions = useWorkoutDraft({ user, activeWk, setActiveWk, setDraft, closeActiveSession: discardWorkout, startWorkout });
 
-  const skipRest = () => {
-    setRestTime(null);
-    setRestType(null);
-    setRestTotal(null);
-  };
+  const skipRest = () => { setRestTime(null); setRestType(null); setRestTotal(null); };
 
   const adjustActiveWeight = (val) => {
     setActiveWk((prev) => ({
@@ -141,12 +135,14 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
     }));
   };
 
+  const updateSetsReps = useUpdateSetsReps({ user, activeWk, setActiveWk, workouts });
+
   return {
     activeWk, elapsedTime, restTime, restTotal, restType,
     showExit, setShowExit, showRpe, rpeValue, setRpeValue,
     showSummary, summaryData,
     startWorkout, handleNextSet, confirmRpe, saveWorkoutSession, discardWorkout, exitWithoutSave,
-    skipRest, adjustActiveWeight, selectExercise,
+    skipRest, adjustActiveWeight, selectExercise, updateSetsReps,
     ...draftActions,
   };
 }

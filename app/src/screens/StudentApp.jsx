@@ -72,6 +72,7 @@ export function StudentApp() {
         onSwitchWorkout={session.switchWorkout}
         onSelectExercise={session.selectExercise}
         onExitWithoutSave={session.exitWithoutSave}
+        onUpdateSetsReps={session.updateSetsReps}
       />
     );
   }
@@ -104,7 +105,7 @@ export function StudentApp() {
           {tab === "home" && (
             <HomeTab
               profile={profile} workouts={workouts} draft={draft} cycleInfo={cycleInfo}
-              trendChart={trendChart} suggestions={suggestions} sessions={sessions}
+              trendChart={trendChart} suggestions={suggestions} user={user} reload={reload}
               onAvatarClick={() => changeTab("profile")}
               onStart={session.startWorkout} onOpenDetail={setSelectedWk}
               onResumeDraft={session.resumeWorkout} onStartFromScratch={session.startFromScratch}
