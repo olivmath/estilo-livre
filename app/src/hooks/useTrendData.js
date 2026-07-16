@@ -81,27 +81,35 @@ export function getTrendChartForMetric(sessions, metricId) {
   let pts, title, color;
 
   if (metricId === "load") {
+    // Average load per session (not RPE, actual weight)
     pts = sortedSess.map((s) => {
-      const weights = (s.exs || []).map(e => e.wt || 0);
-      return weights.length ? weights.reduce((a, b) => a + b, 0) / weights.length : 0;
+      const weights = (s.exs || []).map(e => e.wt || 0).filter(w => w > 0);
+      if (weights.length === 0) return 0;
+      return weights.reduce((a, b) => a + b, 0) / weights.length;
     });
     title = "Carga média por sessão";
-    color = "var(--green)";
+    color = "#00D9FF"; // Cyan (accessible)
   } else if (metricId === "streak") {
-    pts = sortedSess.map((s) => (s.exs?.length || 0) > 0 ? 1 : 0);
+    // Days with sessions in last weeks (scale to 1-10)
+    pts = sortedSess.map((s) => (s.exs?.length || 0) > 0 ? 5 : 2); // Simplified: has session = 5, no session = 2
     title = "Sessões completadas";
-    color = "var(--green)";
+    color = "#B366FF"; // Purple (accessible)
   } else if (metricId === "session") {
-    pts = sortedSess.map((s) => (s.duration || 0) / 60);
-    title = "Duração média da sessão";
-    color = "var(--blue2)";
+    // Duration in minutes (scale to 1-10 range)
+    pts = sortedSess.map((s) => {
+      const dur = (s.duration || 0) / 60; // Already in minutes
+      return Math.min(dur / 10, 10); // Scale: 60min = 10, cap at 10
+    });
+    title = "Duração da sessão";
+    color = "#00D9FF"; // Cyan (accessible)
   } else {
+    // RPE (default)
     pts = sortedSess.map((s) => {
       const exs = s.exs || [];
       return exs.length ? exs.reduce((acc, curr) => acc + (curr.diff || 5), 0) / exs.length : 5;
     });
     title = "Intensidade do treino";
-    color = "var(--acc)";
+    color = "#FFB366"; // Orange (accessible, replaces yellow)
   }
 
   const { svgPts, bezierPath: bPath, areaPath, W, H } = buildChartPath(pts);

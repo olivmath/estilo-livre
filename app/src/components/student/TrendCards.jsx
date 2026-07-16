@@ -8,10 +8,10 @@ export function TrendCards({ trendData, onSelectTrend, selectedTrendId }) {
   const duration = trendData?.avgDuration ?? 0;
 
   const cards = [
-    { id: "rpe", label: "RPE", value: rpe > 0 ? rpe.toFixed(1) : "—", color: "var(--acc)" },
-    { id: "load", label: "Carga", value: load > 0 ? `+${load.toFixed(1)}` : "—", color: "var(--green)" },
-    { id: "streak", label: "Streak", value: streak !== "0d" ? streak : "—", color: "var(--green)" },
-    { id: "session", label: "Sessão", value: duration > 0 ? `${Math.round(duration)}m` : "—", color: "var(--blue2)" },
+    { id: "rpe", label: "RPE", value: rpe > 0 ? rpe.toFixed(1) : "—", color: "#FFB366" }, // Orange (accessible)
+    { id: "load", label: "Carga", value: load > 0 ? `+${load.toFixed(1)}` : "—", color: "#00D9FF" }, // Cyan (accessible)
+    { id: "streak", label: "Streak", value: streak !== "0d" ? streak : "—", color: "#B366FF" }, // Purple (accessible)
+    { id: "session", label: "Sessão", value: duration > 0 ? `${Math.round(duration)}m` : "—", color: "#00D9FF" }, // Cyan (accessible)
   ];
 
   return (
