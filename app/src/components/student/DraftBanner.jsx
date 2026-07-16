@@ -19,17 +19,18 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
         position: "relative",
       }}
     >
-      {/* Close button — top right */}
+      {/* Close button — top right corner */}
       <Button
         variant="ghost"
         size="icon"
         onClick={() => setConfirmReset(true)}
         style={{
           position: "absolute",
-          top: 8,
-          right: 8,
+          top: 0,
+          right: 0,
           width: 32,
           height: 32,
+          transform: "translate(25%, -25%)",
         }}
         aria-label="Fechar banner"
       >
