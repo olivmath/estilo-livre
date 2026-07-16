@@ -71,7 +71,7 @@ export function getTrendData(sessions) {
       ? { status: "Caindo", message: "RPE em queda, foque na recuperação" }
       : { status: "Estável", message: "RPE consistente com as últimas semanas" };
 
-  return { bezierPath: bPath, areaPath, maPath, svgPts, trendColor, trendLabel, W, H, sessionsList: sortedSess, avgRpe, currentRpe, trend, avgLoad, streak, avgDuration, insight };
+  return { bezierPath: bPath, areaPath, maPath, svgPts, trendColor, trendLabel, title: "Intensidade do treino", W, H, sessionsList: sortedSess, avgRpe, currentRpe, trend, avgLoad, streak, avgDuration, insight };
 }
 
 export function getTrendChartForMetric(sessions, metricId) {
@@ -116,5 +116,5 @@ export function getTrendChartForMetric(sessions, metricId) {
   const avgValue = pts.reduce((a, b) => a + b, 0) / pts.length;
   const currentValue = pts[pts.length - 1];
 
-  return { bezierPath: bPath, areaPath, svgPts, W, H, sessionsList: sortedSess, trendColor: color, currentRpe: currentValue, avgRpe: avgValue, trendLabel: title };
+  return { bezierPath: bPath, areaPath, svgPts, W, H, sessionsList: sortedSess, trendColor: color, currentRpe: currentValue, avgRpe: avgValue, title, trendLabel: title };
 }

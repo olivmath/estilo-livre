@@ -12,11 +12,11 @@ export function TrendChart({ chart, onInfoClick }) {
     <div style={{ background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 16, padding: 20, marginBottom: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 0, display: "flex", alignItems: "center", gap: 6 }}>
-          Intensidade do treino
+          {chart.title || "Intensidade do treino"}
           <button onClick={onInfoClick} style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--acc)", border: "none", color: "var(--bg)", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>i</button>
         </h4>
         <span style={{ fontSize: 11, fontWeight: 700, color: chart.trendColor, background: `color-mix(in srgb, ${chart.trendColor} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${chart.trendColor} 30%, transparent)`, borderRadius: 99, padding: "3px 10px" }}>
-          {chart.trendLabel}
+          {chart.trendLabel || "—"}
         </span>
       </div>
 
