@@ -17,7 +17,6 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
         alignItems: "center",
         justifyContent: "space-between",
         gap: 12,
-        marginBottom: 24,
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}>
