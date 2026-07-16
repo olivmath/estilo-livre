@@ -37,10 +37,14 @@ function LoopDots({ workouts, cycleInfo, onSelect }) {
             size="icon"
             onClick={() => onSelect?.(w.id)}
             style={{
-              width: 44,
-              height: 44,
+              width: "clamp(40px, 10vw, 48px)",
+              height: "clamp(40px, 10vw, 48px)",
               borderRadius: "50%",
-              boxShadow: isNext ? "0 0 12px rgba(245,196,0,0.3)" : isDone ? "0 0 12px rgba(0,200,83,0.2)" : "none",
+              boxShadow: isNext
+                ? "0 0 clamp(8px, 2vw, 12px) rgba(245,196,0,0.3)"
+                : isDone
+                  ? "0 0 clamp(8px, 2vw, 12px) rgba(0,200,83,0.2)"
+                  : "none",
             }}
             className={isDone ? "bg-[var(--green)] hover:bg-[var(--green)]" : isNext ? "bg-[var(--acc)] hover:bg-[var(--acc)]" : ""}
             aria-label={label}
