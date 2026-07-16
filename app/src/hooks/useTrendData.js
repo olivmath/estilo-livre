@@ -117,5 +117,5 @@ export function getTrendChartForMetric(sessions, metricId) {
   const avgValue = pts.reduce((a, b) => a + b, 0) / pts.length;
   const currentValue = pts[pts.length - 1];
 
-  return { bezierPath, areaPath, svgPts, W, H, sessionsList: sortedSess, trendColor: color, sessionsList: sortedSess, currentRpe: currentValue, avgRpe: avgValue, trendLabel: title };
+  return { bezierPath, areaPath, svgPts, W, H, sessionsList: sortedSess, trendColor: color, currentRpe: currentValue, avgRpe: avgValue, trendLabel: title };
 }
