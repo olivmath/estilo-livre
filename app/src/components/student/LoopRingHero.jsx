@@ -8,7 +8,7 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
 
   return (
     <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
-      <svg width={160} height={160} viewBox="0 0 160 160">
+      <svg width={160} height={160} viewBox="0 0 160 160" style={{ overflow: "visible" }}>
         {/* Background ring */}
         <circle cx={80} cy={80} r={radius} fill="none" stroke="var(--bg3)" strokeWidth={8} strokeLinecap="round" />
 
@@ -30,8 +30,9 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
         {/* Number */}
         <text
           x={80}
-          y={75}
+          y={80}
           textAnchor="middle"
+          dominantBaseline="central"
           fontSize={48}
           fontWeight={900}
           fill="var(--acc)"
@@ -43,8 +44,9 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
         {/* Label */}
         <text
           x={80}
-          y={110}
+          y={105}
           textAnchor="middle"
+          dominantBaseline="central"
           fontSize={10}
           fontWeight={700}
           fill="var(--sub)"
