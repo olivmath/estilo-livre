@@ -12,6 +12,7 @@ export function getSuggestions(workouts, sessions) {
       const lastWeight = rows[0]?.wt ?? ex.wt;
       if (avg <= 6) {
         out.push({
+          wkId: wk.id,
           wkName: wk.name,
           wkLabel: wk.label,
           name: ex.name,
