@@ -1,6 +1,6 @@
 // Loop ring progress indicator with centered number and label
 export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) {
-  const radius = 50;
+  const radius = 70;
   const circumference = 2 * Math.PI * radius;
   let progress = totalWorkouts > 0 ? (done.size / totalWorkouts) : 0;
   if (hasDraft) progress += 0.5 / totalWorkouts;
@@ -8,14 +8,14 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
 
   return (
     <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
-      <svg width={160} height={160} viewBox="0 0 160 160" style={{ overflow: "visible" }}>
+      <svg width={220} height={220} viewBox="0 0 220 220" style={{ overflow: "visible" }}>
         {/* Background ring */}
-        <circle cx={80} cy={80} r={radius} fill="none" stroke="var(--bg3)" strokeWidth={8} strokeLinecap="round" />
+        <circle cx={110} cy={110} r={radius} fill="none" stroke="var(--bg3)" strokeWidth={8} strokeLinecap="round" />
 
         {/* Progress ring - starts at top (12 o'clock) */}
         <circle
-          cx={80}
-          cy={80}
+          cx={110}
+          cy={110}
           r={radius}
           fill="none"
           stroke="var(--acc)"
@@ -24,13 +24,13 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
           strokeDashoffset={offset}
           strokeLinecap="round"
           style={{ transition: "stroke-dashoffset 0.6s ease" }}
-          transform="rotate(-90 80 80)"
+          transform="rotate(-90 110 110)"
         />
 
         {/* Number */}
         <text
-          x={80}
-          y={72}
+          x={110}
+          y={105}
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={56}
@@ -43,8 +43,8 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
 
         {/* Label */}
         <text
-          x={80}
-          y={102}
+          x={110}
+          y={137}
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={12}
@@ -52,7 +52,7 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
           fill="var(--sub)"
           fontFamily="system-ui"
         >
-          loops completos
+          loops feitos
         </text>
       </svg>
     </div>
