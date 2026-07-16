@@ -65,6 +65,7 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | `useWorkoutCycle.js` | `getCycleInfo` (próximo treino + loops) e `lastWeightFor` |
 | `useTrendData.js` | Pontos do gráfico SVG de intensidade (RPE) |
 | `useSuggestions.js` | Sugestões de progressão de carga |
+| `useHomeStats.js` | Stats da home: streak, carga, RPE, duração, veredito |
 | `useActiveWorkoutSession.js` | Orquestra a sessão ativa (sets, RPE, salvar) |
 | `useWorkoutTimers.js` | Cronômetro da sessão + contagem de descanso |
 | `useWorkoutDraft.js` | Draft (`drafts/current`) + `switchWorkout` |
@@ -80,9 +81,14 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | `HomeTab.jsx` / `WorkoutsTab.jsx` / `HistoryTab.jsx` / `ProfileTab.jsx` | As 4 abas do StudentApp |
 | `BottomNav.jsx` | Barra de navegação inferior |
 | `WorkoutListItem.jsx` | Linha "Treino X" (reusada em Home e Treinos) |
+| `LoopRing.jsx` | Anel SVG de progresso do loop com contador central |
+| `MiniChart.jsx` | Gráfico SVG reutilizável (pontos + avg line + gridlines) |
+| `TrendChips.jsx` | 4 chips seletores de métrica + veredito + MiniChart |
+| `RpeDrillScreen.jsx` | Tela 2: RPE por treino com lista selecionável + gráfico |
+| `RpeExerciseScreen.jsx` | Tela 3: RPE por exercício com barras + gráfico |
 | `CycleTracker.jsx` | Dots + barra de progresso do loop |
 | `DraftBanner.jsx` | Card "Treino pausado" |
-| `TrendChart.jsx` | Gráfico SVG de RPE |
+| `TrendChart.jsx` | Gráfico SVG de RPE (legado, usado em WorkoutsTab) |
 | `SuggestionsCard.jsx` | Card de sugestões de progressão |
 | `WorkoutDetailOverlay.jsx` / `SessionReportOverlay.jsx` | Overlays full-bleed (detalhe do treino / relatório de sessão) |
 | `EditWeightModal.jsx` | shadcn `Dialog` para ajustar carga padrão |

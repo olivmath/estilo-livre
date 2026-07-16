@@ -6,8 +6,7 @@ import { Spinner } from "@/components/shared";
 import { ActiveWorkoutScreen } from "@/screens/ActiveWorkoutScreen";
 import { useStudentData } from "@/hooks/useStudentData";
 import { getCycleInfo } from "@/hooks/useWorkoutCycle";
-import { getTrendData } from "@/hooks/useTrendData";
-import { getSuggestions } from "@/hooks/useSuggestions";
+import { getHomeStats } from "@/hooks/useHomeStats";
 import { useActiveWorkoutSession } from "@/hooks/useActiveWorkoutSession";
 import { useUploadPhoto } from "@/hooks/useUploadPhoto";
 import { useEditWeight } from "@/hooks/useEditWeight";
@@ -21,6 +20,8 @@ import { WorkoutDetailOverlay } from "@/components/student/WorkoutDetailOverlay"
 import { SessionReportOverlay } from "@/components/student/SessionReportOverlay";
 import { EditWeightModal } from "@/components/student/EditWeightModal";
 import { RpeTutorialSheet } from "@/components/student/RpeTutorialSheet";
+import { RpeDrillScreen } from "@/components/student/RpeDrillScreen";
+import { RpeExerciseScreen } from "@/components/student/RpeExerciseScreen";
 import { S } from "@/components/student/shared";
 
 // Student role entry point: 4-tab shell (home/workouts/history/profile) that
@@ -32,18 +33,19 @@ export function StudentApp() {
   const [viewingSession, setViewingSession] = useState(null);
   const [showRpeTutorial, setShowRpeTutorial] = useState(false);
   const [rpeTutSlide, setRpeTutSlide] = useState(0);
+  const [rpeScreen, setRpeScreen] = useState(null);
+  const [rpeWk, setRpeWk] = useState(null);
 
   const { workouts, sessions, draft, setDraft, loading, reload } = useStudentData(user);
   const cycleInfo = getCycleInfo(workouts, sessions);
-  const trendChart = getTrendData(sessions);
-  const suggestions = getSuggestions(workouts, sessions);
+  const homeStats = getHomeStats(sessions, workouts, cycleInfo);
   useCelebrateCycle(cycleInfo.pct);
 
   const session = useActiveWorkoutSession({ user, workouts, sessions, setDraft, reload, onSaved: () => setTab("workouts") });
   const uploadPhoto = useUploadPhoto(user, reload);
   const editWeight = useEditWeight(user, workouts, reload);
 
-  const changeTab = (t) => { setSelectedWk(null); setTab(t); };
+  const changeTab = (t) => { setSelectedWk(null); setRpeScreen(null); setRpeWk(null); setTab(t); };
 
   if (session.activeWk) {
     return (
@@ -101,15 +103,24 @@ export function StudentApp() {
         </div>
       ) : (
         <div style={{ paddingBottom: 80 }}>
-          {tab === "home" && (
+          {tab === "home" && !rpeScreen && (
             <HomeTab
               profile={profile} workouts={workouts} draft={draft} cycleInfo={cycleInfo}
-              trendChart={trendChart} suggestions={suggestions} sessions={sessions}
+              homeStats={homeStats}
               onAvatarClick={() => changeTab("profile")}
-              onStart={session.startWorkout} onOpenDetail={setSelectedWk}
+              onStart={session.startWorkout}
               onResumeDraft={session.resumeWorkout} onStartFromScratch={session.startFromScratch}
-              onShowRpeTutorial={() => { setShowRpeTutorial(true); setRpeTutSlide(0); }}
+              onDrillDown={() => setRpeScreen("workouts")}
             />
+          )}
+          {tab === "home" && rpeScreen === "workouts" && (
+            <RpeDrillScreen workouts={workouts} sessions={sessions}
+              onBack={() => setRpeScreen(null)}
+              onDrillExercise={(wk) => { setRpeWk(wk); setRpeScreen("exercises"); }} />
+          )}
+          {tab === "home" && rpeScreen === "exercises" && rpeWk && (
+            <RpeExerciseScreen workout={rpeWk} sessions={sessions}
+              onBack={() => setRpeScreen("workouts")} />
           )}
           {tab === "workouts" && (
             <WorkoutsTab workouts={workouts} cycleInfo={cycleInfo} onStart={session.startWorkout} onOpenDetail={setSelectedWk} />
