@@ -11,8 +11,8 @@ function LoopDots({ workouts, cycleInfo, onSelect }) {
       style={{
         display: "flex",
         justifyContent: "center",
-        gap: 8,
-        marginTop: 16,
+        gap: "clamp(8px, 2vw, 12px)",
+        marginTop: "clamp(16px, 5vw, 24px)",
         flexWrap: "wrap",
       }}
       role="group"
@@ -58,16 +58,22 @@ export function HomeTab({
   profile, workouts, cycleInfo, draft,
   onAvatarClick, onStart, onResumeDraft, onStartFromScratch,
 }) {
+  const spacing = {
+    px: "clamp(12px, 4vw, 24px)",
+    sm: "clamp(16px, 5vw, 32px)",
+    md: "clamp(24px, 6vw, 40px)",
+  };
+
   return (
-    <div style={{ padding: "16px" }}>
+    <div style={{ padding: spacing.px }}>
       {/* Header */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          gap: 12,
-          marginBottom: 16,
+          gap: spacing.px,
+          marginBottom: spacing.sm,
         }}
         role="banner"
       >
@@ -105,14 +111,14 @@ export function HomeTab({
 
       {/* Draft Banner */}
       {draft && (
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: spacing.sm }}>
           <DraftBanner draft={draft} onResume={onResumeDraft} onStartFromScratch={onStartFromScratch} />
         </div>
       )}
 
       {/* Hero: Loop Ring + Dots */}
       {workouts.length > 0 && (
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: spacing.md }}>
           <LoopRingHero
             loopsCompleted={cycleInfo.cycles}
             totalWorkouts={workouts.length}
