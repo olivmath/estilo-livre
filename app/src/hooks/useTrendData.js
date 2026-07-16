@@ -31,6 +31,7 @@ export function getTrendData(sessions) {
   });
 
   const { svgPts, bezierPath, areaPath, W, H } = buildChartPath(pts);
+  const PAD_Y = 10;
 
   const WINDOW = 3;
   const maPts = pts.length >= WINDOW
