@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { Dumbbell } from "lucide-react";
+import { locName } from "@/lib/localize";
 
 export function ExerciseCard({ item, currentSet, onVideoClick, onSelect }) {
   const { t } = useTranslation();
-  const { status, name, sets, reps, machine, result } = item;
+  const { status, sets, reps, machine, result } = item;
   const isDone = status === "done";
   const isCurrent = status === "current";
   const hasMachine = machine && machine !== "0";
@@ -47,7 +48,7 @@ export function ExerciseCard({ item, currentSet, onVideoClick, onSelect }) {
           color: isDone ? "var(--green)" : isCurrent ? "var(--acc)" : "var(--sub)",
           whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.2,
         }}>
-          {name}
+          {locName(item)}
         </span>
         <span style={{
           fontSize: 10, letterSpacing: 0.2,

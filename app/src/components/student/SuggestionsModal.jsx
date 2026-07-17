@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { locName } from "@/lib/localize";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -47,7 +48,7 @@ export function SuggestionsModal({ open, onClose, suggestions, user, workouts, r
           {suggestions.map((s, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: sp, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600 }}>{s.name}</div>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>{locName(s)}</div>
                 <div style={{ fontSize: 11, color: "var(--sub)" }}>{t("workoutDetail.workoutLabel", { label: s.wkLabel })}</div>
               </div>
               <span style={{ fontSize: 13, fontWeight: 700 }}>

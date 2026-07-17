@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { locName } from "@/lib/localize";
 import { S, diffColor } from "@/components/student/shared";
 
 export function SessionEditOverlay({ session, onClose, onSave, isSaving }) {
@@ -24,7 +25,7 @@ export function SessionEditOverlay({ session, onClose, onSave, isSaving }) {
           {exs.map((ex, i) => (
             <div key={i} style={{ background: "rgba(255,255,255,0.01)", border: "1px solid var(--bg3)", borderRadius: 10, padding: 12 }}>
               <div style={{ marginBottom: 12 }}>
-                <span style={{ fontWeight: 600, fontSize: 14 }}>{ex.name}</span>
+                <span style={{ fontWeight: 600, fontSize: 14 }}>{locName(ex)}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>

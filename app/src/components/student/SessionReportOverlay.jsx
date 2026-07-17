@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { locName } from "@/lib/localize";
 import { S, diffColor, fmtDateFull, fmtDur, fmtVol } from "@/components/student/shared";
 import { SessionEditOverlay } from "./SessionEditOverlay";
 import { updateStudentSession } from "@/services/sessions";
@@ -63,7 +64,7 @@ export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
             <div key={i} style={{ background: "rgba(255,255,255,0.01)", border: "1px solid var(--bg3)", borderRadius: 10, padding: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                 {res.num && <span style={{ padding: "2px 8px", color: "#fff", fontWeight: 700, fontSize: 11, borderRadius: 6, background: session.wkColor }}>{res.num}</span>}
-                <span style={{ fontWeight: 600, fontSize: 14 }}>{res.name}</span>
+                <span style={{ fontWeight: 600, fontSize: 14 }}>{locName(res)}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: 12, color: "var(--sub)" }}>{res.sets} {t("sessionReport.setsXReps").split(" x ")[0]} × {res.reps} reps · <b>{res.wt}kg</b></span>

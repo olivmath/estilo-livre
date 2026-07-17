@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { locName } from "@/lib/localize";
 import { Dumbbell, ListChecks } from "lucide-react";
 import { RestOverlay } from "@/components/workout/RestOverlay";
 import { RpeOverlay } from "@/components/workout/RpeOverlay";
@@ -47,10 +48,10 @@ export function ActiveWorkoutScreen({
     <div style={S.page}>
       {restTime !== null && (
         <RestOverlay restTime={restTime} restTotal={restTotal} restType={restType}
-          nextExName={nextEx?.name} nextExMachine={nextEx?.machine} onSkip={onSkipRest} />
+          nextExName={nextEx ? locName(nextEx) : undefined} nextExMachine={nextEx?.machine} onSkip={onSkipRest} />
       )}
       {showRpe && (
-        <RpeOverlay exName={ex.name} rpeValue={rpeValue} setRpeValue={setRpeValue} onConfirm={onConfirmRpe} />
+        <RpeOverlay exName={locName(ex)} rpeValue={rpeValue} setRpeValue={setRpeValue} onConfirm={onConfirmRpe} />
       )}
       {showSummary && (
         <SummaryOverlay summaryData={summaryData} onSave={onSaveSession} onDiscard={onConfirmExit} />
@@ -86,7 +87,7 @@ export function ActiveWorkoutScreen({
             <Dumbbell size={16} color="var(--sub)" />
           )}
         </div>
-        <h1 style={S.exName}>{ex.name}</h1>
+        <h1 style={S.exName}>{locName(ex)}</h1>
         <button onClick={() => setDrawerOpen(true)} style={S.listBtn}>
           <ListChecks size={18} color="var(--acc)" />
           <span style={S.listLabel}>{doneCount}/{activeWk.exercises.length}</span>

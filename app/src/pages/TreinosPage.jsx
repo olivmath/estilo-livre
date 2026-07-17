@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Spinner, Field } from "@/components/shared";
+import { locName, locGroup } from "@/lib/localize";
 import { Plus, Edit2, Trash2, X, UserPlus } from "lucide-react";
 
 const PALETTE = [
@@ -129,7 +130,7 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
                   </SelectTrigger>
                   <SelectContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)" }}>
                     {allExercises.map((e) => (
-                      <SelectItem key={e.id} value={e.id}>{e.name} ({e.group})</SelectItem>
+                      <SelectItem key={e.id} value={e.id}>{locName(e)} ({locGroup(e)})</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -145,7 +146,7 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
                   borderLeft: `3px solid ${form.color}`,
                 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{ex.name}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{locName(ex)}</span>
                     <button type="button" onClick={() => removeEx(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)" }}>
                       <X size={13} />
                     </button>

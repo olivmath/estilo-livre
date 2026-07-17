@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Spinner, Field } from "@/components/shared";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { locName, locGroup } from "@/lib/localize";
 import { Plus, Edit2, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 
 const GROUPS = [
@@ -126,7 +127,7 @@ function GroupSection({ group, exercises, onEdit, onDelete }) {
               border: "1px solid var(--blue)", borderRadius: 8,
             }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{ex.name}</p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{locName(ex)}</p>
                 {ex.machine && <p style={{ fontSize: 11, color: "var(--sub)" }}>{ex.machine}</p>}
               </div>
               <span style={{ fontSize: 12, color: "var(--sub)", flexShrink: 0 }}>
@@ -198,7 +199,7 @@ export function ExerciciosPage() {
         <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("exerciciosPage.noExercises")}</p>
       ) : (
         sortedGroups.map((g) => (
-          <GroupSection key={g} group={g} exercises={grouped[g]} onEdit={handleEdit} onDelete={handleDelete} />
+          <GroupSection key={g} group={locGroup({ group: g })} exercises={grouped[g]} onEdit={handleEdit} onDelete={handleDelete} />
         ))
       )}
 

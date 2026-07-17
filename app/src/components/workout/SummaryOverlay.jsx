@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { locName } from "@/lib/localize";
 
 function fmtDur(sec) {
   const m = String(Math.floor(sec / 60)).padStart(2, "0");
@@ -36,7 +37,7 @@ export function SummaryOverlay({ summaryData, onSave, onDiscard }) {
         {summaryData.exs.map((res, i) => (
           <div key={i} style={S.sumItem}>
             <span style={{ color: "var(--green)", fontSize: 14, flexShrink: 0 }}>✓</span>
-            <span style={{ flex: 1, fontSize: 14, color: "var(--text)", fontWeight: 500 }}>{res.name}</span>
+            <span style={{ flex: 1, fontSize: 14, color: "var(--text)", fontWeight: 500 }}>{locName(res)}</span>
             <span style={{ fontSize: 11, color: "var(--sub)" }}>{res.sets}×{res.kg ?? res.wt}kg · RPE {res.diff ?? res.rpe}</span>
           </div>
         ))}

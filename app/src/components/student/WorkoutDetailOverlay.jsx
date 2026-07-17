@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ChevronLeft } from "lucide-react";
+import { locName } from "@/lib/localize";
 import { S } from "@/components/student/shared";
 
 export function WorkoutDetailOverlay({ wk, onClose, onStart, onOpenExercise }) {
@@ -26,7 +27,7 @@ export function WorkoutDetailOverlay({ wk, onClose, onStart, onOpenExercise }) {
                   {ex.num && <span style={{ padding: "2px 8px", color: "#fff", fontWeight: 700, fontSize: 11, borderRadius: 6, background: wk.color }}>{ex.num}</span>}
                   {ex.mac && <span style={{ padding: "2px 8px", background: "var(--blue)", color: "#fff", fontWeight: 650, fontSize: 11, borderRadius: 6 }}>{t("common.machineN", { n: ex.mac })}</span>}
                 </div>
-                <span style={{ fontWeight: 600, color: "var(--text)" }}>{ex.name}</span>
+                <span style={{ fontWeight: 600, color: "var(--text)" }}>{locName(ex)}</span>
                 <span style={{ fontSize: 12, color: "var(--sub)" }}>{ex.sets} × {ex.reps} {t("workoutDetail.reps")}</span>
                 {ex.obs && <span style={{ fontSize: 11, color: "var(--sub)", fontStyle: "italic" }}>{ex.obs}</span>}
               </div>

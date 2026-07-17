@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { locName } from "@/lib/localize";
 
 export function SuggestionsCard({ suggestions }) {
   const { t } = useTranslation();
@@ -12,7 +13,7 @@ export function SuggestionsCard({ suggestions }) {
         {suggestions.map((s, idx) => (
           <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{s.name}</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{locName(s)}</span>
               <span style={{ fontSize: 11, color: "var(--sub)" }}>{t("workoutsTab.workoutLabel", { label: s.wkLabel, name: s.wkName })}</span>
             </div>
             <span style={{ fontSize: 13, fontWeight: 700 }}>

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Spinner, UserAvatar, Field } from "@/components/shared";
+import { locName, locGroup } from "@/lib/localize";
 import { X, Plus, Search, Trash2, ChevronRight, ChevronDown, Lock, KeyRound, Edit2, ChevronUp } from "lucide-react";
 
 const PALETTE = [
@@ -302,8 +303,8 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
                       border: "none", cursor: "pointer", color: "var(--text)", textAlign: "left",
                     }}
                   >
-                    <span style={{ fontSize: 13 }}>{ex.name}</span>
-                    <span style={{ fontSize: 11, color: "var(--sub)" }}>{ex.group}</span>
+                    <span style={{ fontSize: 13 }}>{locName(ex)}</span>
+                    <span style={{ fontSize: 11, color: "var(--sub)" }}>{locGroup(ex)}</span>
                   </button>
                 ))}
                 {filteredExs.length === 0 && (
@@ -321,9 +322,9 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                   <div>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{ex.name}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{locName(ex)}</span>
                     {ex.group && (
-                      <span style={{ fontSize: 11, color: "var(--sub)", marginLeft: 6 }}>{ex.group}</span>
+                      <span style={{ fontSize: 11, color: "var(--sub)", marginLeft: 6 }}>{locGroup(ex)}</span>
                     )}
                   </div>
                   <button
@@ -697,7 +698,7 @@ function StudentDetail({ uid, role: _role }) {
                                 padding: "6px 0",
                                 borderBottom: i < exCount - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
                               }}>
-                                <span style={{ fontSize: 13, color: "var(--text)" }}>{ex.name}</span>
+                                <span style={{ fontSize: 13, color: "var(--text)" }}>{locName(ex)}</span>
                                 <span style={{ fontSize: 11, color: "var(--sub)", flexShrink: 0, marginLeft: 8 }}>
                                   {ex.sets}×{ex.reps}{ex.wt > 0 ? ` · ${ex.wt}kg` : ""}
                                 </span>
