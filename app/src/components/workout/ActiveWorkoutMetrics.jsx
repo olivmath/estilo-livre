@@ -1,12 +1,14 @@
 // Reps + weight metric cards for the active workout screen.
 import { Pencil } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function ActiveWorkoutMetrics({ ex, currentSetIdx, currentWeight, onWeightClick, onSetsRepsClick }) {
+  const { t } = useTranslation();
   return (
     <div style={S.metricsRow}>
       <div style={S.metricCard}>
         <div style={S.cardHeader}>
-          <span style={S.mcLabel}>Repetições</span>
+          <span style={S.mcLabel}>{t("common.reps")}</span>
           <button onClick={onSetsRepsClick} style={S.editBtn}>
             <Pencil size={13} color="var(--acc)" />
           </button>
@@ -27,7 +29,7 @@ export function ActiveWorkoutMetrics({ ex, currentSetIdx, currentWeight, onWeigh
 
       <div style={S.metricCard}>
         <div style={S.cardHeader}>
-          <span style={S.mcLabel}>Carga</span>
+          <span style={S.mcLabel}>{t("common.weight")}</span>
           <button onClick={onWeightClick} style={S.editBtn}>
             <Pencil size={13} color="var(--acc)" />
           </button>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getDashboardStats } from "@/services/dashboard";
 import { Spinner } from "@/components/shared";
 
@@ -40,13 +41,13 @@ function WeekChart({ data }) {
   );
 }
 
-function timeAgo(date) {
+function timeAgo(date, t) {
   if (!date) return "";
   const ms = typeof date.toMillis === "function" ? date.toMillis() : new Date(date).getTime();
   const days = Math.floor((Date.now() - ms) / 86400000);
-  if (days === 0) return "hoje";
-  if (days === 1) return "1 dia atrás";
-  return `${days} dias atrás`;
+  if (days === 0) return t("dashboardPage.today");
+  if (days === 1) return t("dashboardPage.oneDayAgo");
+  return t("dashboardPage.daysAgo", { n: days });
 }
 
 function fmtDuration(secs) {
@@ -56,6 +57,7 @@ function fmtDuration(secs) {
 }
 
 export function DashboardPage() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -75,16 +77,16 @@ export function DashboardPage() {
   return (
     <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", marginBottom: 20 }}>
-        Dashboard
+        {t("dashboardPage.title")}
       </h1>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <KpiCard label="Total Alunos" value={stats.totalStudents} />
-        <KpiCard label="Sessões Hoje" value={stats.todaySessions} />
-        <KpiCard label="Sessões Semana" value={stats.weekSessions} />
+        <KpiCard label={t("dashboardPage.totalStudents")} value={stats.totalStudents} />
+        <KpiCard label={t("dashboardPage.todaySessions")} value={stats.todaySessions} />
+        <KpiCard label={t("dashboardPage.weekSessions")} value={stats.weekSessions} />
         <KpiCard
-          label="Inativos"
+          label={t("dashboardPage.inactive")}
           value={stats.inactiveCount}
           accent={stats.inactiveCount > 0}
         />
@@ -99,7 +101,7 @@ export function DashboardPage() {
           padding: 20,
         }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 16 }}>
-            Sessões — últimos 7 dias
+            {t("dashboardPage.sessionsLast7Days")}
           </p>
           <WeekChart data={stats.weekChart} />
         </div>
@@ -112,10 +114,10 @@ export function DashboardPage() {
           padding: 20,
         }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>
-            Alertas ({stats.alerts.length})
+            {t("dashboardPage.alerts")} ({stats.alerts.length})
           </p>
           {stats.alerts.length === 0 ? (
-            <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum alerta</p>
+            <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("dashboardPage.noAlerts")}</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {stats.alerts.map((a) => (
@@ -133,7 +135,7 @@ export function DashboardPage() {
                     background: a.daysAgo >= 30 ? "rgba(244,67,54,0.15)" : "rgba(245,196,0,0.12)",
                     color: a.daysAgo >= 30 ? "var(--red)" : "var(--acc)",
                   }}>
-                    {a.daysAgo != null ? `${a.daysAgo}d sem treinar` : "sem sessão"}
+                    {a.daysAgo != null ? t("dashboardPage.daysNoTraining", { n: a.daysAgo }) : t("dashboardPage.noSession")}
                   </span>
                 </div>
               ))}
@@ -151,10 +153,10 @@ export function DashboardPage() {
         marginTop: 20,
       }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>
-          Atividade Recente
+          {t("dashboardPage.recentActivity")}
         </p>
         {stats.recentActivity.length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhuma atividade ainda</p>
+          <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("dashboardPage.noActivity")}</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {stats.recentActivity.map((a, i) => (
@@ -179,13 +181,13 @@ export function DashboardPage() {
                     {a.studentName ?? a.name}
                   </p>
                   <p style={{ fontSize: 11, color: "var(--sub)" }}>
-                    {a.wkName ?? "Treino"}
+                    {a.wkName ?? t("dashboardPage.workout")}
                     {a.dur ? ` · ${fmtDuration(a.dur)}` : ""}
-                    {a.exs?.length ? ` · ${a.exs.length} exercício${a.exs.length !== 1 ? "s" : ""}` : ""}
+                    {a.exs?.length ? ` · ${a.exs.length} ${a.exs.length !== 1 ? t("common.exercise_other") : t("common.exercise_one")}` : ""}
                   </p>
                 </div>
                 <span style={{ fontSize: 11, color: "var(--sub)", flexShrink: 0 }}>
-                  {timeAgo(a.date)}
+                  {timeAgo(a.date, t)}
                 </span>
               </div>
             ))}

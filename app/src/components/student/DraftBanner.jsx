@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
 // Draft banner (paused workout) — compact alert bar, fully responsive
 export function DraftBanner({ draft, onResume, onStartFromScratch }) {
+  const { t } = useTranslation();
   const [confirmReset, setConfirmReset] = useState(false);
 
   const spacing = {
@@ -28,12 +30,12 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
           {draft.label} — {draft.name}
         </div>
         <div style={{ fontSize: "clamp(11px, 3vw, 14px)", color: "var(--sub)" }}>
-          {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} exercícios
+          {draft.results?.length ?? 0}/{draft.exercises?.length ?? 0} {t("common.exercises")}
         </div>
       </div>
 
       <Button size="sm" onClick={() => onResume(draft)} style={{ flexShrink: 0 }}>
-        Retomar
+        {t("common.resume")}
       </Button>
 
       <button
@@ -44,7 +46,7 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
           display: "flex", alignItems: "center", justifyContent: "center",
           cursor: "pointer", padding: 0,
         }}
-        aria-label="Fechar banner"
+        aria-label={t("draft.closeBanner")}
       >
         <X size={14} color="var(--sub)" />
       </button>
@@ -52,22 +54,22 @@ export function DraftBanner({ draft, onResume, onStartFromScratch }) {
       <Dialog open={confirmReset} onOpenChange={setConfirmReset}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>⚠️ Resetar treino?</DialogTitle>
+            <DialogTitle>⚠️ {t("draft.resetTitle")}</DialogTitle>
           </DialogHeader>
           <div style={{ marginBottom: spacing.sm }}>
             <div style={{ fontSize: "clamp(13px, 3.5vw, 16px)", fontWeight: 600, marginBottom: spacing.px, color: "var(--text)" }}>
               {draft.label} — {draft.name}
             </div>
             <div style={{ fontSize: "clamp(12px, 3vw, 15px)", color: "var(--sub)", lineHeight: 1.6 }}>
-              Vai deletar <strong>{draft.results?.length ?? 0} exercícios completados</strong> e recomeçar do zero.
+              {t("draft.resetMsg", { n: draft.results?.length ?? 0 })}
             </div>
           </div>
           <DialogFooter style={{ gap: spacing.px }}>
             <Button variant="outline" onClick={() => setConfirmReset(false)}>
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button variant="destructive" onClick={() => { setConfirmReset(false); onStartFromScratch(draft.id); }}>
-              Resetar
+              {t("draft.reset")}
             </Button>
           </DialogFooter>
         </DialogContent>

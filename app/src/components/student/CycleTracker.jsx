@@ -1,6 +1,9 @@
+import { useTranslation } from "react-i18next";
+
 // Row of workout-label dots + progress bar showing loop progress; reused by
 // HomeTab (full size, clickable) and WorkoutsTab (compact, display-only).
 export function CycleTracker({ workouts, cycleInfo, onSelect, size = 36 }) {
+  const { t } = useTranslation();
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, gap: 6 }}>
@@ -34,8 +37,8 @@ export function CycleTracker({ workouts, cycleInfo, onSelect, size = 36 }) {
           </div>
           <p style={{ fontSize: 12, color: "var(--sub)", textAlign: "center", marginTop: 8 }}>
             {cycleInfo.pct === 100
-              ? "🎉 Fique no loop!"
-              : cycleInfo.pct ? `${Math.round(cycleInfo.pct)}% concluído — não saia do loop!` : "Entre no loop!"}
+              ? `🎉 ${t("home.stayInLoop")}`
+              : cycleInfo.pct ? t("home.progressMsg", { pct: Math.round(cycleInfo.pct) }) : t("home.enterLoop")}
           </p>
         </>
       )}

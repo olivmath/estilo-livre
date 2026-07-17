@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
 // Horizontal dots showing workouts + current position with keyboard accessibility
 export function LoopDots({ workouts, cycleInfo, onSelect }) {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -12,7 +14,7 @@ export function LoopDots({ workouts, cycleInfo, onSelect }) {
         flexWrap: "wrap",
       }}
       role="group"
-      aria-label="Seletor de treinos"
+      aria-label={t("home.workoutSelector")}
     >
       {workouts.map((w, idx) => {
         const letter = w.label?.charAt(0).toUpperCase() || String.fromCharCode(65 + idx);
@@ -23,8 +25,8 @@ export function LoopDots({ workouts, cycleInfo, onSelect }) {
         if (isNext) variant = "default";
         if (isDone) variant = "secondary";
 
-        const status = isDone ? "concluído" : isNext ? "próximo" : "não iniciado";
-        const label = `Treino ${letter} — ${w.name} (${status})`;
+        const status = isDone ? t("common.done") : isNext ? t("common.next") : "";
+        const label = `${t("workoutsTab.workoutLabel", { label: letter, name: w.name })} (${status})`;
 
         return (
           <Button

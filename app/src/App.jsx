@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginScreen } from "@/screens/LoginScreen";
 import { PendingScreen } from "@/screens/PendingScreen";
@@ -12,13 +13,14 @@ import { RankingPage } from "@/pages/RankingPage";
 import { ContasPage } from "@/pages/ContasPage";
 
 function Spinner() {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4">
       <div
         className="w-10 h-10 rounded-full border-[3px] animate-spin"
         style={{ borderColor: "var(--bg3)", borderTopColor: "var(--acc)" }}
       />
-      <p className="text-sm" style={{ color: "var(--sub)" }}>Verificando acesso…</p>
+      <p className="text-sm" style={{ color: "var(--sub)" }}>{t("common.loading")}</p>
     </div>
   );
 }

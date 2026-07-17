@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Dumbbell, ListChecks } from "lucide-react";
 import { RestOverlay } from "@/components/workout/RestOverlay";
 import { RpeOverlay } from "@/components/workout/RpeOverlay";
@@ -23,6 +24,7 @@ export function ActiveWorkoutScreen({
   onSavePartial, onSwitchWorkout, onSelectExercise,
   onExitWithoutSave, onUpdateSetsReps,
 }) {
+  const { t } = useTranslation();
   const [videoEx, setVideoEx] = useState(null);
   const [weightOpen, setWeightOpen] = useState(false);
   const [setsRepsOpen, setSetsRepsOpen] = useState(false);
@@ -77,7 +79,7 @@ export function ActiveWorkoutScreen({
         <div style={S.exIcon}>
           {hasMachine ? (
             <>
-              <span style={{ fontSize: 8, color: "var(--sub)", fontWeight: 600, lineHeight: 1 }}>máq</span>
+              <span style={{ fontSize: 8, color: "var(--sub)", fontWeight: 600, lineHeight: 1 }}>{t("common.machine")}</span>
               <span style={{ fontSize: 14, color: "var(--acc)", fontWeight: 800, lineHeight: 1 }}>{ex.machine}</span>
             </>
           ) : (
@@ -100,7 +102,7 @@ export function ActiveWorkoutScreen({
       </div>
 
       <div style={{ padding: "10px 14px 26px", flexShrink: 0 }}>
-        <button onClick={onNextSet} style={S.ctaBtn}>Concluir Série</button>
+        <button onClick={onNextSet} style={S.ctaBtn}>{t("activeWorkout.completeSet")}</button>
       </div>
     </div>
   );

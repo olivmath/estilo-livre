@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -21,6 +22,7 @@ const GoogleIcon = () => (
 );
 
 export function LoginScreen() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
   const { notAuthorized, clearNotAuthorized } = useAuth();
@@ -61,12 +63,12 @@ export function LoginScreen() {
         <div style={styles.modalOverlay}>
           <div style={styles.modal}>
             <span style={styles.modalIcon}>🚫</span>
-            <h2 style={styles.modalTitle}>Acesso negado</h2>
+            <h2 style={styles.modalTitle}>{t("auth.accessDenied")}</h2>
             <p style={styles.modalBody}>
-              Sua conta não está cadastrada na academia. Entre em contato com o administrador.
+              {t("auth.notRegistered")}
             </p>
             <button style={styles.modalBtn} onClick={clearNotAuthorized}>
-              Voltar ao login
+              {t("auth.backToLogin")}
             </button>
           </div>
         </div>
@@ -79,8 +81,8 @@ export function LoginScreen() {
         </div>
 
         {/* Brand */}
-        <p style={styles.brandSub}>ACADEMIA</p>
-        <h1 style={styles.brandName}>ESTILO LIVRE</h1>
+        <p style={styles.brandSub}>{t("auth.academia")}</p>
+        <h1 style={styles.brandName}>{t("auth.estiloLivre")}</h1>
 
         {/* Divider */}
         <div style={styles.divider} />
@@ -100,11 +102,11 @@ export function LoginScreen() {
             ? <span style={styles.spinner} />
             : <GoogleIcon />
           }
-          <span>{loading ? "Entrando…" : "Continuar com Google"}</span>
+          <span>{loading ? t("auth.signingIn") : t("auth.continueGoogle")}</span>
         </button>
 
         <p style={styles.footnote}>
-          Apenas membros da academia têm acesso.
+          {t("auth.membersOnly")}
         </p>
 
         <p style={{ marginTop: 16, fontSize: 11, color: "var(--sub)", opacity: 0.4 }}>

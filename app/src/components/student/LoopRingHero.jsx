@@ -1,5 +1,8 @@
+import { useTranslation } from "react-i18next";
+
 // Loop ring progress indicator with centered number and label
 export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) {
+  const { t } = useTranslation();
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
   let progress = totalWorkouts > 0 ? (done.size / totalWorkouts) : 0;
@@ -52,7 +55,7 @@ export function LoopRingHero({ loopsCompleted, totalWorkouts, done, hasDraft }) 
           fill="var(--sub)"
           fontFamily="system-ui"
         >
-          loops feitos
+          {t("home.loopsDone")}
         </text>
       </svg>
     </div>

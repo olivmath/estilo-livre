@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { doc, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useTranslation } from "react-i18next";
 import { useWorkoutTimers } from "./useWorkoutTimers";
 import { useWorkoutDraft } from "./useWorkoutDraft";
 import { useSaveWorkoutSession } from "./useSaveWorkoutSession";
@@ -8,6 +9,7 @@ import { useUpdateSetsReps } from "./useUpdateSetsReps";
 import { lastWeightFor } from "./useWorkoutCycle";
 
 export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, reload, onSaved }) {
+  const { t } = useTranslation();
   const [activeWk, setActiveWk] = useState(null);
   const [restTime, setRestTime] = useState(null);
   const [restTotal, setRestTotal] = useState(null);
@@ -22,7 +24,7 @@ export function useActiveWorkoutSession({ user, workouts, sessions, setDraft, re
 
   const startWorkout = (wkId) => {
     const wk = workouts.find((w) => w.id === wkId);
-    if (!wk?.exercises?.length) return alert("Este treino não possui exercícios cadastrados.");
+    if (!wk?.exercises?.length) return alert(t("hooks.noExercises"));
     setActiveWk({
       id: wk.id,
       label: wk.label,

@@ -1,3 +1,5 @@
+import { getLocale } from "@/lib/i18n";
+
 // Style tokens shared by the student tab components (home/workouts/history/profile).
 export const S = {
   mobileContainer: {
@@ -20,8 +22,8 @@ export function diffColor(v) {
   return "var(--red)";
 }
 
-export function fmtDateFull(timestamp) {
-  return new Date(timestamp).toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" });
+export function fmtDateFull(timestamp, locale) {
+  return new Date(timestamp).toLocaleDateString(locale || getLocale(), { weekday: "short", day: "2-digit", month: "2-digit" });
 }
 
 export function fmtDur(sec) {

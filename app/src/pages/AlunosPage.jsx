@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   getStudents, createStudent,
@@ -31,28 +32,29 @@ const PALETTE = [
 ];
 
 const STATUS_COLORS = {
-  active:   { bg: "rgba(0,200,83,0.12)",  text: "var(--green)",  label: "Ativo" },
-  warning:  { bg: "rgba(245,196,0,0.12)", text: "var(--acc)",    label: "Atenção" },
-  inactive: { bg: "rgba(244,67,54,0.12)", text: "var(--red)",    label: "Inativo" },
-  blocked:  { bg: "rgba(121,134,203,0.15)", text: "var(--sub)",  label: "Bloqueado" },
+  active:   { bg: "rgba(0,200,83,0.12)",  text: "var(--green)",  labelKey: "common.active" },
+  warning:  { bg: "rgba(245,196,0,0.12)", text: "var(--acc)",    labelKey: "common.attention" },
+  inactive: { bg: "rgba(244,67,54,0.12)", text: "var(--red)",    labelKey: "common.inactive" },
+  blocked:  { bg: "rgba(121,134,203,0.15)", text: "var(--sub)",  labelKey: "common.blocked" },
 };
 
 const STATUS_FILTERS = ["todos", "active", "warning", "inactive", "blocked"];
-const STATUS_LABELS  = { todos: "Todos", ...Object.fromEntries(Object.entries(STATUS_COLORS).map(([k, v]) => [k, v.label])) };
 
 function StatusBadge({ status }) {
+  const { t } = useTranslation();
   const c = STATUS_COLORS[status] ?? STATUS_COLORS.inactive;
   return (
     <span style={{
       fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 20,
       background: c.bg, color: c.text,
     }}>
-      {c.label}
+      {t(c.labelKey)}
     </span>
   );
 }
 
 function NovoAlunoModal({ open, onClose, onCreated }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -78,18 +80,18 @@ function NovoAlunoModal({ open, onClose, onCreated }) {
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent side="bottom" style={{ maxWidth: 520, margin: "0 auto" }}>
         <SheetHeader>
-          <SheetTitle>Convidar Aluno</SheetTitle>
+          <SheetTitle>{t("alunosPage.inviteTitle")}</SheetTitle>
         </SheetHeader>
         <form onSubmit={submit} style={{ padding: "0 0 16px" }}>
           {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
-          <Field label="Email do aluno">
+          <Field label={t("alunosPage.studentEmail")}>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" required />
           </Field>
           <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 16 }}>
-            O aluno aparecerá na lista assim que fizer login com esse email pelo Google.
+            {t("alunosPage.inviteHint")}
           </p>
           <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
-            {loading ? "Enviando…" : "Adicionar à lista"}
+            {loading ? t("alunosPage.sending") : t("alunosPage.addToList")}
           </Button>
         </form>
       </SheetContent>
@@ -98,8 +100,9 @@ function NovoAlunoModal({ open, onClose, onCreated }) {
 }
 
 function RpeChart({ sessions }) {
+  const { t } = useTranslation();
   const withRpe = sessions.filter((s) => s.exercises?.some((e) => e.rpe > 0));
-  if (!withRpe.length) return <p style={{ fontSize: 13, color: "var(--sub)" }}>Sem dados de RPE</p>;
+  if (!withRpe.length) return <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("alunosPage.noRpeData")}</p>;
 
   const data = withRpe.slice(0, 10).reverse().map((s) => {
     const rpes = s.exercises?.map((e) => Number(e.rpe)).filter((r) => r > 0) ?? [];
@@ -127,6 +130,7 @@ function RpeChart({ sessions }) {
 const WORKOUT_EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [] };
 
 function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState(WORKOUT_EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -203,13 +207,13 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent side="bottom" style={{ maxWidth: 520, margin: "0 auto", maxHeight: "92vh", overflowY: "auto" }}>
         <SheetHeader>
-          <SheetTitle>{initial?.id ? "Editar Treino" : "Novo Treino Customizado"}</SheetTitle>
+          <SheetTitle>{initial?.id ? t("alunosPage.editWorkout") : t("alunosPage.newCustomWorkout")}</SheetTitle>
         </SheetHeader>
       <form onSubmit={submit} style={{ padding: "0 0 16px" }}>
         {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
         <div style={{ display: "grid", gridTemplateColumns: "64px 1fr", gap: 12 }}>
-          <Field label="Label">
+          <Field label={t("alunosPage.label")}>
             <Input
               value={form.label}
               onChange={(e) => set("label", e.target.value.toUpperCase().slice(0, 2))}
@@ -217,7 +221,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
               maxLength={2}
             />
           </Field>
-          <Field label="Nome">
+          <Field label={t("alunosPage.name")}>
             <Input
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
@@ -227,7 +231,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
           </Field>
         </div>
 
-        <Field label="Cor">
+        <Field label={t("alunosPage.color")}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {PALETTE.map((c) => (
               <button
@@ -247,7 +251,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <label style={{ fontSize: 12, color: "var(--sub)" }}>
-              Exercícios ({form.exercises.length})
+              {t("alunosPage.exercises")} ({form.exercises.length})
             </label>
             {!addingEx && (
               <button
@@ -255,7 +259,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
                 onClick={() => setAddingEx(true)}
                 style={{ background: "none", border: "none", cursor: "pointer", color: "var(--acc)", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}
               >
-                <Plus size={13} /> Adicionar
+                <Plus size={13} /> {t("alunosPage.add")}
               </button>
             )}
           </div>
@@ -269,7 +273,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
                     autoFocus
                     value={exSearch}
                     onChange={(e) => setExSearch(e.target.value)}
-                    placeholder="Buscar exercício…"
+                    placeholder={t("alunosPage.searchExercise")}
                     style={{
                       paddingLeft: 30,
                       background: "var(--bg2)", border: "1px solid var(--blue)",
@@ -303,7 +307,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
                   </button>
                 ))}
                 {filteredExs.length === 0 && (
-                  <p style={{ fontSize: 13, color: "var(--sub)", padding: "8px 0" }}>Nenhum exercício encontrado</p>
+                  <p style={{ fontSize: 13, color: "var(--sub)", padding: "8px 0" }}>{t("alunosPage.noExerciseFound")}</p>
                 )}
               </div>
             </div>
@@ -332,9 +336,9 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {[
-                    { k: "sets", label: "Séries" },
-                    { k: "reps", label: "Reps" },
-                    { k: "wt", label: "Peso (kg)" },
+                    { k: "sets", label: t("common.sets") },
+                    { k: "reps", label: t("common.reps") },
+                    { k: "wt", label: t("common.weightKg") },
                   ].map(({ k, label }) => (
                     <div key={k}>
                       <p style={{ fontSize: 10, color: "var(--sub)", marginBottom: 2 }}>{label}</p>
@@ -358,7 +362,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
         </div>
 
         <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
-          {loading ? "Salvando…" : initial?.id ? "Salvar Alterações" : "Criar Treino"}
+          {loading ? t("common.saving") : initial?.id ? t("alunosPage.saveChanges") : t("alunosPage.createWorkout")}
         </Button>
       </form>
       </SheetContent>
@@ -367,6 +371,7 @@ function WorkoutModal({ open, onClose, uid, initial, allExercises, onSaved }) {
 }
 
 function StudentDetail({ uid, role: _role }) {
+  const { t } = useTranslation();
   const [tab, setTab] = useState("progresso");
   const [stats, setStats] = useState(null);
   const [sessions, setSessions] = useState([]);
@@ -450,29 +455,32 @@ function StudentDetail({ uid, role: _role }) {
     <div>
       {/* Tabs */}
       <div style={{ display: "flex", gap: 4, marginBottom: 20, background: "var(--bg3)", borderRadius: 8, padding: 4 }}>
-        {["progresso", "treinos"].map((t) => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            flex: 1, padding: "8px 0", borderRadius: 6, border: "none",
-            background: tab === t ? "var(--blue2)" : "transparent",
-            color: tab === t ? "var(--text)" : "var(--sub)",
-            fontSize: 13, fontWeight: tab === t ? 600 : 400, cursor: "pointer",
-            textTransform: "capitalize",
-          }}>
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
+        {["progresso", "treinos"].map((tabKey) => {
+          const TAB_LABELS = { progresso: t("alunosPage.progress"), treinos: t("alunosPage.workouts") };
+          return (
+            <button key={tabKey} onClick={() => setTab(tabKey)} style={{
+              flex: 1, padding: "8px 0", borderRadius: 6, border: "none",
+              background: tab === tabKey ? "var(--blue2)" : "transparent",
+              color: tab === tabKey ? "var(--text)" : "var(--sub)",
+              fontSize: 13, fontWeight: tab === tabKey ? 600 : 400, cursor: "pointer",
+              textTransform: "capitalize",
+            }}>
+              {TAB_LABELS[tabKey]}
+            </button>
+          );
+        })}
       </div>
 
       {tab === "progresso" && (
         <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
             {[
-              { label: "Total Sessões", value: stats?.totalSessions ?? 0 },
-              { label: "Semana", value: stats?.weekSessions ?? 0 },
-              { label: "Mês", value: stats?.monthSessions ?? 0 },
-              { label: "Dias s/ treinar", value: stats?.daysLastWorkout ?? "—" },
-              { label: "RPE médio", value: stats?.avgRpe != null ? stats.avgRpe.toFixed(1) : "—" },
-              { label: "Loops", value: stats?.cycles ?? 0 },
+              { label: t("alunosPage.totalSessions"), value: stats?.totalSessions ?? 0 },
+              { label: t("alunosPage.week"), value: stats?.weekSessions ?? 0 },
+              { label: t("alunosPage.month"), value: stats?.monthSessions ?? 0 },
+              { label: t("alunosPage.daysNoTraining"), value: stats?.daysLastWorkout ?? "—" },
+              { label: t("alunosPage.avgRpe"), value: stats?.avgRpe != null ? stats.avgRpe.toFixed(1) : "—" },
+              { label: t("profileTab.loops"), value: stats?.cycles ?? 0 },
             ].map((c) => (
               <div key={c.label} style={{
                 background: "var(--bg3)", borderRadius: 8, padding: "10px 12px", textAlign: "center",
@@ -484,13 +492,13 @@ function StudentDetail({ uid, role: _role }) {
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 8 }}>RPE (últimas sessões)</p>
+            <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 8 }}>{t("alunosPage.rpeLast")}</p>
             <RpeChart sessions={sessions} />
           </div>
 
-          <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 8 }}>Últimas sessões</p>
+          <p style={{ fontSize: 12, color: "var(--sub)", marginBottom: 8 }}>{t("alunosPage.lastSessions")}</p>
           {sessions.length === 0 ? (
-            <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhuma sessão registrada</p>
+            <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("alunosPage.noSessions")}</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {sessions.map((s) => {
@@ -501,9 +509,9 @@ function StudentDetail({ uid, role: _role }) {
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                     padding: "8px 12px", background: "var(--bg3)", borderRadius: 8,
                   }}>
-                    <span style={{ fontSize: 13, color: "var(--text)" }}>{s.wkName ?? "Treino"}</span>
+                    <span style={{ fontSize: 13, color: "var(--text)" }}>{s.wkName ?? t("dashboardPage.workout")}</span>
                     <span style={{ fontSize: 11, color: "var(--sub)" }}>
-                      {days === 0 ? "hoje" : `${days}d atrás`}
+                      {days === 0 ? t("dashboardPage.today") : t("dashboardPage.daysAgo", { n: days })}
                     </span>
                   </div>
                 );
@@ -521,7 +529,7 @@ function StudentDetail({ uid, role: _role }) {
               onClick={() => setAssignOpen((p) => !p)}
               style={{ flex: 1 }}
             >
-              Atribuir Treino
+              {t("alunosPage.assignWorkout")}
             </Button>
             <Button
               size="sm"
@@ -529,7 +537,7 @@ function StudentDetail({ uid, role: _role }) {
               onClick={() => { setWkEditing(null); setWkModal(true); }}
               style={{ flex: 1 }}
             >
-              Novo Customizado
+              {t("alunosPage.newCustom")}
             </Button>
           </div>
 
@@ -539,7 +547,7 @@ function StudentDetail({ uid, role: _role }) {
               background: "var(--bg3)", borderRadius: 10, padding: 12, marginBottom: 12,
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <p style={{ fontSize: 12, color: "var(--sub)", fontWeight: 600 }}>Selecione um template</p>
+                <p style={{ fontSize: 12, color: "var(--sub)", fontWeight: 600 }}>{t("alunosPage.selectTemplate")}</p>
                 <button
                   onClick={() => setAssignOpen(false)}
                   style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)" }}
@@ -548,38 +556,38 @@ function StudentDetail({ uid, role: _role }) {
                 </button>
               </div>
               {treinos.length === 0 ? (
-                <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum template criado</p>
+                <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("alunosPage.noTemplates")}</p>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {treinos.map((t) => (
+                  {treinos.map((tmpl) => (
                     <button
-                      key={t.id}
-                      onClick={() => handleAssign(t.id)}
+                      key={tmpl.id}
+                      onClick={() => handleAssign(tmpl.id)}
                       disabled={assigning !== null}
                       style={{
                         display: "flex", alignItems: "center", gap: 10,
                         padding: "10px 12px", background: "var(--bg2)",
                         borderRadius: 8, border: "1px solid var(--blue)",
-                        borderLeft: `3px solid ${t.color ?? "var(--blue)"}`,
+                        borderLeft: `3px solid ${tmpl.color ?? "var(--blue)"}`,
                         cursor: assigning ? "default" : "pointer",
                         color: "var(--text)", textAlign: "left",
-                        opacity: assigning === t.id ? 0.6 : 1,
+                        opacity: assigning === tmpl.id ? 0.6 : 1,
                       }}
                     >
                       <span style={{
                         fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 20,
-                        background: `${t.color ?? "var(--blue)"}22`, color: t.color ?? "var(--sub)",
+                        background: `${tmpl.color ?? "var(--blue)"}22`, color: tmpl.color ?? "var(--sub)",
                         flexShrink: 0,
                       }}>
-                        {t.label}
+                        {tmpl.label}
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{t.name}</p>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{tmpl.name}</p>
                         <p style={{ fontSize: 11, color: "var(--sub)" }}>
-                          {t.exercises?.length ?? 0} exercício{(t.exercises?.length ?? 0) !== 1 ? "s" : ""}
+                          {t("alunosPage.exerciseCount", { n: tmpl.exercises?.length ?? 0 })}
                         </p>
                       </div>
-                      {assigning === t.id && (
+                      {assigning === tmpl.id && (
                         <div className="w-4 h-4 rounded-full border-2 animate-spin"
                           style={{ borderColor: "var(--bg3)", borderTopColor: "var(--acc)", flexShrink: 0 }} />
                       )}
@@ -592,7 +600,7 @@ function StudentDetail({ uid, role: _role }) {
 
           {/* Workout list */}
           {workouts.length === 0 ? (
-            <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhuma ficha atribuída</p>
+            <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("alunosPage.noWorkouts")}</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {workouts.map((w) => {
@@ -625,14 +633,14 @@ function StudentDetail({ uid, role: _role }) {
                               {w.label}
                             </span>
                             {!w.fromTemplateId && (
-                              <span style={{ fontSize: 10, color: "var(--sub)" }}>customizado</span>
+                              <span style={{ fontSize: 10, color: "var(--sub)" }}>{t("alunosPage.custom")}</span>
                             )}
                           </div>
                           <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {w.name}
                           </p>
                           <p style={{ fontSize: 11, color: "var(--sub)" }}>
-                            {exCount} exercício{exCount !== 1 ? "s" : ""}
+                            {t("alunosPage.exerciseCount", { n: exCount })}
                           </p>
                         </div>
                         <span style={{
@@ -647,7 +655,7 @@ function StudentDetail({ uid, role: _role }) {
                         <button
                           onClick={() => handleMoveWk(w.id, "up")}
                           disabled={workouts.indexOf(w) === 0}
-                          title="Mover para cima"
+                          title={t("alunosPage.moveUp")}
                           style={{ background: "none", border: "none", cursor: workouts.indexOf(w) === 0 ? "default" : "pointer", color: "var(--sub)", padding: 6, opacity: workouts.indexOf(w) === 0 ? 0.3 : 1 }}
                         >
                           <ChevronUp size={13} />
@@ -655,21 +663,21 @@ function StudentDetail({ uid, role: _role }) {
                         <button
                           onClick={() => handleMoveWk(w.id, "down")}
                           disabled={workouts.indexOf(w) === workouts.length - 1}
-                          title="Mover para baixo"
+                          title={t("alunosPage.moveDown")}
                           style={{ background: "none", border: "none", cursor: workouts.indexOf(w) === workouts.length - 1 ? "default" : "pointer", color: "var(--sub)", padding: 6, opacity: workouts.indexOf(w) === workouts.length - 1 ? 0.3 : 1 }}
                         >
                           <ChevronDown size={13} />
                         </button>
                         <button
                           onClick={() => { setWkEditing(w); setWkModal(true); }}
-                          title="Editar"
+                          title={t("common.edit")}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)", padding: 6 }}
                         >
                           <Edit2 size={13} />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(w.id)}
-                          title="Remover"
+                          title={t("alunosPage.remove")}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)", padding: 6 }}
                         >
                           <Trash2 size={13} />
@@ -680,7 +688,7 @@ function StudentDetail({ uid, role: _role }) {
                     {expanded && (
                       <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "8px 14px 12px" }}>
                         {exCount === 0 ? (
-                          <p style={{ fontSize: 12, color: "var(--sub)" }}>Nenhum exercício — clique em editar para adicionar</p>
+                          <p style={{ fontSize: 12, color: "var(--sub)" }}>{t("alunosPage.noExercisesEdit")}</p>
                         ) : (
                           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                             {w.exercises.map((ex, i) => (
@@ -719,15 +727,15 @@ function StudentDetail({ uid, role: _role }) {
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover ficha?</AlertDialogTitle>
+            <AlertDialogTitle>{t("alunosPage.removeWorkoutTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O histórico de sessões é preservado.
+              {t("alunosPage.removeWorkoutDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteWk} style={{ background: "var(--red)" }}>
-              Remover
+              {t("alunosPage.remove")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -737,6 +745,7 @@ function StudentDetail({ uid, role: _role }) {
 }
 
 export function AlunosPage() {
+  const { t } = useTranslation();
   const { role } = useAuth();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -822,9 +831,9 @@ export function AlunosPage() {
   }
 
   const bulkLabels = {
-    block:   { title: "Bloquear alunos selecionados?",   desc: (n) => `${n} aluno${n > 1 ? "s" : ""} perderá${n > 1 ? "ão" : ""} acesso ao app.`,    action: "Bloquear",    danger: true  },
-    unblock: { title: "Liberar alunos selecionados?",      desc: (n) => `${n} aluno${n > 1 ? "s" : ""} voltará${n > 1 ? "ão" : ""} a ter acesso.`,       action: "Liberar",     danger: false },
-    delete:  { title: "Deletar alunos?",     desc: (n) => `Esta ação não pode ser desfeita. ${n} aluno${n > 1 ? "s" : ""} será${n > 1 ? "ão" : ""} removido${n > 1 ? "s" : ""}.`, action: "Deletar", danger: true },
+    block:   { title: t("alunosPage.bulkBlockTitle"),   desc: (n) => t("alunosPage.bulkBlockDesc", { n }),   action: t("common.block"),   danger: true  },
+    unblock: { title: t("alunosPage.bulkUnblockTitle"), desc: (n) => t("alunosPage.bulkUnblockDesc", { n }), action: t("common.unblock"), danger: false },
+    delete:  { title: t("alunosPage.bulkDeleteTitle"),  desc: (n) => t("alunosPage.bulkDeleteDesc", { n }),  action: t("common.delete"),  danger: true  },
   };
 
   if (loading) return <Spinner />;
@@ -837,9 +846,9 @@ export function AlunosPage() {
   return (
     <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Alunos</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{t("alunosPage.title")}</h1>
         <Button size="sm" onClick={() => setNovoOpen(true)}>
-          <Plus size={15} /> Novo Aluno
+          <Plus size={15} /> {t("alunosPage.newStudent")}
         </Button>
       </div>
 
@@ -848,7 +857,7 @@ export function AlunosPage() {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por nome ou email…"
+          placeholder={t("alunosPage.searchPlaceholder")}
           style={{
             paddingLeft: 36,
             background: "var(--bg2)", border: "1px solid var(--blue)",
@@ -865,7 +874,13 @@ export function AlunosPage() {
             background: statusFilter === f ? "var(--acc)" : "var(--bg3)",
             color: statusFilter === f ? "#000" : "var(--sub)",
           }}>
-            {STATUS_LABELS[f]}
+            {{
+              todos: t("alunosPage.all"),
+              active: t("common.active"),
+              warning: t("common.attention"),
+              inactive: t("common.inactive"),
+              blocked: t("common.blocked"),
+            }[f]}
           </button>
         ))}
 
@@ -884,7 +899,7 @@ export function AlunosPage() {
                 transition: "background .15s, border-color .15s",
               }}
             >
-              Ações
+              {t("alunosPage.actions")}
               {nSelected > 0 && (
                 <span style={{
                   background: "rgba(255,255,255,0.15)", borderRadius: 10,
@@ -908,13 +923,13 @@ export function AlunosPage() {
                 onClick={() => setBulkConfirm({ action: "block", uids: [...selected] })}
                 style={{ color: "var(--text)", borderRadius: 7, padding: "8px 12px", cursor: "pointer" }}
               >
-                <Lock size={13} style={{ color: "var(--acc)" }} /> Bloquear
+                <Lock size={13} style={{ color: "var(--acc)" }} /> {t("common.block")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setBulkConfirm({ action: "unblock", uids: [...selected] })}
                 style={{ color: "var(--text)", borderRadius: 7, padding: "8px 12px", cursor: "pointer" }}
               >
-                <KeyRound size={13} style={{ color: "var(--green)" }} /> Liberar
+                <KeyRound size={13} style={{ color: "var(--green)" }} /> {t("common.unblock")}
               </DropdownMenuItem>
               {role === "admin" && (
                 <>
@@ -923,7 +938,7 @@ export function AlunosPage() {
                     onClick={() => setBulkConfirm({ action: "delete", uids: [...selected] })}
                     style={{ color: "var(--red)", borderRadius: 7, padding: "8px 12px", cursor: "pointer" }}
                   >
-                    <Trash2 size={13} /> Deletar
+                    <Trash2 size={13} /> {t("common.delete")}
                   </DropdownMenuItem>
                 </>
               )}
@@ -933,7 +948,7 @@ export function AlunosPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum aluno encontrado</p>
+        <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("alunosPage.noStudents")}</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "4px 14px" }}>
@@ -958,7 +973,7 @@ export function AlunosPage() {
               )}
             </button>
             <span style={{ fontSize: 11, color: "var(--sub)" }}>
-              {nSelected > 0 ? `${nSelected} selecionado${nSelected > 1 ? "s" : ""}` : "Selecionar todos"}
+              {nSelected > 0 ? t("alunosPage.selectedCount", { n: nSelected }) : t("alunosPage.selectAll")}
             </span>
           </div>
 
@@ -1005,7 +1020,7 @@ export function AlunosPage() {
                 <div style={{ display: "flex", gap: 16, alignItems: "center" }} className="hidden sm:flex">
                   <div style={{ textAlign: "center" }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{st?.weekSessions ?? "—"}</p>
-                    <p style={{ fontSize: 10, color: "var(--sub)" }}>sess/sem</p>
+                    <p style={{ fontSize: 10, color: "var(--sub)" }}>{t("alunosPage.sessPerWeek")}</p>
                   </div>
                   <div style={{ textAlign: "center" }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{st?.avgRpe != null ? st.avgRpe.toFixed(1) : "—"}</p>
@@ -1043,13 +1058,13 @@ export function AlunosPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={bulkLoading}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={bulkLoading}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={executeBulk}
               disabled={bulkLoading}
               style={bulkConfirm && bulkLabels[bulkConfirm.action].danger ? { background: "var(--red)" } : {}}
             >
-              {bulkLoading ? "Aguarde…" : bulkConfirm && bulkLabels[bulkConfirm.action].action}
+              {bulkLoading ? t("alunosPage.wait") : bulkConfirm && bulkLabels[bulkConfirm.action].action}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,9 +1,12 @@
 // Header of the active workout screen: tap to open the workout switcher.
+import { useTranslation } from "react-i18next";
+
 export function ActiveWorkoutTopNav({ label, name, elapsedTime, onSwitchClick, onShowExit }) {
+  const { t } = useTranslation();
   return (
     <div style={S.topnav}>
       <button onClick={onSwitchClick} style={S.switchBtn}>
-        <span style={S.label}>Treino {label}</span>
+        <span style={S.label}>{t("workoutDetail.workoutLabel", { label })}</span>
         <span style={S.name}>{name}</span>
       </button>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

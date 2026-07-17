@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { Dumbbell } from "lucide-react";
 
 export function ExerciseCard({ item, currentSet, onVideoClick, onSelect }) {
+  const { t } = useTranslation();
   const { status, name, sets, reps, machine, result } = item;
   const isDone = status === "done";
   const isCurrent = status === "current";
@@ -30,7 +32,7 @@ export function ExerciseCard({ item, currentSet, onVideoClick, onSelect }) {
           <span style={{ fontSize: 13, color: "var(--green)", fontWeight: 700, lineHeight: 1 }}>✓</span>
         ) : hasMachine ? (
           <>
-            <span style={{ fontSize: 7, color: "var(--sub)", fontWeight: 600, letterSpacing: 0.3, lineHeight: 1 }}>máq</span>
+            <span style={{ fontSize: 7, color: "var(--sub)", fontWeight: 600, letterSpacing: 0.3, lineHeight: 1 }}>{t("common.machine")}</span>
             <span style={{ fontSize: 12, color: "var(--acc)", fontWeight: 800, lineHeight: 1 }}>{machine}</span>
           </>
         ) : (
@@ -51,7 +53,7 @@ export function ExerciseCard({ item, currentSet, onVideoClick, onSelect }) {
           fontSize: 10, letterSpacing: 0.2,
           color: isDone ? "rgba(0,200,83,0.55)" : isCurrent ? "rgba(245,196,0,0.65)" : "var(--blue2)",
         }}>
-          {isDone ? `${sets}×${result?.wt ?? 0}kg` : isCurrent ? `Série ${currentSet}/${sets}` : `${sets}×${reps}`}
+          {isDone ? `${sets}×${result?.wt ?? 0}kg` : isCurrent ? t("activeWorkout.setProgress", { current: currentSet, total: sets }) : `${sets}×${reps}`}
         </span>
       </div>
 

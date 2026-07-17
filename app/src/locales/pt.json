@@ -1,0 +1,408 @@
+{
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "edit": "Editar",
+    "delete": "Deletar",
+    "logout": "Sair",
+    "loading": "Verificando acesso...",
+    "exercises": "exercícios",
+    "exercise_one": "exercício",
+    "exercise_other": "exercícios",
+    "sets": "Séries",
+    "reps": "Repetições",
+    "weight": "Carga",
+    "weightKg": "Peso (kg)",
+    "machine": "maq",
+    "machineN": "Maq. {{n}}",
+    "machineFull": "Máquina {{n}}",
+    "dumbbells": "Alteres",
+    "freeWeight": "Livre",
+    "equipment": "Equipamento",
+    "min": "{{n}} min",
+    "athlete": "Atleta",
+    "next": "Próximo",
+    "done": "Concluído",
+    "active": "Ativo",
+    "attention": "Atenção",
+    "inactive": "Inativo",
+    "blocked": "Bloqueado",
+    "block": "Bloquear",
+    "unblock": "Liberar",
+    "search": "Buscar",
+    "noResults": "Nenhum resultado",
+    "error": "Erro",
+    "success": "Sucesso",
+    "resume": "Retomar"
+  },
+
+  "roles": {
+    "admin": "Administrador",
+    "professor": "Professor",
+    "aluno": "Aluno",
+    "pendente": "Pendente"
+  },
+
+  "auth": {
+    "accessDenied": "Acesso negado",
+    "notRegistered": "Sua conta não está cadastrada na academia. Entre em contato com o administrador.",
+    "backToLogin": "Voltar ao login",
+    "academia": "ACADEMIA",
+    "estiloLivre": "ESTILO LIVRE",
+    "signingIn": "Entrando...",
+    "continueGoogle": "Continuar com Google",
+    "membersOnly": "Apenas membros da academia têm acesso.",
+    "emailNotRegistered": "Seu email não está cadastrado na academia.",
+    "verifyError": "Não foi possível verificar seu acesso. Tente novamente."
+  },
+
+  "hello": {
+    "welcome": "Bem vindo,",
+    "accessThe": "Acesse o {{desc}}.",
+    "enterApp": "Entrar no app ->",
+    "pendingAccess": "Seu acesso ainda não foi liberado. Fale com o administrador.",
+    "logoutAccount": "Sair da conta",
+    "adminDesc": "painel administrativo",
+    "profDesc": "área do professor",
+    "studentDesc": "app de treinos"
+  },
+
+  "pending": {
+    "title": "Acesso Pendente",
+    "message": "Sua conta está aguardando aprovação da academia. Assim que o professor liberar seu acesso, você poderá entrar.",
+    "logout": "Sair"
+  },
+
+  "nav": {
+    "home": "Início",
+    "workouts": "Treinos",
+    "history": "Histórico",
+    "profile": "Perfil"
+  },
+
+  "home": {
+    "greeting": "Bom treino, {{name}}",
+    "academyName": "ACADEMIA ESTILO LIVRE",
+    "editProfile": "Editar perfil de {{name}}",
+    "noWorkouts": "Sem treinos atribuídos pelo professor. Fale com seu instrutor.",
+    "loopsDone": "loops feitos",
+    "workoutSelector": "Seletor de treinos",
+    "stayInLoop": "Fique no loop!",
+    "progressMsg": "{{pct}}% concluído — não saia do loop!",
+    "enterLoop": "Entre no loop!"
+  },
+
+  "draft": {
+    "closeBanner": "Fechar banner",
+    "resetTitle": "Resetar treino?",
+    "resetMsg": "Vai deletar {{n}} exercícios completados e recomeçar do zero.",
+    "reset": "Resetar"
+  },
+
+  "workoutsTab": {
+    "title": "Meus Treinos",
+    "workoutLabel": "Treino {{label}} — {{name}}",
+    "exerciseCount": "{{n}} exercícios"
+  },
+
+  "historyTab": {
+    "title": "Histórico de Treinos",
+    "avgDiff": "dif. média",
+    "empty": "Nenhum treino realizado ainda. Seus treinos salvos aparecerão aqui!"
+  },
+
+  "profileTab": {
+    "title": "Meu Perfil",
+    "specialAthlete": "Aluno Especial",
+    "completeSessions": "Sessões completas",
+    "loops": "Loops",
+    "logoutApp": "Sair do Aplicativo",
+    "language": "Idioma",
+    "languagePt": "Português",
+    "languageEn": "English",
+    "languageEs": "Español"
+  },
+
+  "workoutDetail": {
+    "workoutLabel": "Treino {{label}}",
+    "reps": "repetições",
+    "startWorkout": "Iniciar Treino"
+  },
+
+  "sessionReport": {
+    "title": "TREINO REALIZADO",
+    "duration": "Duração",
+    "volume": "Volume",
+    "avgDiff": "Dif. média",
+    "setsXReps": "séries x reps",
+    "updateError": "Erro ao atualizar treino. Tente novamente."
+  },
+
+  "sessionEdit": {
+    "title": "EDITAR TREINO",
+    "rpe": "RPE"
+  },
+
+  "editWeight": {
+    "title": "Ajustar Carga",
+    "description": "Defina a carga padrão de:",
+    "saveError": "Erro ao salvar carga."
+  },
+
+  "suggestions": {
+    "title": "Sugestões de Progressão"
+  },
+
+  "trend": {
+    "title": "Intensidade do treino",
+    "details": "detalhes",
+    "currentValue": "Valor atual",
+    "avgValue": "Valor médio",
+    "sessions": "sessões",
+    "rpe": "RPE",
+    "movingAvg": "Média móvel (3)",
+    "progression": "Progressão (<=6)",
+    "increaseWeight": "Aumentar carga"
+  },
+
+  "rpeTutorial": {
+    "title": "Entendendo o gráfico",
+    "whatIsRpe": "O que é RPE?",
+    "perceivedEffort": "Esforço Percebido",
+    "noEffort": "sem esforço",
+    "maximum": "máximo",
+    "easy": "fácil, poderia continuar por horas",
+    "moderate": "moderado, desafiador mas controlado",
+    "intense": "intenso, perto do limite",
+    "rpeAvg": "média do RPE",
+    "evolving": "Evoluindo",
+    "surpassing": "se superando",
+    "green": "verde",
+    "keepItUp": "Continue assim!",
+    "increaseWeight": "Aumentar carga",
+    "red": "vermelho",
+    "increaseWeightTip": "Aumente o peso em 2.5kg nos exercícios sugeridos",
+    "previous": "Anterior",
+    "nextStep": "Próximo"
+  },
+
+  "activeWorkout": {
+    "completeSet": "Concluir Série",
+    "transition": "Transição",
+    "rest": "Descanse",
+    "nextExercise": "Próximo: {{name}}",
+    "skipRest": "Pular descanso ->",
+    "setProgress": "Série {{current}}/{{total}}",
+    "seeExercise": "Ver exercício"
+  },
+
+  "rpe": {
+    "howWasIt": "Como foi?",
+    "allSetsCompleted": "todas as séries concluídas",
+    "easy": "Fácil",
+    "medium": "Médio",
+    "max": "Máximo",
+    "labels": ["Muito fácil", "Fácil", "Leve", "Moderado leve", "Moderado", "Moderado intenso", "Intenso", "Muito intenso", "Exaustivo", "Quase máximo", "Máximo"]
+  },
+
+  "summary": {
+    "title": "Treino Concluído!",
+    "time": "Tempo",
+    "exercises": "Exercícios",
+    "sets": "Séries",
+    "discard": "Descartar",
+    "saveAndExit": "Salvar e Sair"
+  },
+
+  "exit": {
+    "title": "Sair do treino?",
+    "message": "Seu progresso será salvo para continuar depois.",
+    "backToWorkout": "Voltar ao treino",
+    "continueLater": "Continuar depois",
+    "exitWithoutSaving": "Sair sem salvar"
+  },
+
+  "setsReps": {
+    "title": "Séries & Repetições"
+  },
+
+  "switchWorkout": {
+    "title": "Trocar de treino",
+    "message": "Seu progresso atual será salvo para continuar depois.",
+    "current": "atual"
+  },
+
+  "exerciseDrawer": {
+    "title": "Exercícios"
+  },
+
+  "video": {
+    "comingSoon": "Vídeo disponível em breve",
+    "tips": "Dicas de execução",
+    "tip1": "Mantenha a postura alinhada durante todo o movimento",
+    "tip2": "Controle a descida (fase excêntrica) — não deixe o peso cair",
+    "tip3": "Respire: inspire na descida, expire no esforço"
+  },
+
+  "hooks": {
+    "photoUpdated": "Foto atualizada com sucesso!",
+    "photoError": "Erro ao atualizar foto de perfil.",
+    "saveWorkoutError": "Erro ao salvar treino. Tente novamente.",
+    "noExercises": "Este treino não possui exercícios cadastrados."
+  },
+
+  "dashboard": {
+    "navDashboard": "Dashboard",
+    "navStudents": "Alunos",
+    "navExercises": "Exercícios",
+    "navWorkouts": "Treinos",
+    "navRanking": "Ranking",
+    "navAccounts": "Contas"
+  },
+
+  "dashboardPage": {
+    "title": "Dashboard",
+    "totalStudents": "Total Alunos",
+    "todaySessions": "Sessões Hoje",
+    "weekSessions": "Sessões Semana",
+    "inactive": "Inativos",
+    "sessionsLast7Days": "Sessões — últimos 7 dias",
+    "alerts": "Alertas",
+    "noAlerts": "Nenhum alerta",
+    "daysNoTraining": "{{n}}d sem treinar",
+    "noSession": "sem sessão",
+    "recentActivity": "Atividade Recente",
+    "noActivity": "Nenhuma atividade ainda",
+    "today": "hoje",
+    "oneDayAgo": "1 dia atrás",
+    "daysAgo": "{{n}} dias atrás",
+    "workout": "Treino"
+  },
+
+  "alunosPage": {
+    "title": "Alunos",
+    "newStudent": "Novo Aluno",
+    "searchPlaceholder": "Buscar por nome ou email…",
+    "all": "Todos",
+    "actions": "Ações",
+    "noStudents": "Nenhum aluno encontrado",
+    "selectAll": "Selecionar todos",
+    "selectedCount": "{{n}} selecionado(s)",
+    "sessPerWeek": "sess/sem",
+    "inviteTitle": "Convidar Aluno",
+    "studentEmail": "Email do aluno",
+    "inviteHint": "O aluno aparecerá na lista assim que fizer login com esse email pelo Google.",
+    "sending": "Enviando…",
+    "addToList": "Adicionar à lista",
+    "noRpeData": "Sem dados de RPE",
+    "editWorkout": "Editar Treino",
+    "newCustomWorkout": "Novo Treino Customizado",
+    "add": "Adicionar",
+    "searchExercise": "Buscar exercício…",
+    "noExerciseFound": "Nenhum exercício encontrado",
+    "saveChanges": "Salvar Alterações",
+    "createWorkout": "Criar Treino",
+    "progress": "Progresso",
+    "workouts": "Treinos",
+    "totalSessions": "Total Sessões",
+    "week": "Semana",
+    "month": "Mês",
+    "daysNoTraining": "Dias s/ treinar",
+    "avgRpe": "RPE médio",
+    "rpeLast": "RPE (últimas sessões)",
+    "lastSessions": "Últimas sessões",
+    "noSessions": "Nenhuma sessão registrada",
+    "assignWorkout": "Atribuir Treino",
+    "newCustom": "Novo Customizado",
+    "selectTemplate": "Selecione um template",
+    "noTemplates": "Nenhum template criado",
+    "custom": "customizado",
+    "noWorkouts": "Nenhuma ficha atribuída",
+    "noExercisesEdit": "Nenhum exercício — clique em editar para adicionar",
+    "removeWorkoutTitle": "Remover ficha?",
+    "removeWorkoutDesc": "Esta ação não pode ser desfeita. O histórico de sessões é preservado.",
+    "remove": "Remover",
+    "moveUp": "Mover para cima",
+    "moveDown": "Mover para baixo",
+    "bulkBlockTitle": "Bloquear alunos selecionados?",
+    "bulkBlockDesc": "{{n}} aluno(s) perderá(ão) acesso ao app.",
+    "bulkUnblockTitle": "Liberar alunos selecionados?",
+    "bulkUnblockDesc": "{{n}} aluno(s) voltará(ão) a ter acesso.",
+    "bulkDeleteTitle": "Deletar alunos?",
+    "bulkDeleteDesc": "Esta ação não pode ser desfeita. {{n}} aluno(s) será(ão) removido(s).",
+    "wait": "Aguarde…",
+    "exerciseCount": "{{n}} exercício(s)",
+    "label": "Label",
+    "name": "Nome",
+    "color": "Cor",
+    "exercises": "Exercícios"
+  },
+
+  "exerciciosPage": {
+    "title": "Exercícios",
+    "new": "Novo",
+    "editExercise": "Editar Exercício",
+    "newExercise": "Novo Exercício",
+    "name": "Nome",
+    "namePlaceholder": "Ex: Supino Reto",
+    "machineLabel": "Máquina / Equipamento (opcional)",
+    "machinePlaceholder": "Ex: Banco livre, Halter",
+    "muscleGroup": "Grupo Muscular",
+    "usesDumbbells": "Usa alteres (halter)",
+    "noExercises": "Nenhum exercício cadastrado",
+    "confirmDelete": "Deletar exercício?"
+  },
+
+  "treinosPage": {
+    "title": "Treinos",
+    "new": "Novo",
+    "editWorkout": "Editar Treino",
+    "newWorkout": "Novo Treino",
+    "label": "Label",
+    "name": "Nome",
+    "namePlaceholder": "Ex: Treino A — Peito e Tríceps",
+    "color": "Cor",
+    "add": "Adicionar",
+    "select": "Selecione…",
+    "saveWorkout": "Salvar Treino",
+    "noWorkouts": "Nenhum treino criado",
+    "exerciseCount": "{{n}} exercício(s)",
+    "assignToStudent": "Atribuir a Aluno",
+    "assignSuccess": "Treino atribuído com sucesso!",
+    "selectStudent": "Selecione um aluno…",
+    "assigning": "Atribuindo…",
+    "assign": "Atribuir",
+    "confirmDelete": "Deletar treino?",
+    "exercises": "Exercícios"
+  },
+
+  "rankingPage": {
+    "title": "Ranking",
+    "frequency": "Frequência",
+    "volume": "Volume",
+    "improvement": "Melhoria",
+    "noData": "Sem dados suficientes para este ranking"
+  },
+
+  "contasPage": {
+    "title": "Contas",
+    "newAccount": "Nova Conta",
+    "newAccountTitle": "Nova Conta",
+    "accessHint": "O usuário receberá acesso ao fazer login com o Google usando este e-mail.",
+    "name": "Nome",
+    "namePlaceholder": "Nome completo",
+    "email": "Email",
+    "emailPlaceholder": "email@dominio.com",
+    "role": "Papel",
+    "creating": "Criando…",
+    "createAccount": "Criar Conta",
+    "noAccounts": "Nenhuma conta encontrada",
+    "you": "Você",
+    "pendingLabel": "Pendente",
+    "confirmDelete": "Remover esta conta?"
+  }
+}

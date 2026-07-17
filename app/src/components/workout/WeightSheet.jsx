@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const SHORTCUTS = [2.5, 5, 7.5, 10, 15, 20, 30, 40, 50, 60, 80, 100];
@@ -9,6 +10,7 @@ function digitsToDisplay(d) {
 }
 
 export function WeightSheet({ open, onOpenChange, value, onChange }) {
+  const { t } = useTranslation();
   const [digits, setDigits] = useState(0);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function WeightSheet({ open, onOpenChange, value, onChange }) {
         style={{ background: "var(--bg2)", borderRadius: "20px 20px 0 0", maxWidth: 430, margin: "0 auto", padding: "20px 16px 24px", border: "1px solid var(--blue)" }}
       >
         <p style={{ textAlign: "center", fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--sub)", marginBottom: 12 }}>
-          Carga
+          {t("common.weight")}
         </p>
 
         <div style={{ textAlign: "center", fontSize: 52, fontWeight: 900, color: "var(--acc)", letterSpacing: -2, marginBottom: 12, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
@@ -81,7 +83,7 @@ export function WeightSheet({ open, onOpenChange, value, onChange }) {
         </div>
 
         <button onClick={confirm} style={{ width: "100%", padding: 16, borderRadius: 13, border: "none", background: "var(--acc)", color: "#000", fontSize: 17, fontWeight: 800, cursor: "pointer" }}>
-          Confirmar
+          {t("common.confirm")}
         </button>
       </SheetContent>
     </Sheet>

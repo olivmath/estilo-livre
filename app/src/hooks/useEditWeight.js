@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useTranslation } from "react-i18next";
 
 // Backs the EditWeightModal: which exercise is being edited, the input value,
 // and persisting the new default weight onto the workout's exercise list.
 export function useEditWeight(user, workouts, reload) {
+  const { t } = useTranslation();
   const [editingEx, setEditingEx] = useState(null);
   const [exWeightInput, setExWeightInput] = useState(0);
 
@@ -27,7 +29,7 @@ export function useEditWeight(user, workouts, reload) {
       }
     } catch (e) {
       console.error("Error updating weight: ", e);
-      alert("Erro ao salvar carga.");
+      alert(t("editWeight.saveError"));
     }
   };
 

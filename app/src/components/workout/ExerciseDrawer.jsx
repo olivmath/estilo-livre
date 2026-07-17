@@ -1,8 +1,10 @@
 // Right-side drawer containing the exercise list during active workout.
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useTranslation } from "react-i18next";
 import { ExerciseList } from "./ExerciseList";
 
 export function ExerciseDrawer({ open, onOpenChange, exItems, currentSet, onVideoClick, onSelect }) {
+  const { t } = useTranslation();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -12,7 +14,7 @@ export function ExerciseDrawer({ open, onOpenChange, exItems, currentSet, onVide
           width: "min(320px, 85vw)", padding: "20px 12px",
         }}
       >
-        <p style={S.title}>Exercícios</p>
+        <p style={S.title}>{t("exerciseDrawer.title")}</p>
         <ExerciseList
           exItems={exItems}
           currentSet={currentSet}

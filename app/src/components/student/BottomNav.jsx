@@ -1,20 +1,22 @@
+import { useTranslation } from "react-i18next";
 import { LayoutDashboard, Dumbbell, History, User } from "lucide-react";
 
-const ITEMS = [
-  { id: "home", icon: LayoutDashboard, label: "Início" },
-  { id: "workouts", icon: Dumbbell, label: "Treinos" },
-  { id: "history", icon: History, label: "Histórico" },
-  { id: "profile", icon: User, label: "Perfil" },
+const ITEM_KEYS = [
+  { id: "home", icon: LayoutDashboard, key: "nav.home" },
+  { id: "workouts", icon: Dumbbell, key: "nav.workouts" },
+  { id: "history", icon: History, key: "nav.history" },
+  { id: "profile", icon: User, key: "nav.profile" },
 ];
 
 // Fixed bottom tab bar for the student app's 4 sections.
 export function BottomNav({ tab, onChangeTab }) {
+  const { t } = useTranslation();
   return (
     <nav style={S.bottomNav}>
-      {ITEMS.map(({ id, icon: Icon, label }) => (
+      {ITEM_KEYS.map(({ id, icon: Icon, key }) => (
         <button key={id} onClick={() => onChangeTab(id)} style={{ ...S.navItem, color: tab === id ? "var(--acc)" : "var(--sub)" }}>
           <Icon size={20} />
-          <span>{label}</span>
+          <span>{t(key)}</span>
         </button>
       ))}
     </nav>

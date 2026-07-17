@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { getTreinos, createTreino, updateTreino, deleteTreino, assignTreino } from "@/services/workouts";
 import { getExercises } from "@/services/exercises";
 import { getStudents } from "@/services/users";
@@ -20,6 +21,7 @@ const inputStyle = { background: "var(--bg3)", border: "1px solid var(--blue)", 
 const EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [] };
 
 function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState(initial ?? EMPTY);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -79,21 +81,21 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 16, color: "var(--text)", maxHeight: "90vh", overflowY: "auto" }}>
         <DialogHeader>
-          <DialogTitle style={{ color: "var(--text)" }}>{form.id ? "Editar Treino" : "Novo Treino"}</DialogTitle>
+          <DialogTitle style={{ color: "var(--text)" }}>{form.id ? t("treinosPage.editWorkout") : t("treinosPage.newWorkout")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit}>
           {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
           <div style={{ display: "grid", gridTemplateColumns: "64px 1fr", gap: 12 }}>
-            <Field label="Label" htmlFor="tk-label">
+            <Field label={t("treinosPage.label")} htmlFor="tk-label">
               <Input id="tk-label" style={inputStyle} value={form.label} onChange={(e) => set("label", e.target.value.toUpperCase().slice(0, 2))} placeholder="A" maxLength={2} />
             </Field>
-            <Field label="Nome" htmlFor="tk-nome">
-              <Input id="tk-nome" style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex: Treino A — Peito e Tríceps" required />
+            <Field label={t("treinosPage.name")} htmlFor="tk-nome">
+              <Input id="tk-nome" style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={t("treinosPage.namePlaceholder")} required />
             </Field>
           </div>
 
-          <Field label="Cor">
+          <Field label={t("treinosPage.color")}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {PALETTE.map((c) => (
                 <button
@@ -112,10 +114,10 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
 
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <label style={{ fontSize: 12, color: "var(--sub)" }}>Exercícios ({form.exercises.length})</label>
+              <label style={{ fontSize: 12, color: "var(--sub)" }}>{t("treinosPage.exercises")} ({form.exercises.length})</label>
               <button type="button" onClick={() => setAddingEx(true)}
                 style={{ background: "none", border: "none", cursor: "pointer", color: "var(--acc)", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
-                <Plus size={13} /> Adicionar
+                <Plus size={13} /> {t("treinosPage.add")}
               </button>
             </div>
 
@@ -123,7 +125,7 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
               <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                 <Select value={exPick} onValueChange={setExPick}>
                   <SelectTrigger style={{ ...inputStyle, flex: 1, height: 40 }}>
-                    <SelectValue placeholder="Selecione…" />
+                    <SelectValue placeholder={t("treinosPage.select")} />
                   </SelectTrigger>
                   <SelectContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)" }}>
                     {allExercises.map((e) => (
@@ -150,9 +152,9 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                     {[
-                      { k: "sets", label: "Séries" },
-                      { k: "reps", label: "Reps" },
-                      { k: "wt", label: "Peso (kg)" },
+                      { k: "sets", label: t("common.sets") },
+                      { k: "reps", label: t("common.reps") },
+                      { k: "wt", label: t("common.weightKg") },
                     ].map(({ k, label }) => (
                       <div key={k}>
                         <p style={{ fontSize: 10, color: "var(--sub)", marginBottom: 2 }}>{label}</p>
@@ -172,7 +174,7 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
           </div>
 
           <Button type="submit" disabled={loading} style={{ width: "100%", height: 40 }}>
-            {loading ? "Salvando…" : "Salvar Treino"}
+            {loading ? t("common.saving") : t("treinosPage.saveWorkout")}
           </Button>
         </form>
       </DialogContent>
@@ -181,6 +183,7 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
 }
 
 function AssignModal({ open, onClose, treinoId, students }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -202,22 +205,22 @@ function AssignModal({ open, onClose, treinoId, students }) {
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 16, color: "var(--text)" }}>
         <DialogHeader>
-          <DialogTitle style={{ color: "var(--text)" }}>Atribuir a Aluno</DialogTitle>
+          <DialogTitle style={{ color: "var(--text)" }}>{t("treinosPage.assignToStudent")}</DialogTitle>
         </DialogHeader>
         {done ? (
-          <p style={{ color: "var(--green)", fontSize: 13 }}>Treino atribuído com sucesso!</p>
+          <p style={{ color: "var(--green)", fontSize: 13 }}>{t("treinosPage.assignSuccess")}</p>
         ) : (
           <>
             <Select value={selected} onValueChange={setSelected}>
               <SelectTrigger style={{ background: "var(--bg3)", border: "1px solid var(--blue)", color: "var(--text)", marginBottom: 16 }}>
-                <SelectValue placeholder="Selecione um aluno…" />
+                <SelectValue placeholder={t("treinosPage.selectStudent")} />
               </SelectTrigger>
               <SelectContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)" }}>
                 {students.map((s) => <SelectItem key={s.uid} value={s.uid}>{s.name}</SelectItem>)}
               </SelectContent>
             </Select>
             <Button onClick={handle} disabled={loading || !selected} style={{ width: "100%", height: 40 }}>
-              {loading ? "Atribuindo…" : "Atribuir"}
+              {loading ? t("treinosPage.assigning") : t("treinosPage.assign")}
             </Button>
           </>
         )}
@@ -227,6 +230,7 @@ function AssignModal({ open, onClose, treinoId, students }) {
 }
 
 export function TreinosPage() {
+  const { t } = useTranslation();
   const [treinos, setTreinos] = useState([]);
   const [exercises, setExercises] = useState([]);
   const [students, setStudents] = useState([]);
@@ -241,7 +245,7 @@ export function TreinosPage() {
   const load = useCallback(() => {
     setLoading(true);
     Promise.all([getTreinos(), getExercises(), getStudents()])
-      .then(([t, e, s]) => { setTreinos(t); setExercises(e); setStudents(s); })
+      .then(([tr, e, s]) => { setTreinos(tr); setExercises(e); setStudents(s); })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -249,7 +253,7 @@ export function TreinosPage() {
   useEffect(() => { load(); }, [load]);
 
   async function handleDelete(id) {
-    if (!confirm("Deletar treino?")) return;
+    if (!confirm(t("treinosPage.confirmDelete"))) return;
     await deleteTreino(id);
     load();
   }
@@ -263,49 +267,49 @@ export function TreinosPage() {
   return (
     <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Treinos</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{t("treinosPage.title")}</h1>
         <Button size="sm" onClick={handleNew}>
-          <Plus size={15} /> Novo
+          <Plus size={15} /> {t("treinosPage.new")}
         </Button>
       </div>
 
       {treinos.length === 0 ? (
-        <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum treino criado</p>
+        <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("treinosPage.noWorkouts")}</p>
       ) : (
         <div style={{ display: "grid", gap: 12 }} className="sm:grid-cols-2">
-          {treinos.map((t) => (
-            <div key={t.id} style={{
+          {treinos.map((tr) => (
+            <div key={tr.id} style={{
               background: "var(--bg2)", border: "1px solid var(--blue)",
               borderRadius: 12, padding: "16px 18px",
-              borderLeft: `4px solid ${t.color ?? "var(--blue)"}`,
+              borderLeft: `4px solid ${tr.color ?? "var(--blue)"}`,
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                     <span style={{
                       fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 20,
-                      background: `${t.color ?? "var(--blue)"}22`, color: t.color ?? "var(--sub)",
+                      background: `${tr.color ?? "var(--blue)"}22`, color: tr.color ?? "var(--sub)",
                     }}>
-                      {t.label}
+                      {tr.label}
                     </span>
                   </div>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>{t.name}</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>{tr.name}</p>
                   <p style={{ fontSize: 12, color: "var(--sub)", marginTop: 4 }}>
-                    {t.exercises?.length ?? 0} exercício{(t.exercises?.length ?? 0) !== 1 ? "s" : ""}
+                    {t("treinosPage.exerciseCount", { n: tr.exercises?.length ?? 0 })}
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: 4 }}>
                   <button
-                    onClick={() => { setAssignTarget(t.id); setAssignOpen(true); }}
-                    title="Atribuir a aluno"
+                    onClick={() => { setAssignTarget(tr.id); setAssignOpen(true); }}
+                    title={t("treinosPage.assignToStudent")}
                     style={{ background: "none", border: "none", cursor: "pointer", color: "var(--acc)", padding: 6 }}
                   >
                     <UserPlus size={15} />
                   </button>
-                  <button onClick={() => handleEdit(t)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)", padding: 6 }}>
+                  <button onClick={() => handleEdit(tr)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--sub)", padding: 6 }}>
                     <Edit2 size={14} />
                   </button>
-                  <button onClick={() => handleDelete(t.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)", padding: 6 }}>
+                  <button onClick={() => handleDelete(tr.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--red)", padding: 6 }}>
                     <Trash2 size={14} />
                   </button>
                 </div>

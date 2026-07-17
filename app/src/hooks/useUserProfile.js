@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import i18n from "@/lib/i18n";
 
 // Timeout before assuming the trigger failed and showing an error
 const TRIGGER_TIMEOUT_MS = 15000;
@@ -28,7 +29,7 @@ export function useUserProfile(firebaseUser) {
         if (snap.exists()) {
           clearTimeout(timeoutId);
           if (snap.data().role === "negado") {
-            setError("Seu email não está cadastrado na academia.");
+            setError(i18n.t("auth.emailNotRegistered"));
             setLoading(false);
           } else {
             setProfile(snap.data());
@@ -46,7 +47,7 @@ export function useUserProfile(firebaseUser) {
 
     // If the trigger never creates the doc (e.g. cold-start failure), show error after timeout
     timeoutId = setTimeout(() => {
-      setError("Não foi possível verificar seu acesso. Tente novamente.");
+      setError(i18n.t("auth.verifyError"));
       setLoading(false);
     }, TRIGGER_TIMEOUT_MS);
 

@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { S, diffColor, fmtDateFull, fmtDur, fmtVol } from "@/components/student/shared";
 import { SessionEditOverlay } from "./SessionEditOverlay";
 import { updateStudentSession } from "@/services/sessions";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Read-only report for a past session, with option to edit; opened by tapping a HistoryTab row.
 export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -21,36 +22,35 @@ export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
       setIsEditing(false);
     } catch (e) {
       console.error("Error updating session:", e);
-      alert("Erro ao atualizar treino. Tente novamente.");
+      alert(t("sessionReport.updateError"));
     } finally {
       setIsSaving(false);
     }
   };
 
   if (isEditing) {
-    return (
-      <SessionEditOverlay
-        session={session}
-        onClose={() => setIsEditing(false)}
-        onSave={handleSaveEdit}
-        isSaving={isSaving}
-      />
-    );
+    return <SessionEditOverlay session={session} onClose={() => setIsEditing(false)} onSave={handleSaveEdit} isSaving={isSaving} />;
   }
+
+  const metrics = [
+    [fmtDur(session.dur), t("sessionReport.duration"), session.wkColor],
+    [fmtVol(volume), t("sessionReport.volume"), session.wkColor],
+    [`${avgDiff.toFixed(1)}/10`, t("sessionReport.avgDiff"), diffColor(avgDiff)],
+  ];
 
   return (
     <div style={{ ...S.overlay, overflowY: "auto" }}>
       <div style={{ width: "100%", maxWidth: 400, background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 20, padding: "24px 20px", boxShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
         <div style={{ paddingBottom: 16, marginBottom: 16, position: "relative", borderBottom: `3px solid ${session.wkColor}` }}>
           <button onClick={onClose} style={{ position: "absolute", top: 0, right: 0, background: "none", border: "none", color: "var(--sub)", fontSize: 18, cursor: "pointer" }}>✕</button>
-          <span style={{ fontSize: 10, fontWeight: 700, color: session.wkColor, letterSpacing: 2 }}>TREINO REALIZADO</span>
-          <h2 style={{ fontSize: 26, fontWeight: 850, marginTop: 4 }}>Treino {session.wkLabel}</h2>
+          <span style={{ fontSize: 10, fontWeight: 700, color: session.wkColor, letterSpacing: 2 }}>{t("sessionReport.title")}</span>
+          <h2 style={{ fontSize: 26, fontWeight: 850, marginTop: 4 }}>{t("workoutDetail.workoutLabel", { label: session.wkLabel })}</h2>
           <p style={{ color: "var(--sub)", fontSize: 14 }}>{session.wkName}</p>
           <p style={{ color: "var(--sub)", fontSize: 12, marginTop: 4 }}>{fmtDateFull(session.date)}</p>
         </div>
 
         <div style={{ display: "flex", background: "var(--bg3)", borderRadius: 12, border: "1px solid var(--blue)", padding: 12, marginBottom: 20 }}>
-          {[[fmtDur(session.dur), "Duração", session.wkColor], [fmtVol(volume), "Volume", session.wkColor], [`${avgDiff.toFixed(1)}/10`, "Dif. média", diffColor(avgDiff)]].map(([val, label, color], i) => (
+          {metrics.map(([val, label, color], i) => (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, textAlign: "center" }}>
               <span style={{ fontSize: 22, fontWeight: 800, color }}>{val}</span>
               <span style={{ fontSize: 11, color: "var(--sub)" }}>{label}</span>
@@ -66,7 +66,7 @@ export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
                 <span style={{ fontWeight: 600, fontSize: 14 }}>{res.name}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: "var(--sub)" }}>{res.sets} séries × {res.reps} reps · <b>{res.wt}kg</b></span>
+                <span style={{ fontSize: 12, color: "var(--sub)" }}>{res.sets} {t("sessionReport.setsXReps").split(" x ")[0]} × {res.reps} reps · <b>{res.wt}kg</b></span>
                 <span style={{ color: diffColor(res.diff), fontWeight: 700, fontSize: 13 }}>RPE {res.diff}/10</span>
               </div>
             </div>
@@ -74,8 +74,8 @@ export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>
-          <button onClick={onClose} style={{ ...S.btnSecondary, flex: 1 }}>Fechar</button>
-          <button onClick={() => setIsEditing(true)} style={{ ...S.btnPrimary, flex: 1 }}>Editar</button>
+          <button onClick={onClose} style={{ ...S.btnSecondary, flex: 1 }}>{t("common.close")}</button>
+          <button onClick={() => setIsEditing(true)} style={{ ...S.btnPrimary, flex: 1 }}>{t("common.edit")}</button>
         </div>
       </div>
     </div>

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getRanking } from "@/services/ranking";
 import { Spinner, UserAvatar } from "@/components/shared";
 
 const TABS = [
-  { key: "freq",        label: "Frequência" },
-  { key: "volume",      label: "Volume" },
-  { key: "improvement", label: "Melhoria" },
+  { key: "freq" },
+  { key: "volume" },
+  { key: "improvement" },
 ];
 
 const PODIUM_COLORS = ["#F5C400", "#9e9e9e", "#cd7f32"];
@@ -43,10 +44,17 @@ function PodiumCard({ item, rank }) {
 }
 
 export function RankingPage() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState("freq");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const TAB_LABELS = {
+    freq: t("rankingPage.frequency"),
+    volume: t("rankingPage.volume"),
+    improvement: t("rankingPage.improvement"),
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -64,18 +72,18 @@ export function RankingPage() {
   return (
     <div style={{ padding: "20px 16px", maxWidth: 700, margin: "0 auto" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", marginBottom: 20 }}>
-        Ranking
+        {t("rankingPage.title")}
       </h1>
 
       <div style={{ display: "flex", gap: 4, marginBottom: 24, background: "var(--bg3)", borderRadius: 10, padding: 4 }}>
-        {TABS.map((t) => (
-          <button key={t.key} onClick={() => setTab(t.key)} style={{
+        {TABS.map((tb) => (
+          <button key={tb.key} onClick={() => setTab(tb.key)} style={{
             flex: 1, padding: "8px 0", borderRadius: 8, border: "none", cursor: "pointer",
-            background: tab === t.key ? "var(--blue2)" : "transparent",
-            color: tab === t.key ? "var(--text)" : "var(--sub)",
-            fontSize: 13, fontWeight: tab === t.key ? 600 : 400,
+            background: tab === tb.key ? "var(--blue2)" : "transparent",
+            color: tab === tb.key ? "var(--text)" : "var(--sub)",
+            fontSize: 13, fontWeight: tab === tb.key ? 600 : 400,
           }}>
-            {t.label}
+            {TAB_LABELS[tb.key]}
           </button>
         ))}
       </div>
@@ -83,7 +91,7 @@ export function RankingPage() {
       {loading ? <Spinner /> : error ? (
         <p style={{ color: "var(--red)", fontSize: 13 }}>{error}</p>
       ) : data.length === 0 ? (
-        <p style={{ color: "var(--sub)", fontSize: 13 }}>Sem dados suficientes para este ranking</p>
+        <p style={{ color: "var(--sub)", fontSize: 13 }}>{t("rankingPage.noData")}</p>
       ) : (
         <>
           {top3.length > 0 && (

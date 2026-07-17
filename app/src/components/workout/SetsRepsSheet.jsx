@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import { Minus, Plus } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useTranslation } from "react-i18next";
 
 export function SetsRepsSheet({ open, onOpenChange, sets, reps, onChange }) {
+  const { t } = useTranslation();
   const [localSets, setLocalSets] = useState(sets);
   const [localReps, setLocalReps] = useState(reps);
 
@@ -26,15 +28,15 @@ export function SetsRepsSheet({ open, onOpenChange, sets, reps, onChange }) {
           border: "1px solid var(--blue)",
         }}
       >
-        <p style={S.label}>Séries & Repetições</p>
+        <p style={S.label}>{t("setsReps.title")}</p>
 
         <div style={S.row}>
-          <Counter label="Séries" value={localSets} min={1} max={20} onChange={setLocalSets} />
+          <Counter label={t("common.sets")} value={localSets} min={1} max={20} onChange={setLocalSets} />
           <div style={S.sep}>×</div>
-          <Counter label="Repetições" value={localReps} min={1} max={99} onChange={setLocalReps} />
+          <Counter label={t("common.reps")} value={localReps} min={1} max={99} onChange={setLocalReps} />
         </div>
 
-        <button onClick={confirm} style={S.cta}>Confirmar</button>
+        <button onClick={confirm} style={S.cta}>{t("common.confirm")}</button>
       </SheetContent>
     </Sheet>
   );

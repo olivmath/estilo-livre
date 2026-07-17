@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { getExercises, createExercise, updateExercise, deleteExercise } from "@/services/exercises";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ const inputStyle = { background: "var(--bg3)", border: "1px solid var(--blue)", 
 const EMPTY_FORM = { name: "", machine: "", group: GROUPS[0], sets: 3, reps: 12, alteres: false };
 
 function ExerciseModal({ open, onClose, initial, onSaved }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState(initial ?? EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -52,17 +54,17 @@ function ExerciseModal({ open, onClose, initial, onSaved }) {
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent style={{ background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 16, color: "var(--text)" }}>
         <DialogHeader>
-          <DialogTitle style={{ color: "var(--text)" }}>{form.id ? "Editar Exercício" : "Novo Exercício"}</DialogTitle>
+          <DialogTitle style={{ color: "var(--text)" }}>{form.id ? t("exerciciosPage.editExercise") : t("exerciciosPage.newExercise")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit}>
           {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
-          <Field label="Nome" htmlFor="ex-nome">
-            <Input id="ex-nome" style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex: Supino Reto" required />
+          <Field label={t("exerciciosPage.name")} htmlFor="ex-nome">
+            <Input id="ex-nome" style={inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={t("exerciciosPage.namePlaceholder")} required />
           </Field>
-          <Field label="Máquina / Equipamento (opcional)" htmlFor="ex-maquina">
-            <Input id="ex-maquina" style={inputStyle} value={form.machine} onChange={(e) => set("machine", e.target.value)} placeholder="Ex: Banco livre, Halter" />
+          <Field label={t("exerciciosPage.machineLabel")} htmlFor="ex-maquina">
+            <Input id="ex-maquina" style={inputStyle} value={form.machine} onChange={(e) => set("machine", e.target.value)} placeholder={t("exerciciosPage.machinePlaceholder")} />
           </Field>
-          <Field label="Grupo Muscular" htmlFor="ex-grupo">
+          <Field label={t("exerciciosPage.muscleGroup")} htmlFor="ex-grupo">
             <Select value={form.group} onValueChange={(v) => set("group", v)}>
               <SelectTrigger id="ex-grupo" style={{ ...inputStyle, height: 40 }}>
                 <SelectValue />
@@ -73,21 +75,21 @@ function ExerciseModal({ open, onClose, initial, onSaved }) {
             </Select>
           </Field>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <Field label="Séries" htmlFor="ex-sets">
+            <Field label={t("common.sets")} htmlFor="ex-sets">
               <Input id="ex-sets" style={inputStyle} type="number" min={1} max={20} value={form.sets} onChange={(e) => set("sets", e.target.value)} />
             </Field>
-            <Field label="Reps" htmlFor="ex-reps">
+            <Field label={t("common.reps")} htmlFor="ex-reps">
               <Input id="ex-reps" style={inputStyle} type="number" min={1} max={100} value={form.reps} onChange={(e) => set("reps", e.target.value)} />
             </Field>
           </div>
-          <Field label="Equipamento">
+          <Field label={t("common.equipment")}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40 }}>
               <Checkbox id="ex-alteres" checked={!!form.alteres} onCheckedChange={(v) => set("alteres", v)} />
-              <Label htmlFor="ex-alteres" style={{ color: "var(--text)", fontSize: 13, cursor: "pointer" }}>Usa alteres (halter)</Label>
+              <Label htmlFor="ex-alteres" style={{ color: "var(--text)", fontSize: 13, cursor: "pointer" }}>{t("exerciciosPage.usesDumbbells")}</Label>
             </div>
           </Field>
           <Button type="submit" disabled={loading} style={{ width: "100%", height: 40, marginTop: 4 }}>
-            {loading ? "Salvando…" : "Salvar"}
+            {loading ? t("common.saving") : t("common.save")}
           </Button>
         </form>
       </DialogContent>
@@ -145,6 +147,7 @@ function GroupSection({ group, exercises, onEdit, onDelete }) {
 }
 
 export function ExerciciosPage() {
+  const { t } = useTranslation();
   const [exercises, setExercises] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -162,7 +165,7 @@ export function ExerciciosPage() {
   useEffect(() => { load(); }, [load]);
 
   async function handleDelete(id) {
-    if (!confirm("Deletar exercício?")) return;
+    if (!confirm(t("exerciciosPage.confirmDelete"))) return;
     await deleteExercise(id);
     load();
   }
@@ -185,14 +188,14 @@ export function ExerciciosPage() {
   return (
     <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Exercícios</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{t("exerciciosPage.title")}</h1>
         <Button size="sm" onClick={handleNew}>
-          <Plus size={15} /> Novo
+          <Plus size={15} /> {t("exerciciosPage.new")}
         </Button>
       </div>
 
       {exercises.length === 0 ? (
-        <p style={{ fontSize: 13, color: "var(--sub)" }}>Nenhum exercício cadastrado</p>
+        <p style={{ fontSize: 13, color: "var(--sub)" }}>{t("exerciciosPage.noExercises")}</p>
       ) : (
         sortedGroups.map((g) => (
           <GroupSection key={g} group={g} exercises={grouped[g]} onEdit={handleEdit} onDelete={handleDelete} />

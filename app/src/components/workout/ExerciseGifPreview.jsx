@@ -1,8 +1,9 @@
-// Inline GIF preview of the current exercise with tap-to-expand.
+import { useTranslation } from "react-i18next";
 import { Play } from "lucide-react";
 import { getExerciseGif } from "@/lib/exerciseGifs";
 
 export function ExerciseGifPreview({ name, onVideoClick }) {
+  const { t } = useTranslation();
   const gif = getExerciseGif(name);
 
   return (
@@ -14,7 +15,7 @@ export function ExerciseGifPreview({ name, onVideoClick }) {
           <div style={S.playCircle}>
             <Play size={20} color="#000" fill="#000" style={{ marginLeft: 2 }} />
           </div>
-          <p style={S.placeholderText}>Ver exercício</p>
+          <p style={S.placeholderText}>{t("activeWorkout.seeExercise")}</p>
         </div>
       )}
     </button>

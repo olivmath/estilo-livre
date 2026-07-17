@@ -1,9 +1,11 @@
 import { doc, updateDoc, addDoc, collection, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useTranslation } from "react-i18next";
 
 // Persists a finished workout: writes the session doc and carries the
 // exercise weights used forward as the workout's new defaults.
 export function useSaveWorkoutSession({ user, workouts, summaryData, closeSummary, reload, onSaved }) {
+  const { t } = useTranslation();
   return async function saveWorkoutSession() {
     if (!summaryData) return;
     try {
@@ -25,7 +27,7 @@ export function useSaveWorkoutSession({ user, workouts, summaryData, closeSummar
       onSaved?.();
     } catch (e) {
       console.error("Error saving session: ", e);
-      alert("Erro ao salvar treino. Tente novamente.");
+      alert(t("hooks.saveWorkoutError"));
     }
   };
 }

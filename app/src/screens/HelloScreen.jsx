@@ -1,14 +1,16 @@
+import { useTranslation } from "react-i18next";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 const ROLE_META = {
-  admin:    { label: "Admin",      bg: "#F5C400", color: "#000",     path: "/app/admin/", desc: "painel administrativo" },
-  prof:     { label: "Professor",  bg: "#2352c8", color: "#fff",     path: "/app/prof/",  desc: "área do professor"     },
-  aluno:    { label: "Aluno",      bg: "#00c853", color: "#000",     path: "/app/user/",  desc: "app de treinos"        },
-  pendente: { label: "Pendente",   bg: "#162040", color: "#7986cb",  path: null,          desc: null                    },
+  admin:    { labelKey: "roles.admin",    bg: "#F5C400", color: "#000",     path: "/app/admin/", descKey: "hello.adminDesc"   },
+  prof:     { labelKey: "roles.professor",bg: "#2352c8", color: "#fff",     path: "/app/prof/",  descKey: "hello.profDesc"    },
+  aluno:    { labelKey: "roles.aluno",    bg: "#00c853", color: "#000",     path: "/app/user/",  descKey: "hello.studentDesc" },
+  pendente: { labelKey: "roles.pendente", bg: "#162040", color: "#7986cb",  path: null,          descKey: null                },
 };
 
 export function HelloScreen({ user, role }) {
+  const { t } = useTranslation();
   const meta  = ROLE_META[role] ?? ROLE_META.pendente;
   const first = user?.displayName?.split(" ")[0] ?? "";
 
@@ -26,12 +28,12 @@ export function HelloScreen({ user, role }) {
         )}
 
         {/* Greeting */}
-        <p style={styles.greeting}>Bem vindo,</p>
+        <p style={styles.greeting}>{t("hello.welcome")}</p>
         <h1 style={styles.name}>{first}</h1>
 
         {/* Badge */}
         <span style={{ ...styles.badge, background: meta.bg, color: meta.color }}>
-          {meta.label}
+          {t(meta.labelKey)}
         </span>
 
         {/* Divider */}
@@ -40,28 +42,27 @@ export function HelloScreen({ user, role }) {
         {/* CTA */}
         {meta.path ? (
           <>
-            <p style={styles.desc}>Acesse o {meta.desc}.</p>
+            <p style={styles.desc}>{t("hello.accessThe", { desc: t(meta.descKey) })}</p>
             <button
               style={styles.btnEnter}
               onClick={() => { window.location.href = meta.path; }}
               onMouseEnter={e => e.currentTarget.style.opacity = ".88"}
               onMouseLeave={e => e.currentTarget.style.opacity = "1"}
             >
-              Entrar no app →
+              {t("hello.enterApp")}
             </button>
           </>
         ) : (
           <div style={styles.pendingBox}>
             <span style={styles.pendingIcon}>⏳</span>
             <p style={styles.pendingText}>
-              Seu acesso ainda não foi liberado.<br />
-              Fale com o administrador.
+              {t("hello.pendingAccess")}
             </p>
           </div>
         )}
 
         <button style={styles.btnLogout} onClick={() => signOut(auth)}>
-          Sair da conta
+          {t("hello.logoutAccount")}
         </button>
       </div>
     </div>

@@ -1,0 +1,408 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "edit": "Edit",
+    "delete": "Delete",
+    "logout": "Logout",
+    "loading": "Checking access...",
+    "exercises": "exercises",
+    "exercise_one": "exercise",
+    "exercise_other": "exercises",
+    "sets": "Sets",
+    "reps": "Reps",
+    "weight": "Weight",
+    "weightKg": "Weight (kg)",
+    "machine": "mac",
+    "machineN": "Mac. {{n}}",
+    "machineFull": "Machine {{n}}",
+    "dumbbells": "Dumbbells",
+    "freeWeight": "Free",
+    "equipment": "Equipment",
+    "min": "{{n}} min",
+    "athlete": "Athlete",
+    "next": "Next",
+    "done": "Done",
+    "active": "Active",
+    "attention": "Attention",
+    "inactive": "Inactive",
+    "blocked": "Blocked",
+    "block": "Block",
+    "unblock": "Unblock",
+    "search": "Search",
+    "noResults": "No results",
+    "error": "Error",
+    "success": "Success",
+    "resume": "Resume"
+  },
+
+  "roles": {
+    "admin": "Administrator",
+    "professor": "Coach",
+    "aluno": "Student",
+    "pendente": "Pending"
+  },
+
+  "auth": {
+    "accessDenied": "Access denied",
+    "notRegistered": "Your account is not registered at the gym. Contact the administrator.",
+    "backToLogin": "Back to login",
+    "academia": "GYM",
+    "estiloLivre": "ESTILO LIVRE",
+    "signingIn": "Signing in...",
+    "continueGoogle": "Continue with Google",
+    "membersOnly": "Only gym members have access.",
+    "emailNotRegistered": "Your email is not registered at the gym.",
+    "verifyError": "Could not verify your access. Try again."
+  },
+
+  "hello": {
+    "welcome": "Welcome,",
+    "accessThe": "Access the {{desc}}.",
+    "enterApp": "Enter the app ->",
+    "pendingAccess": "Your access has not been granted yet. Contact the administrator.",
+    "logoutAccount": "Log out",
+    "adminDesc": "admin panel",
+    "profDesc": "coach area",
+    "studentDesc": "workout app"
+  },
+
+  "pending": {
+    "title": "Access Pending",
+    "message": "Your account is waiting for gym approval. Once the coach grants access, you'll be able to log in.",
+    "logout": "Logout"
+  },
+
+  "nav": {
+    "home": "Home",
+    "workouts": "Workouts",
+    "history": "History",
+    "profile": "Profile"
+  },
+
+  "home": {
+    "greeting": "Good workout, {{name}}",
+    "academyName": "GYM ESTILO LIVRE",
+    "editProfile": "Edit {{name}}'s profile",
+    "noWorkouts": "No workouts assigned by the coach. Talk to your instructor.",
+    "loopsDone": "loops done",
+    "workoutSelector": "Workout selector",
+    "stayInLoop": "Stay in the loop!",
+    "progressMsg": "{{pct}}% completed — stay in the loop!",
+    "enterLoop": "Get in the loop!"
+  },
+
+  "draft": {
+    "closeBanner": "Close banner",
+    "resetTitle": "Reset workout?",
+    "resetMsg": "This will delete {{n}} completed exercises and start over.",
+    "reset": "Reset"
+  },
+
+  "workoutsTab": {
+    "title": "My Workouts",
+    "workoutLabel": "Workout {{label}} — {{name}}",
+    "exerciseCount": "{{n}} exercises"
+  },
+
+  "historyTab": {
+    "title": "Workout History",
+    "avgDiff": "avg. diff",
+    "empty": "No workouts done yet. Your saved workouts will appear here!"
+  },
+
+  "profileTab": {
+    "title": "My Profile",
+    "specialAthlete": "Special Student",
+    "completeSessions": "Complete sessions",
+    "loops": "Loops",
+    "logoutApp": "Log out",
+    "language": "Language",
+    "languagePt": "Português",
+    "languageEn": "English",
+    "languageEs": "Español"
+  },
+
+  "workoutDetail": {
+    "workoutLabel": "Workout {{label}}",
+    "reps": "reps",
+    "startWorkout": "Start Workout"
+  },
+
+  "sessionReport": {
+    "title": "WORKOUT COMPLETED",
+    "duration": "Duration",
+    "volume": "Volume",
+    "avgDiff": "Avg. diff",
+    "setsXReps": "sets x reps",
+    "updateError": "Error updating workout. Try again."
+  },
+
+  "sessionEdit": {
+    "title": "EDIT WORKOUT",
+    "rpe": "RPE"
+  },
+
+  "editWeight": {
+    "title": "Adjust Weight",
+    "description": "Set the default weight for:",
+    "saveError": "Error saving weight."
+  },
+
+  "suggestions": {
+    "title": "Progression Suggestions"
+  },
+
+  "trend": {
+    "title": "Workout intensity",
+    "details": "details",
+    "currentValue": "Current value",
+    "avgValue": "Average value",
+    "sessions": "sessions",
+    "rpe": "RPE",
+    "movingAvg": "Moving avg (3)",
+    "progression": "Progression (<=6)",
+    "increaseWeight": "Increase weight"
+  },
+
+  "rpeTutorial": {
+    "title": "Understanding the chart",
+    "whatIsRpe": "What is RPE?",
+    "perceivedEffort": "Perceived Effort",
+    "noEffort": "no effort",
+    "maximum": "maximum",
+    "easy": "easy, could go on for hours",
+    "moderate": "moderate, challenging but controlled",
+    "intense": "intense, close to the limit",
+    "rpeAvg": "RPE average",
+    "evolving": "Evolving",
+    "surpassing": "pushing limits",
+    "green": "green",
+    "keepItUp": "Keep it up!",
+    "increaseWeight": "Increase weight",
+    "red": "red",
+    "increaseWeightTip": "Increase weight by 2.5kg on suggested exercises",
+    "previous": "Previous",
+    "nextStep": "Next"
+  },
+
+  "activeWorkout": {
+    "completeSet": "Complete Set",
+    "transition": "Transition",
+    "rest": "Rest",
+    "nextExercise": "Next: {{name}}",
+    "skipRest": "Skip rest ->",
+    "setProgress": "Set {{current}}/{{total}}",
+    "seeExercise": "See exercise"
+  },
+
+  "rpe": {
+    "howWasIt": "How was it?",
+    "allSetsCompleted": "all sets completed",
+    "easy": "Easy",
+    "medium": "Medium",
+    "max": "Max",
+    "labels": ["Very easy", "Easy", "Light", "Light moderate", "Moderate", "Moderate intense", "Intense", "Very intense", "Exhausting", "Almost max", "Maximum"]
+  },
+
+  "summary": {
+    "title": "Workout Complete!",
+    "time": "Time",
+    "exercises": "Exercises",
+    "sets": "Sets",
+    "discard": "Discard",
+    "saveAndExit": "Save & Exit"
+  },
+
+  "exit": {
+    "title": "Leave workout?",
+    "message": "Your progress will be saved to continue later.",
+    "backToWorkout": "Back to workout",
+    "continueLater": "Continue later",
+    "exitWithoutSaving": "Exit without saving"
+  },
+
+  "setsReps": {
+    "title": "Sets & Reps"
+  },
+
+  "switchWorkout": {
+    "title": "Switch workout",
+    "message": "Your current progress will be saved to continue later.",
+    "current": "current"
+  },
+
+  "exerciseDrawer": {
+    "title": "Exercises"
+  },
+
+  "video": {
+    "comingSoon": "Video coming soon",
+    "tips": "Execution tips",
+    "tip1": "Keep your posture aligned throughout the movement",
+    "tip2": "Control the descent (eccentric phase) — don't let the weight drop",
+    "tip3": "Breathe: inhale on the way down, exhale on effort"
+  },
+
+  "hooks": {
+    "photoUpdated": "Photo updated successfully!",
+    "photoError": "Error updating profile photo.",
+    "saveWorkoutError": "Error saving workout. Try again.",
+    "noExercises": "This workout has no exercises registered."
+  },
+
+  "dashboard": {
+    "navDashboard": "Dashboard",
+    "navStudents": "Students",
+    "navExercises": "Exercises",
+    "navWorkouts": "Workouts",
+    "navRanking": "Ranking",
+    "navAccounts": "Accounts"
+  },
+
+  "dashboardPage": {
+    "title": "Dashboard",
+    "totalStudents": "Total Students",
+    "todaySessions": "Today's Sessions",
+    "weekSessions": "Week Sessions",
+    "inactive": "Inactive",
+    "sessionsLast7Days": "Sessions — last 7 days",
+    "alerts": "Alerts",
+    "noAlerts": "No alerts",
+    "daysNoTraining": "{{n}}d no training",
+    "noSession": "no session",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No activity yet",
+    "today": "today",
+    "oneDayAgo": "1 day ago",
+    "daysAgo": "{{n}} days ago",
+    "workout": "Workout"
+  },
+
+  "alunosPage": {
+    "title": "Students",
+    "newStudent": "New Student",
+    "searchPlaceholder": "Search by name or email…",
+    "all": "All",
+    "actions": "Actions",
+    "noStudents": "No students found",
+    "selectAll": "Select all",
+    "selectedCount": "{{n}} selected",
+    "sessPerWeek": "sess/wk",
+    "inviteTitle": "Invite Student",
+    "studentEmail": "Student email",
+    "inviteHint": "The student will appear on the list once they log in with this Google email.",
+    "sending": "Sending…",
+    "addToList": "Add to list",
+    "noRpeData": "No RPE data",
+    "editWorkout": "Edit Workout",
+    "newCustomWorkout": "New Custom Workout",
+    "add": "Add",
+    "searchExercise": "Search exercise…",
+    "noExerciseFound": "No exercise found",
+    "saveChanges": "Save Changes",
+    "createWorkout": "Create Workout",
+    "progress": "Progress",
+    "workouts": "Workouts",
+    "totalSessions": "Total Sessions",
+    "week": "Week",
+    "month": "Month",
+    "daysNoTraining": "Days w/o training",
+    "avgRpe": "Avg RPE",
+    "rpeLast": "RPE (last sessions)",
+    "lastSessions": "Last sessions",
+    "noSessions": "No sessions recorded",
+    "assignWorkout": "Assign Workout",
+    "newCustom": "New Custom",
+    "selectTemplate": "Select a template",
+    "noTemplates": "No templates created",
+    "custom": "custom",
+    "noWorkouts": "No workouts assigned",
+    "noExercisesEdit": "No exercises — click edit to add",
+    "removeWorkoutTitle": "Remove workout?",
+    "removeWorkoutDesc": "This action cannot be undone. Session history is preserved.",
+    "remove": "Remove",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "bulkBlockTitle": "Block selected students?",
+    "bulkBlockDesc": "{{n}} student(s) will lose access to the app.",
+    "bulkUnblockTitle": "Unblock selected students?",
+    "bulkUnblockDesc": "{{n}} student(s) will regain access.",
+    "bulkDeleteTitle": "Delete students?",
+    "bulkDeleteDesc": "This action cannot be undone. {{n}} student(s) will be removed.",
+    "wait": "Please wait…",
+    "exerciseCount": "{{n}} exercise(s)",
+    "label": "Label",
+    "name": "Name",
+    "color": "Color",
+    "exercises": "Exercises"
+  },
+
+  "exerciciosPage": {
+    "title": "Exercises",
+    "new": "New",
+    "editExercise": "Edit Exercise",
+    "newExercise": "New Exercise",
+    "name": "Name",
+    "namePlaceholder": "Ex: Bench Press",
+    "machineLabel": "Machine / Equipment (optional)",
+    "machinePlaceholder": "Ex: Free bench, Dumbbell",
+    "muscleGroup": "Muscle Group",
+    "usesDumbbells": "Uses dumbbells",
+    "noExercises": "No exercises registered",
+    "confirmDelete": "Delete exercise?"
+  },
+
+  "treinosPage": {
+    "title": "Workouts",
+    "new": "New",
+    "editWorkout": "Edit Workout",
+    "newWorkout": "New Workout",
+    "label": "Label",
+    "name": "Name",
+    "namePlaceholder": "Ex: Workout A — Chest & Triceps",
+    "color": "Color",
+    "add": "Add",
+    "select": "Select…",
+    "saveWorkout": "Save Workout",
+    "noWorkouts": "No workouts created",
+    "exerciseCount": "{{n}} exercise(s)",
+    "assignToStudent": "Assign to Student",
+    "assignSuccess": "Workout assigned successfully!",
+    "selectStudent": "Select a student…",
+    "assigning": "Assigning…",
+    "assign": "Assign",
+    "confirmDelete": "Delete workout?",
+    "exercises": "Exercises"
+  },
+
+  "rankingPage": {
+    "title": "Ranking",
+    "frequency": "Frequency",
+    "volume": "Volume",
+    "improvement": "Improvement",
+    "noData": "Not enough data for this ranking"
+  },
+
+  "contasPage": {
+    "title": "Accounts",
+    "newAccount": "New Account",
+    "newAccountTitle": "New Account",
+    "accessHint": "The user will receive access when logging in with Google using this email.",
+    "name": "Name",
+    "namePlaceholder": "Full name",
+    "email": "Email",
+    "emailPlaceholder": "email@domain.com",
+    "role": "Role",
+    "creating": "Creating…",
+    "createAccount": "Create Account",
+    "noAccounts": "No accounts found",
+    "you": "You",
+    "pendingLabel": "Pending",
+    "confirmDelete": "Remove this account?"
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { UserAvatar } from "@/components/shared";
 import { S } from "@/components/student/shared";
 import { LoopRingHero } from "@/components/student/LoopRingHero";
@@ -9,6 +10,7 @@ export function HomeTab({
   profile, workouts, cycleInfo, draft, trendChart, suggestions, user, reload,
   onAvatarClick, onStart, onResumeDraft, onStartFromScratch, onShowRpeTutorial,
 }) {
+  const { t } = useTranslation();
   const spacing = {
     px: "clamp(4px, 1.5vw, 8px)",
     sm: "clamp(6px, 2vw, 10px)",
@@ -30,7 +32,7 @@ export function HomeTab({
       >
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4, lineHeight: 1.2 }}>
-            Bom treino, {profile?.name?.split(" ")[0] ?? "Atleta"} 👋
+            {t("home.greeting", { name: profile?.name?.split(" ")[0] ?? t("common.athlete") })} 👋
           </h1>
           <span
             style={{
@@ -40,9 +42,9 @@ export function HomeTab({
               letterSpacing: 2,
               display: "block",
             }}
-            aria-label="Academia Estilo Livre"
+            aria-label={t("home.academyName")}
           >
-            ACADEMIA ESTILO LIVRE
+            {t("home.academyName")}
           </span>
         </div>
         <button
@@ -54,7 +56,7 @@ export function HomeTab({
             background: "transparent",
             padding: 0,
           }}
-          aria-label={`Editar perfil de ${profile?.name ?? "Atleta"}`}
+          aria-label={t("home.editProfile", { name: profile?.name ?? t("common.athlete") })}
         >
           <UserAvatar name={profile?.name} photoURL={profile?.photoURL} size={44} />
         </button>
@@ -86,7 +88,7 @@ export function HomeTab({
       {/* Empty state */}
       {workouts.length === 0 && (
         <div style={S.cardEmpty} role="status" aria-live="polite">
-          <p>Sem treinos atribuídos pelo professor. Fale com seu instrutor.</p>
+          <p>{t("home.noWorkouts")}</p>
         </div>
       )}
     </div>

@@ -1,3 +1,5 @@
+import { getLocale } from "@/lib/i18n";
+
 const bezierPath = (points) => points.reduce((acc, p, i, arr) => {
   if (i === 0) return `M ${p.x.toFixed(1)},${p.y.toFixed(1)}`;
   const prev = arr[i - 1];
@@ -59,7 +61,7 @@ export function getTrendData(sessions) {
   const trendLabel = avgRpe <= 6 ? "↑ Aumentar carga" : trend > 0.5 ? "↑ Evoluindo" : trend < -0.5 ? "↓ Caindo" : "→ Estável";
 
   const toMs = (d) => (d?.toDate?.() ?? new Date(d)).getTime();
-  const fmtDate = (ms) => new Date(ms).toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
+  const fmtDate = (ms) => new Date(ms).toLocaleDateString(getLocale(), { day: "numeric", month: "short" });
   const firstMs = toMs(sortedSess[0].date), lastMs = toMs(sortedSess[sortedSess.length - 1].date);
   const msRange = lastMs - firstMs || 1;
   const DAY = 86400000, WEEK = 7 * DAY;

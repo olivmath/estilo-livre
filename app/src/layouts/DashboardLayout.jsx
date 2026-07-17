@@ -1,4 +1,5 @@
 import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,22 +9,16 @@ import {
 } from "lucide-react";
 
 const NAV_ITEMS = [
-  { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { key: "alunos",    label: "Alunos",    icon: Users },
-  { key: "exercicios",label: "Exercícios",icon: Dumbbell },
-  { key: "treinos",   label: "Treinos",   icon: ClipboardList },
-  { key: "ranking",   label: "Ranking",   icon: Trophy },
-  { key: "contas",    label: "Contas",    icon: UserCog, adminOnly: true },
+  { key: "dashboard", labelKey: "dashboard.navDashboard", icon: LayoutDashboard },
+  { key: "alunos",    labelKey: "dashboard.navStudents",   icon: Users },
+  { key: "exercicios",labelKey: "dashboard.navExercises",  icon: Dumbbell },
+  { key: "treinos",   labelKey: "dashboard.navWorkouts",   icon: ClipboardList },
+  { key: "ranking",   labelKey: "dashboard.navRanking",    icon: Trophy },
+  { key: "contas",    labelKey: "dashboard.navAccounts",   icon: UserCog, adminOnly: true },
 ];
 
-const ROLE_LABEL = {
-  admin:     "Administrador",
-  professor: "Professor",
-  aluno:     "Aluno",
-  pendente:  "Pendente",
-};
-
 export function DashboardLayout() {
+  const { t } = useTranslation();
   const { profile, role } = useAuth();
   const location = useLocation();
 
@@ -52,7 +47,7 @@ export function DashboardLayout() {
         })}
       >
         <Icon size={18} />
-        <span>{item.label}</span>
+        <span>{t(item.labelKey)}</span>
       </NavLink>
     );
   }
@@ -92,8 +87,8 @@ export function DashboardLayout() {
         }}
       >
         <div>
-          <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.2em", color: "var(--sub)", lineHeight: 1 }}>ACADEMIA</p>
-          <p style={{ fontSize: 14, fontWeight: 800, color: "var(--acc)", letterSpacing: "0.05em", lineHeight: 1.2 }}>ESTILO LIVRE</p>
+          <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.2em", color: "var(--sub)", lineHeight: 1 }}>{t("auth.academia")}</p>
+          <p style={{ fontSize: 14, fontWeight: 800, color: "var(--acc)", letterSpacing: "0.05em", lineHeight: 1.2 }}>{t("auth.estiloLivre")}</p>
         </div>
         {avatar}
       </header>
@@ -113,9 +108,9 @@ export function DashboardLayout() {
       >
         {/* Logo */}
         <div style={{ padding: "8px 12px 20px", marginBottom: 8 }}>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", color: "var(--sub)" }}>ACADEMIA</p>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", color: "var(--sub)" }}>{t("auth.academia")}</p>
           <p style={{ fontSize: 18, fontWeight: 800, color: "var(--acc)", letterSpacing: "0.05em" }}>
-            ESTILO LIVRE
+            {t("auth.estiloLivre")}
           </p>
         </div>
 
@@ -139,7 +134,7 @@ export function DashboardLayout() {
                 {profile?.name ?? "…"}
               </p>
               <p style={{ fontSize: 11, color: "var(--sub)" }}>
-                {ROLE_LABEL[role] ?? role}
+                {t(`roles.${role}`) ?? role}
               </p>
             </div>
           </div>
@@ -157,7 +152,7 @@ export function DashboardLayout() {
             onMouseLeave={(e) => e.currentTarget.style.color = "var(--sub)"}
           >
             <LogOut size={15} />
-            Sair
+            {t("common.logout")}
           </button>
           <p style={{ fontSize: 10, color: "var(--sub)", opacity: 0.4, padding: "0 12px" }}>
             v{__APP_VERSION__}
@@ -206,7 +201,7 @@ export function DashboardLayout() {
               }}
             >
               <Icon size={20} />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </NavLink>
           );
         })}
