@@ -206,7 +206,7 @@
     "easy": "Easy",
     "medium": "Medium",
     "max": "Max",
-    "labels": ["Very easy", "Easy", "Light", "Light moderate", "Moderate", "Moderate intense", "Intense", "Very intense", "Exhausting", "Almost max", "Maximum"]
+    "labels": ["Didn't even feel it", "Could do this all day", "Very easy", "Could do a lot more", "Could do more", "Challenging, but controlled", "Felt the weight, finished well", "Hard, almost at my limit", "At my limit", "Almost couldn't finish", "Couldn't do any more"]
   },
 
   "summary": {

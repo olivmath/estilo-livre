@@ -206,7 +206,7 @@
     "easy": "Fácil",
     "medium": "Medio",
     "max": "Máximo",
-    "labels": ["Muy fácil", "Fácil", "Leve", "Moderado leve", "Moderado", "Moderado intenso", "Intenso", "Muy intenso", "Agotador", "Casi máximo", "Máximo"]
+    "labels": ["Ni lo sentí", "Podría hacerlo todo el día", "Muy tranquilo", "Podría hacer mucho más", "Podría hacer más", "Desafiante, pero controlado", "Sentí el peso, terminé bien", "Difícil, casi en mi límite", "En mi límite", "Casi no pude terminar", "No podría hacer nada más"]
   },
 
   "summary": {

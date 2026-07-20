@@ -1,20 +1,19 @@
+import * as React from "react"
+import * as SliderPrimitive from "@radix-ui/react-slider"
 import { cn } from "@/lib/utils"
 
-function Slider({ min = 0, max = 100, step = 1, value, onValueChange, className, style }) {
-  const current = Array.isArray(value) ? value[0] : (value ?? min);
-
-  return (
-    <input
-      type="range"
-      min={min}
-      max={max}
-      step={step}
-      value={current}
-      onChange={(e) => onValueChange?.([Number(e.target.value)])}
-      className={cn("w-full cursor-pointer", className)}
-      style={{ accentColor: "var(--acc)", height: 20, ...style }}
-    />
-  );
-}
+const Slider = React.forwardRef(({ className, ...props }, ref) => (
+  <SliderPrimitive.Root
+    ref={ref}
+    className={cn("relative flex w-full touch-none select-none items-center py-3", className)}
+    {...props}
+  >
+    <SliderPrimitive.Track className="relative h-3 w-full grow overflow-hidden rounded-full" style={{ background: "var(--bg3)" }}>
+      <SliderPrimitive.Range className="absolute h-full" style={{ background: "var(--acc)" }} />
+    </SliderPrimitive.Track>
+    <SliderPrimitive.Thumb className="block h-11 w-11 rounded-full border-2 shadow-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" style={{ background: "var(--acc)", borderColor: "var(--acc)" }} />
+  </SliderPrimitive.Root>
+))
+Slider.displayName = SliderPrimitive.Root.displayName
 
 export { Slider }
