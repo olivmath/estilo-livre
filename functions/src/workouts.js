@@ -4,6 +4,7 @@ const { requireAuth, requireAdminOrProf } = require("./helpers");
 
 const db = admin.firestore();
 
+
 exports.getTemplates = onCall({ region: "us-central1" }, async (request) => {
   requireAuth(request);
   const snap = await db.collection("wk_templates").orderBy("label").get();

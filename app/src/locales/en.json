@@ -381,7 +381,8 @@
     "assigning": "Assigning…",
     "assign": "Assign",
     "confirmDelete": "Delete workout?",
-    "exercises": "Exercises"
+    "exercises": "Exercises",
+    "autoAssign": "Auto-assign to new students"
   },
 
   "rankingPage": {

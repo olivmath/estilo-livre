@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Spinner, Field } from "@/components/shared";
+import { Checkbox } from "@/components/ui/checkbox";
 import { locName, locGroup } from "@/lib/localize";
 import { Plus, Edit2, Trash2, X, UserPlus } from "lucide-react";
 
@@ -19,7 +20,7 @@ const PALETTE = [
 
 const inputStyle = { background: "var(--bg3)", border: "1px solid var(--blue)", color: "var(--text)" };
 
-const EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [] };
+const EMPTY = { label: "A", name: "", color: PALETTE[0], exercises: [], autoAssign: false };
 
 function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
   const { t } = useTranslation();
@@ -63,7 +64,7 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
     setLoading(true);
     setError(null);
     try {
-      const payload = { label: form.label, name: form.name, color: form.color, exercises: form.exercises };
+      const payload = { label: form.label, name: form.name, color: form.color, exercises: form.exercises, autoAssign: form.autoAssign ?? false };
       if (form.id) {
         await updateTreino(form.id, payload);
       } else {
@@ -112,6 +113,11 @@ function TreinoModal({ open, onClose, initial, allExercises, onSaved }) {
               ))}
             </div>
           </Field>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <Checkbox id="tk-auto" checked={form.autoAssign ?? false} onCheckedChange={(v) => set("autoAssign", !!v)} />
+            <label htmlFor="tk-auto" style={{ fontSize: 13, color: "var(--text)", cursor: "pointer" }}>{t("treinosPage.autoAssign")}</label>
+          </div>
 
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
@@ -293,6 +299,11 @@ export function TreinosPage() {
                     }}>
                       {tr.label}
                     </span>
+                    {tr.autoAssign && (
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 20, background: "var(--green)22", color: "var(--green)" }}>
+                        Auto
+                      </span>
+                    )}
                   </div>
                   <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>{tr.name}</p>
                   <p style={{ fontSize: 12, color: "var(--sub)", marginTop: 4 }}>

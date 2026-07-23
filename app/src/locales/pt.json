@@ -381,7 +381,8 @@
     "assigning": "Atribuindo…",
     "assign": "Atribuir",
     "confirmDelete": "Deletar treino?",
-    "exercises": "Exercícios"
+    "exercises": "Exercícios",
+    "autoAssign": "Atribuir automaticamente a novos alunos"
   },
 
   "rankingPage": {

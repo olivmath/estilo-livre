@@ -52,11 +52,10 @@ export function PendingScreen() {
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             placeholder={t("pending.codePlaceholder")}
-            maxLength={6}
             style={{ textAlign: "center", letterSpacing: 4, fontSize: 18, fontWeight: 700, marginBottom: 8 }}
           />
           {error && <p style={{ color: "var(--red)", fontSize: 13, marginBottom: 8 }}>{error}</p>}
-          <Button type="submit" disabled={loading || code.trim().length < 6} style={{ width: "100%" }}>
+          <Button type="submit" disabled={loading || !code.trim()} style={{ width: "100%" }}>
             {loading ? t("common.loading") : t("pending.redeem")}
           </Button>
         </form>
