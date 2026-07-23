@@ -74,7 +74,11 @@
   "pending": {
     "title": "Access Pending",
     "message": "Your account is waiting for gym approval. Once the coach grants access, you'll be able to log in.",
-    "logout": "Logout"
+    "logout": "Logout",
+    "hasCode": "Have an invite code?",
+    "codePlaceholder": "ABC123",
+    "redeem": "Join",
+    "invalidCode": "Invalid code"
   },
 
   "nav": {
@@ -386,6 +390,14 @@
     "volume": "Volume",
     "improvement": "Improvement",
     "noData": "Not enough data for this ranking"
+  },
+
+  "inviteCode": {
+    "myCode": "My invite code",
+    "noCode": "No code generated",
+    "copy": "Copy",
+    "copied": "Copied",
+    "generate": "New code"
   },
 
   "contasPage": {

@@ -1,9 +1,26 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const { requireAuth, requireAdmin } = require("./helpers");
+const { requireAuth, requireAdmin, requireAdminOrProf } = require("./helpers");
 
 const db = admin.firestore();
+
+function generateCode() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+async function createInviteCodeForProfessor(uid, name) {
+  const code = generateCode();
+  await db.collection("invite_codes").doc(code).set({
+    professorUid: uid,
+    professorName: name ?? "",
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  return code;
+}
 
 const SEEDED_ROLES = {
   "olivmath97@gmail.com": "admin",
@@ -37,7 +54,7 @@ async function migrateUserSubcollections(oldUid, newUid) {
 exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
   const email = user.email;
   const inviteSnap = await db.collection("invites").doc(email).get();
-  let role = SEEDED_ROLES[email] ?? "negado";
+  let role = SEEDED_ROLES[email] ?? "pendente";
   let extra = {};
 
   if (inviteSnap.exists) {
@@ -70,6 +87,10 @@ exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
   });
 
   await admin.auth().setCustomUserClaims(user.uid, { role });
+
+  if (role === "professor" || role === "admin") {
+    await createInviteCodeForProfessor(user.uid, user.displayName ?? "");
+  }
 });
 
 exports.getMyRole = onCall({ region: "us-central1" }, async (request) => {
@@ -88,4 +109,39 @@ exports.setUserRole = onCall({ region: "us-central1" }, async (request) => {
   await db.collection("users").doc(targetUid).update({ role: newRole });
   await admin.auth().setCustomUserClaims(targetUid, { role: newRole });
   return { ok: true };
+});
+
+exports.redeemInviteCode = onCall({ region: "us-central1" }, async (request) => {
+  const auth = requireAuth(request);
+  const { code } = request.data;
+  if (!code || typeof code !== "string" || !code.trim())
+    throw new HttpsError("invalid-argument", "Code is required");
+
+  const snap = await db.collection("invite_codes").doc(code.trim().toUpperCase()).get();
+  if (!snap.exists) throw new HttpsError("not-found", "Invalid invite code");
+
+  const { professorUid, professorName } = snap.data();
+  await db.collection("users").doc(auth.uid).update({
+    role: "aluno",
+    professorId: professorUid,
+  });
+  await admin.auth().setCustomUserClaims(auth.uid, { role: "aluno" });
+  return { success: true, professorName };
+});
+
+exports.getMyInviteCode = onCall({ region: "us-central1" }, async (request) => {
+  const auth = requireAdminOrProf(request);
+  const snap = await db.collection("invite_codes").where("professorUid", "==", auth.uid).limit(1).get();
+  if (snap.empty) return { code: null };
+  return { code: snap.docs[0].id };
+});
+
+exports.generateInviteCode = onCall({ region: "us-central1" }, async (request) => {
+  const auth = requireAdminOrProf(request);
+  const existing = await db.collection("invite_codes").where("professorUid", "==", auth.uid).get();
+  const batch = db.batch();
+  existing.docs.forEach((d) => batch.delete(d.ref));
+  await batch.commit();
+  const code = await createInviteCodeForProfessor(auth.uid, auth.token?.name ?? "");
+  return { code };
 });

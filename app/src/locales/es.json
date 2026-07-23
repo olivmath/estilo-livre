@@ -74,7 +74,11 @@
   "pending": {
     "title": "Acceso Pendiente",
     "message": "Tu cuenta está esperando la aprobación del gimnasio. Cuando el profesor apruebe tu acceso, podrás ingresar.",
-    "logout": "Salir"
+    "logout": "Salir",
+    "hasCode": "Tienes un codigo de invitacion?",
+    "codePlaceholder": "ABC123",
+    "redeem": "Entrar",
+    "invalidCode": "Codigo invalido"
   },
 
   "nav": {
@@ -386,6 +390,14 @@
     "volume": "Volumen",
     "improvement": "Mejora",
     "noData": "Sin datos suficientes para este ranking"
+  },
+
+  "inviteCode": {
+    "myCode": "Mi codigo de invitacion",
+    "noCode": "Ningun codigo generado",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "generate": "Nuevo codigo"
   },
 
   "contasPage": {

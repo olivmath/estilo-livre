@@ -1,21 +1,42 @@
 import { useEffect, useRef, useState } from "react";
 
-// Elapsed-time clock + rest countdown for an active workout session.
-function beep() {
+function playBellSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.connect(g);
-    g.connect(ctx.destination);
-    o.frequency.value = 880;
-    o.type = "sine";
-    g.gain.setValueAtTime(0.3, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    o.start();
-    o.stop(ctx.currentTime + 0.5);
-  } catch (e) {
-    console.error(e);
+    const t = ctx.currentTime;
+    const dur = 2;
+
+    const tones = [
+      { freq: 150, gain: 0.5 },
+      { freq: 400, gain: 0.3 },
+      { freq: 800, gain: 0.15 },
+    ];
+
+    tones.forEach(({ freq, gain: vol }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(vol, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur);
+    });
+
+    const strike = ctx.createOscillator();
+    const strikeGain = ctx.createGain();
+    strike.type = "square";
+    strike.frequency.setValueAtTime(300, t);
+    strikeGain.gain.setValueAtTime(0.4, t);
+    strikeGain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+    strike.connect(strikeGain);
+    strikeGain.connect(ctx.destination);
+    strike.start(t);
+    strike.stop(t + 0.08);
+  } catch {
+    /* AudioContext may be unavailable */
   }
 }
 
@@ -46,7 +67,7 @@ export function useWorkoutTimers(activeWk, showSummary, restTime, setRestTime) {
         setRestTime((prev) => {
           if (prev <= 1) {
             clearInterval(restTimerRef.current);
-            beep();
+            playBellSound();
             return null;
           }
           return prev - 1;

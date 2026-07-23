@@ -30,7 +30,7 @@ app/src/
 ├── pages/                      # Admin/prof pages (Dashboard, Alunos, Exercicios, Treinos, Ranking, Contas)
 ├── screens/                    # Role entry points (Login, Pending, StudentApp, ActiveWorkout, Hello)
 ├── services/                   # Thin wrappers over call() per domain
-│   └── accounts / dashboard / exercises / ranking / sessions / users / workouts
+│   └── accounts / dashboard / exercises / invites / ranking / sessions / users / workouts
 ├── components/ui/              # shadcn components (button, badge, checkbox, …)
 ├── components/student/         # StudentApp tab/overlay components (ver catálogo abaixo)
 └── components/workout/         # ActiveWorkoutScreen components (ver catálogo abaixo)
@@ -89,6 +89,7 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | `EditWeightModal.jsx` | shadcn `Dialog` para ajustar carga padrão |
 | `RpeTutorialSheet.jsx` | shadcn `Sheet` explicando o RPE |
 | `shared.js` | Tokens de estilo + helpers (`diffColor`, `fmtDateFull`, …) |
+| `InviteCodeCard.jsx` | Card com código de convite do professor (copiar/gerar novo) |
 
 **Componentes (`app/src/components/workout/`):**
 

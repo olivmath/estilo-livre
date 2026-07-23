@@ -6,11 +6,12 @@ const db = admin.firestore();
 const msDay = 86400000;
 
 exports.getStudents = onCall({ region: "us-central1" }, async (request) => {
-  requireAdminOrProf(request);
-  const snap = await db.collection("users")
-    .where("role", "==", "aluno")
-    .orderBy("name")
-    .get();
+  const auth = requireAdminOrProf(request);
+  let query = db.collection("users").where("role", "==", "aluno");
+  if (auth.token?.role === "professor") {
+    query = query.where("professorId", "==", auth.uid);
+  }
+  const snap = await query.orderBy("name").get();
   return snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
 });
 

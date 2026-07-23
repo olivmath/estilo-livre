@@ -26,6 +26,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Spinner, UserAvatar, Field } from "@/components/shared";
 import { locName, locGroup } from "@/lib/localize";
 import { X, Plus, Search, Trash2, ChevronRight, ChevronDown, Lock, KeyRound, Edit2, ChevronUp } from "lucide-react";
+import { InviteCodeCard } from "@/components/student/InviteCodeCard";
 
 const PALETTE = [
   "#2352c8", "#1B3487", "#F5C400", "#00c853", "#f44336",
@@ -846,6 +847,7 @@ export function AlunosPage() {
 
   return (
     <div style={{ padding: "20px 16px", maxWidth: 900, margin: "0 auto" }}>
+      <InviteCodeCard />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{t("alunosPage.title")}</h1>
         <Button size="sm" onClick={() => setNovoOpen(true)}>

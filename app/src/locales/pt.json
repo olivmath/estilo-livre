@@ -74,7 +74,11 @@
   "pending": {
     "title": "Acesso Pendente",
     "message": "Sua conta está aguardando aprovação da academia. Assim que o professor liberar seu acesso, você poderá entrar.",
-    "logout": "Sair"
+    "logout": "Sair",
+    "hasCode": "Tem um código de convite?",
+    "codePlaceholder": "ABC123",
+    "redeem": "Entrar",
+    "invalidCode": "Código inválido"
   },
 
   "nav": {
@@ -386,6 +390,14 @@
     "volume": "Volume",
     "improvement": "Melhoria",
     "noData": "Sem dados suficientes para este ranking"
+  },
+
+  "inviteCode": {
+    "myCode": "Meu código de convite",
+    "noCode": "Nenhum código gerado",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "generate": "Gerar novo"
   },
 
   "contasPage": {
