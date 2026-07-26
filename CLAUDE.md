@@ -73,6 +73,7 @@ Todo componente/hook aqui tem <150 linhas (ver Tamanho de Arquivo). **Reutilizar
 | `useUpdateSetsReps.js` | Persiste edição de séries/reps no Firestore |
 | `useUploadPhoto.js` | Upload/crop de foto de perfil |
 | `useCelebrateCycle.js` | Dispara confete ao completar o loop |
+| `useShareWorkout.js` | Captura summary como imagem e compartilha via Web Share API |
 
 **Componentes (`app/src/components/student/`):**
 
