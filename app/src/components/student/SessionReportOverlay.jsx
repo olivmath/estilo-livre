@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { Share2 } from "lucide-react";
 import { locName } from "@/lib/localize";
 import { S, diffColor, fmtDateFull, fmtDur, fmtVol } from "@/components/student/shared";
 import { SessionEditOverlay } from "./SessionEditOverlay";
 import { updateStudentSession } from "@/services/sessions";
 import { useAuth } from "@/contexts/AuthContext";
+import { useShareWorkout } from "@/hooks/useShareWorkout";
 
 export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const captureRef = useRef(null);
+  const { share, sharing } = useShareWorkout();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -41,7 +45,7 @@ export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
 
   return (
     <div style={{ ...S.overlay, overflowY: "auto" }}>
-      <div style={{ width: "100%", maxWidth: 400, background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 20, padding: "24px 20px", boxShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
+      <div ref={captureRef} style={{ width: "100%", maxWidth: 400, background: "var(--bg2)", border: "1px solid var(--blue)", borderRadius: 20, padding: "24px 20px", boxShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
         <div style={{ paddingBottom: 16, marginBottom: 16, position: "relative", borderBottom: `3px solid ${session.wkColor}` }}>
           <button onClick={onClose} style={{ position: "absolute", top: 0, right: 0, background: "none", border: "none", color: "var(--sub)", fontSize: 18, cursor: "pointer" }}>✕</button>
           <span style={{ fontSize: 10, fontWeight: 700, color: session.wkColor, letterSpacing: 2 }}>{t("sessionReport.title")}</span>
@@ -76,6 +80,9 @@ export function SessionReportOverlay({ session, onClose, onSessionUpdated }) {
 
         <div style={{ display: "flex", gap: 12 }}>
           <button onClick={onClose} style={{ ...S.btnSecondary, flex: 1 }}>{t("common.close")}</button>
+          <button onClick={() => share(captureRef, session.wkName)} disabled={sharing} style={{ ...S.btnSecondary, flex: 0, padding: "14px 16px" }}>
+            <Share2 size={16} />
+          </button>
           <button onClick={() => setIsEditing(true)} style={{ ...S.btnPrimary, flex: 1 }}>{t("common.edit")}</button>
         </div>
       </div>
